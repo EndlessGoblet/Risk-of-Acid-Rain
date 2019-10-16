@@ -1,8 +1,13 @@
+#macro item mod_variable_get("mod", "itemlib", "ItemDirectory")
+
 #define init
 if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
 //DEBUG
 global.debug = true;
 //Create important initial variables
+global.AnomalyGet  = 0;
+global.HardmodeGet = 0;
+
 global.difficulty = 0;
 global.time = 0;
 global.frame = 0;
@@ -27,9 +32,9 @@ if (instance_exists(CharSelect)) CharSelect.closeSettings = true;
 if (instance_exists(Player)) Player.debug = false;
 //Main Menu (Splash screen?)
 global.menu = false;
-global.sprSplash = sprite_add("splash.png", 1, 320, 240);
-global.sprVersion = sprite_add("sprVersion.png", 1, 93, 20);
-global.sprOutline = sprite_add("sprOutline.png", 1, 93, 20);
+global.sprSplash  = sprite_add("sprites/other/splash.png", 1, 320, 240);
+global.sprVersion = sprite_add("sprites/other/sprVersion.png", 1, 93, 20);
+global.sprOutline = sprite_add("sprites/other/sprOutline.png", 1, 93, 20);
 if (instance_exists(CharSelect)) global.menu = true;
 //set new level function
 global.newLevel = instance_exists(GenCont);
@@ -44,8 +49,6 @@ while(true){
 	global.hasGenCont = instance_exists(GenCont);
 	wait 1;
 }
-
-
 
 #define level_start
 //Reset vars
@@ -172,6 +175,20 @@ var SpawnY = Player.y + y_
 }
 }
 #define step
+if global.AnomalyGet = false && instance_exists(Player) && Player.race = "horror"
+{
+	if ultra_get("horror", 2) = true
+	{
+		global.AnomalyGet = true
+		repeat(2) get_item(item[? "energy"])
+	}
+}
+if global.HardmodeGet = false && instance_exists(Player) && UberCont.hardmode = true && !instance_exists(SpiralCont)
+{
+	global.HardmodeGet = true
+	get_item(item[? "times"])
+}
+
 if instance_exists(CharSelect) {
 if "debugSet" in self {
 global.debug = CharSelect.debugSet
@@ -313,7 +330,7 @@ if !instance_exists(Spiral) && global.teleporter == true && point_in_circle(x, y
 global.chargeF++
 if global.chargeF == round(room_speed / 1.5){
 global.chargeF = 0;
-global.charge += 1 //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
+global.charge += 1 + item_get_count("times") * .5 //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
 if (GameCont.area = 101) global.charge += 4 //Charge faster in oasis
 with instances_matching_le(enemy,"my_health",0){
 		if object_index != Maggot {
@@ -322,7 +339,7 @@ if (roll == 10) instance_create(x, y, AmmoPickup)
         }
 }
 }
-if global.charge >= 100 {
+if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get_count("energy") * 10) {
     instance_create(Gen.x, Gen.y, Portal)
     GameCont.hard += 2
     if (GameCont.area = 1) GameCont.subarea = 3;
@@ -404,6 +421,8 @@ with (enemy) {
    if (roll >= 7) image_blend = merge_color(c_green, c_white, 1);
 }}
 #define game_start
+global.AnomalyGet  = false;
+global.HardmodeGet = false;
 Player.debug1 = 0;
 var roll = round(random_range(1, 3))
 if (roll = 1) {
@@ -472,7 +491,7 @@ if instance_exists(CharSelect)  {
         var draw_y = -5
         draw_text_nt(game_width / 2 - 152, 66 + draw_y, "@s-PATCH NOTES-")
         draw_set_font(fntChat)
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "@w-More balanced items")  
+        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "@w-More balanced items")
 
         draw_text_nt(game_width / 2 - 152, 182 + draw_y, "ITEMS: 25 @g+3 NEW ONES")
         draw_text_nt(game_width / 2 - 152, 191 + draw_y, "SHRINES: 8")
@@ -679,4 +698,7 @@ if (GameCont.area == 2) var SpawnY = Player.y - (random_range(105, 115) * negati
 	}
 }
 
+#define add_item(ITEM)																	 return mod_script_call("mod", "items","add_item"      , ITEM)
+#define get_item(ITEM)     			                         return mod_script_call("mod", "items","get_item"      , ITEM)
+#define item_get_count(ITEM)                             return mod_script_call("mod", "items","item_get_count", ITEM)
 #define draw_backdrop(XSTART, YSTART, XEND, YEND, TITLE) return mod_script_call("mod", "items", "draw_backdrop", XSTART, YSTART, XEND, YEND, TITLE)

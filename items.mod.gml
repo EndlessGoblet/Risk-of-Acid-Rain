@@ -3,13 +3,20 @@
 #define init
 global.preformanceMode = false //Turn on to avoid lag (recommended)
 
-global.sprItemChest         = sprite_add_weapon("sprItemChest.png", 8, 8);
-global.sprGoldItemChest     = sprite_add_weapon("sprGoldItemChest.png", 13, 8);
-global.sprItemChestOpen     = sprite_add("sprItemChestOpen.png", 1, 8, 7);
-global.sprGoldItemChestOpen = sprite_add("sprGoldItemChestOpen.png", 1, 13, 8);
+global.sprItemChest           = sprite_add_weapon("sprites/chests/sprItemChest.png"       ,     8, 8);
+global.sprGoldItemChest       = sprite_add_weapon("sprites/chests/sprGoldItemChest.png"   ,    13, 8);
+global.sprRustyItemChest      = sprite_add_weapon("sprites/chests/sprRustyItemChest.png"  ,     8, 8);
+global.sprLargeItemChest      = sprite_add_weapon("sprites/chests/sprLargeItemChest.png"  ,    12, 8);
+global.sprCursedItemChest     = sprite_add_weapon("sprites/chests/sprCursedItemChest.png" ,    11, 8);
+global.sprItemChestOpen       = sprite_add("sprites/chests/sprItemChestOpen.png"          , 1,  8, 8);
+global.sprGoldItemChestOpen   = sprite_add("sprites/chests/sprGoldItemChestOpen.png"      , 1, 13, 8);
+global.sprRustyItemChestOpen  = sprite_add("sprites/chests/sprRustyItemChestOpen.png"     , 1,  8, 8);
+global.sprLargeItemChestOpen  = sprite_add("sprites/chests/sprLargeItemChestOpen.png"     , 1, 12, 8);
+global.sprCursedItemChestOpen = sprite_add("sprites/chests/sprCursedItemChestOpen.png"    , 1, 11, 8);
 
-global.sprItems = sprite_add("sprItems.png", 101, 17, 17);
-global.sprText = sprite_add("sprText.png", 1, 8, 8);
+global.sprItems = sprite_add("sprites/items/sprItems.png", 101, 17, 17);
+
+global.sprText = sprite_add("sprites/other/sprText.png", 1, 8, 8);
 
 global.sprBackdropCornerTop     = sprite_add_base64("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAOSURBVBhXY0CA////AwAGCAL++VY/agAAAABJRU5ErkJggg=="     , 1, 0, 0);
 global.sprBackdropCornerBottom  = sprite_add_base64("iVBORw0KGgoAAAANSUhEUgAAAAIAAAADCAIAAAA2iEnWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAATSURBVBhXYwCC////gygYYGAAAC/lAv7Wwl7SAAAAAElFTkSuQmCC" , 1, 0, 0);
@@ -20,7 +27,7 @@ global.sprBackdropFill          = sprite_add_base64("iVBORw0KGgoAAAANSUhEUgAAAAE
 
 //global.sprHorrorBall = sprite_add("sprHorrorBall.png", 6, 48, 48);
 //global.sprIceExplosion = sprite_add("sprIceExplosion.png", 6, 32, 32);
-global.shrineIcons = sprite_add("shrineIcons.png", 16, 13, 13)
+global.shrineIcons = sprite_add("sprites/shrines/shrineIcons.png", 16, 13, 13)
 with(instances_matching(chestprop, "name", "ItemChest")) {
 instance_delete(self);
 }
@@ -39,9 +46,11 @@ global.hideDes = 0;
 global.hurtFloor = false;
 global.forceSupport = false;
 global.popoChance = 0; //Bandit mask is temporarily disabled item[? "mask"]
-global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"]   , item[? "mush"]       , item[? "grease"], item[? "boots"], item[? "chopper"]] //TO DO: None
-global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"], item[? "plate"], item[? "firewood"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
-global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]] //To-Do: None
+global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"], item[? "chopper"], item[? "locket"]] //TO DO: None
+global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"], item[? "plate"] , item[? "firewood"] , item[? "coin"]] //To-Do: coin, Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
+global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "fern"]] //To-Do: Fern
+global.CursedItems   = [item[? "dice"]      , item[? "heater"]] // Todo: dice, heater
+global.UniqueItems   = [item[? "energy"]    , item[? "times"]]
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
 if instance_exists(CharSelect) CharSelect.debug = false;
@@ -66,6 +75,7 @@ while(true){
 
 #define game_start
 Player.reloadspeed_base = Player.reloadspeed;
+Player.speed_base       = Player.maxspeed;
 Player.firewoodCharge = 0;
 Player.firewoodKills = 0;
 Player.s_Combat = 0;
@@ -74,22 +84,36 @@ global.PlayerItems = [item[? "none"]]
 global.descriptionTimer = 0;
 global.settings = false;
 #define level_start
+var amount = item_get_count("dice");
+if amount >= 1{reorder()}
+
 Player.s_Combat = 0;
 Player.s_Challenge = 0;
 
 //Perfect Prize
 if global.hurtFloor = false
 {
-	var amount = item_get_count("prize"),
-	    _i     = 0,
-			_ang   = random(360);
-	if amount >= 1
+	var _floorq = ds_list_create(),
+	    _i      = 0;
+	with Floor // get a list of all "unoccupied" Floors
 	{
-		with obj_create(Player.x + lengthdir_x(_ang + 360/amount* 2 * i, _ang), Player.y + lengthdir_y(_ang + 360/amount* 2 * i, _ang), "ItemChest") {tag = "gold"; sprite_index = global.sprGoldItemChest; spr_open = global.sprGoldItemChestOpen; spr_shadow = shd32} obj_create(mouse_x, mouse_y, "ItemChest")
-		i++
-				 obj_create(Player.x + lengthdir_x(_ang + 360/amount* 2 * i, _ang), Player.y + lengthdir_y(_ang + 360/amount* 2 * i, _ang), "ItemChest")
-		i++
+		if !place_meeting(x, y, prop) && !place_meeting(x, y, chestprop) && !place_meeting(x, y, Wall) && self != FloorExplo
+		{
+			_floorq[| _i] = self;
+			_i++;
+		}
 	}
+
+	var amount = item_get_count("prize");
+	if amount >= 1 repeat(amount)
+	{
+		ds_list_shuffle(_floorq)
+		with obj_create(_floorq[| 0].x - 16, _floorq[| 0].y - 16, "ItemChest") {tag = "gold"; chest_setup(tag); with instance_place(x, y, Wall){instance_delete(self)}}
+		ds_list_delete(_floorq, 0)
+		ds_list_shuffle(_floorq)
+		with obj_create(_floorq[| 0].x - 16, _floorq[| 0].y - 16, "ItemChest") {with instance_place(x, y, Wall){instance_delete(self)}}
+	}
+	ds_list_destroy(_floorq)
 }
 global.hurtFloor = false;
 //Perfect Prize
@@ -346,17 +370,7 @@ if (type == "Crowns") {
 
 if (type == "Order")
 {
-  var amount_common   = 0
-			amount_uncommon = 0
-			amount_rare     = 0
-	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 0{amount_common   += global.PlayerItems[i].count}};
-	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 1{amount_uncommon += global.PlayerItems[i].count}};
-	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 2{amount_rare     += global.PlayerItems[i].count}};
-	global.PlayerItems =  []
-	global.PlayerItems[0] = item[? "none"]
-	global.PlayerItems[1] = global.CommonItems[random_range(0, array_length(global.CommonItems))]     ;global.PlayerItems[1].count = amount_common
-	global.PlayerItems[2] = global.UncommonItems[random_range(0, array_length(global.UncommonItems))] ;global.PlayerItems[2].count = amount_uncommon
-	global.PlayerItems[3] = global.RareItems[random_range(0, array_length(global.RareItems))]         ;global.PlayerItems[3].count = amount_rare
+  reorder();
 	sound_play_pitch(sndLilHunterAppear, 0.5)
 	with instance_create(x,y,GreenExplosion) { damage = 0; mask_index = mskNone}
 	with instance_create(Player.x, Player.y, PopupText)
@@ -428,13 +442,8 @@ switch(obj_name) {
 			spr_shadow = shd24;
 			spr_open = global.sprItemChestOpen;
 			sprite_index = global.sprItemChest;
-			if irandom(99) = 0 && "tag" not in self // 1% chance to turn regular chests into gold chests
-			{
-				tag = "gold";
-				sprite_index = global.sprGoldItemChest;
-				spr_open = global.sprGoldItemChestOpen;
-				spr_shadow = shd32;
-			}
+			if irandom(99) = 0 tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
+			chest_setup(tag)
 			on_open = itemchest_open;
 	}
 	return _obj;
@@ -456,6 +465,10 @@ global.descriptionTimer = room_speed * 4
 if ITEM = item[? "gift"] repeat(2)
 {
 	get_item(global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))])
+}
+if ITEM = item[? "dice"] repeat(2)
+{
+	get_item(global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))])
 }
 add_item(ITEM)
 
@@ -480,7 +493,8 @@ with instances_matching(enemy, "walled", true)
 with instances_matching(chestprop, "name", "ItemChest"){
 	 if "tag" in self switch tag
 	 {
-		 case "gold": if irandom(19) = 0 with instance_create( x+random_range(-8, 8), y+random_range(-13,13), CaveSparkle) depth = other.depth - 1; break;
+		 case "gold"   : if irandom(19) = 0 with instance_create( x+random_range(-8, 8), y+random_range(-13,13), CaveSparkle) depth = other.depth - 1; break;
+		 case "cursed" : if irandom( 4) = 0 instance_create(x+random_range(-5, 5), y+random_range( -8, 8), Curse); break;
 	 }
 
 	 if place_meeting(x, y, Player) || place_meeting(x, y, PortalShock) || instance_exists(BigPortal){
@@ -524,8 +538,35 @@ global.hurtFloor = true;
 //Cheats--------------------------------------------------------------------------------------------------------------------------------------------------------
 with (Player) {
 if(button_pressed(index, "horn")) {
-	if (Player.debug == true) {with obj_create(mouse_x, mouse_y, "ItemChest") {tag = "gold"; sprite_index = global.sprGoldItemChest; spr_open = global.sprGoldItemChestOpen; spr_shadow = shd32} obj_create(mouse_x, mouse_y, "ItemChest")
-    }
+	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth"
+	{
+		with obj_create(mouse_x, mouse_y, "ItemChest")
+		{
+			tag = "gold"
+			chest_setup(tag)
+		}
+		with obj_create(mouse_x, mouse_y, "ItemChest")
+		{
+			tag = "rusty"
+			chest_setup(tag)
+		}
+		with obj_create(mouse_x, mouse_y, "ItemChest")
+		{
+			tag = "large"
+			chest_setup(tag)
+		}
+		with obj_create(mouse_x, mouse_y, "ItemChest")
+		{
+			tag = "cursed"
+			chest_setup(tag)
+		}
+		obj_create(mouse_x, mouse_y, "ItemChest")
+		/*with obj_create(mouse_x, mouse_y, "ItemChest")
+		{
+			tag = "test"
+			chest_setup(tag)
+		}*/
+	}
       var FreeItem = "Chopper" //Cheats
       //global.PlayerItems[array_length_1d(global.PlayerItems)] = FreeItem; var amount = 0; for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) { if (global.PlayerItems[i] == FreeItem) amount++    }
 	}
@@ -534,7 +575,8 @@ if(button_pressed(index, "horn")) {
 global.frame += current_time_scale; if (global.frame == 60) global.frame = 0;
 //WHAT DO ITEMS DO YOU MAY ASK???
 
-var extra_reload = 0;
+var extra_reload = 0,
+    extra_speed  = 0;
 
 //inside information (more damage to IDPD and they drop more stuff)
 var amount = item_get_count("info");
@@ -555,8 +597,6 @@ with instances_matching_le(choice,"my_health",0){
     if (roll == 1) { instance_create(Player.x, Player.y, AmmoPickup); } }
 }
 //inside information (more damage to IDPD and they drop more stuff)
-
-
 
 //radi gumdrop (heal overtime)
 var amount = item_get_count("gumdrop");
@@ -592,7 +632,6 @@ with instances_matching(projectile, "team", 2) {
        }}}}}}
 //Mechanical Lens (Homing
 
-
 //Golden Shots (random crits)
 var amount = item_get_count("golden");
 if amount >= 1 {
@@ -609,8 +648,6 @@ crit = 1;
 }
 }}
 //Golden Shots (random crits)
-
-
 
 //Radiated Snack
 var amount = item_get_count("snack");
@@ -900,6 +937,7 @@ with (Player) {
     var _size = amount * 0.075; if (_size > .6) _size = .6
     image_xscale = 1 - _size
     image_yscale = 1 - _size
+		extra_speed += .15
 }
 }
 //Mini-Mush
@@ -987,7 +1025,7 @@ if (Player.firewoodKills) >= 10 {
 //Ammo Extractor
 var amount = item_get_count("extractor");
 if amount >= 1 {
-	with instances_matching_le(enemy,"my_health",0){if Player.infammo < room_speed * 1 Player.infammo += room_speed * (size + .5) * .5}
+	 if instance_exists(Player) with instances_matching_le(enemy,"my_health",0){if Player.infammo < room_speed * 1 Player.infammo += room_speed * (size + .5) * .5}
 }
 //Ammo Extractor
 
@@ -998,19 +1036,39 @@ if amount >= 1 {
 if distance_to_object(enemy) <= (15 + (amount * 5)) {
     var roll = round(random_range(1, (30 / amount)))
     var Near = instance_nearest(x, y, enemy)
-        if (roll == 1) with instance_create(x, y, Slash) {
+        if (roll == 1) with instance_create(x, y, Shank) {
         direction = point_direction(x, y, Near.x, Near.y);
         image_angle = direction
         team = 2;
+				damage =  6
         }
 }
 }}
 //Chopper
 
+//Broken Locket
+var amount = item_get_count("locket");
+if amount >= 1
+{
+	with instances_matching(enemy, "my_health", 0)
+	{
+		if irandom(91 - amount * 3) = 0 // 5% base chance to drop chest + 2% per stack
+		{
+			with obj_create(x, y, "ItemChest")
+			{
+				tag = "rusty";
+				chest_setup(tag)
+			}
+		}
+	}
+}
+//Broken Locket
+
 //Stat changes
 if instance_exists(Player)
 {
 	Player.reloadspeed = Player.reloadspeed_base + extra_reload + (skill_get(mut_stress) * (1 - Player.my_health/Player.maxhealth)) + ultra_get(char_venuz,1) * .4
+	Player.maxspeed    = Player.speed_base       + extra_speed  + (skill_get(mut_extra_feet) * .5)
 }
 
 with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction instance_destroy()}
@@ -1169,7 +1227,6 @@ if (global.descriptionTimer > 0)
 }
 
 #define draw_pause
-
  var cx     = view_xview,
      cy     = view_yview,
 	   draw_x = 23,
@@ -1177,19 +1234,18 @@ if (global.descriptionTimer > 0)
 //draw_text_nt(cx + 20, cy + 55, "GAME IS PAUSED UWU");
 // ":(", -Karmelyth
 
-draw_backdrop(cx + draw_x-23, cy + draw_y-58, cx + draw_x+293, cy + draw_y-55 + 19 * (floor(array_length(global.PlayerItems) / (16)) + 1), "")
+draw_backdrop(cx + draw_x-23, cy + draw_y-58, cx + draw_x+293, cy + draw_y-54 + 20 * (ceil(array_length(global.PlayerItems) / 15)), "")
 
-for(i = 0; i < array_length_1d(global.PlayerItems); i++)
+for(i = 1; i < array_length_1d(global.PlayerItems); i++)
 {
-	if i != 0
-  {
 		var _hover   = false,
 		    maxitems = 15, // 15 items per line
 		    line     = 0,  // what line the item is on
 		    itemx    = i,  // xposition (first item, second item... 15th item)
 		    maxline  = round(floor(array_length(global.PlayerItems) / (maxitems + 1))) // absolute amount of lines (for the descrption)
-		line = round(floor((itemx) / (maxitems + 1)))
-		itemx = i mod (maxitems + 1) + line mod 2
+		line = ceil(i / maxitems) - 1
+		itemx = i mod maxitems
+		if itemx = 0 itemx = maxitems
 		draw_set_font(fntM)
 		var _nl = string_width(string_upper(global.PlayerItems[i].name))
 		draw_set_font(fntSmall)
@@ -1202,14 +1258,13 @@ for(i = 0; i < array_length_1d(global.PlayerItems); i++)
 			_hover = true;
 			var _biglength = clamp(cx + (itemx * 21) - 20, 0, view_xview + game_width - _boxwidth - 3)
 
-			draw_backdrop(_biglength - 1, cy + 52 + (20 * (maxline + 1)), _biglength - 1 + _boxwidth, cy + 50 + (22 * (maxline + 1)) + string_height(string_upper(global.PlayerItems[i].name)) + string_height(string_upper(global.PlayerItems[i].description_small)), string_upper(global.PlayerItems[i].name))
+			draw_backdrop(_biglength - 1, cy + 55 + (20 * (maxline + 1)), _biglength - 1 + _boxwidth, cy + 53 + (22 * (maxline + 1)) + string_height(string_upper(global.PlayerItems[i].name)) + string_height(string_upper(global.PlayerItems[i].description_small)), string_upper(global.PlayerItems[i].name))
 			draw_set_font(fntSmall)
-			draw_text_nt(_biglength + 2, cy + 61 + (20 * (maxline + 1)), string_upper(global.PlayerItems[i].description_small))
+			draw_text_nt(_biglength + 2, cy + 64 + (20 * (maxline + 1)), string_upper(global.PlayerItems[i].description_small))
 		}
 		draw_sprite_ext(global.sprItems, global.PlayerItems[i].spr_index, cx + (itemx * 21) - 1, cy + 45 + (20 * (line + 1)) - _hover, 1, 1, 0, merge_colour(c_black, c_white, .9 + _hover * .1), 1) //sprUltraLevel
 		draw_set_font(fntChat)
 		if global.PlayerItems[i].count > 1 draw_text_nt(cx + (itemx * 21) - 1 - 7, cy + 45 + (20 * (line + 1)) - 8 - _hover,"x" + string(global.PlayerItems[i].count))
-	}
 }
 
 
@@ -1275,23 +1330,72 @@ sound_play(sndAmmoChest);
 var tem = 0
 if "tag" in self
 {
+	var roll = irandom(99);
 	switch tag
 	{
-		case "gold" : tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]   //GET RARE
-	}
-}
-else // base rarity
-{
-	var roll = random_range(1, 100) //1, 100
-	if (roll <= 65) {
-		tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]   //GET COMMON
-		global.rarity = "common"
-	} else if (roll >= 90) {
-		tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]   //GET RARE
-		global.rarity = "RARE"
-	} else {
-		tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]    //GET UNCOMMON
-		global.rarity = "Uncommon"
+		case "gold"   : if roll <= 99 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
+									  break;
+		case "rusty"  : if roll <= 94 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
+									  else          {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
+									  break;
+		case "large"  : if roll <= 79 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
+									  else          {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
+									  break;
+		case "cursed"	: if roll <= 99 {tem = global.CursedItems[round(random_range(0, array_length_1d(global.CursedItems) - 1))]    }
+										break;
+		case "test"   : tem = item[? "dice"] // this is for testing
+								    break;
+		case "none"   :
+		default       : if roll <= 64 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
+									  if roll >  64 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
+                    if roll >= 89 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
+									  break;
 	}
 }
 get_item(tem)
+
+#define chest_setup(TAG)
+switch TAG
+{
+	case "gold"     :
+		sprite_index = global.sprGoldItemChest
+		spr_open = global.sprGoldItemChestOpen
+		spr_shadow = shd32
+		break;
+	case "rusty"    :
+		sprite_index = global.sprRustyItemChest
+		spr_open = global.sprRustyItemChestOpen
+		spr_shadow = shd16
+		spr_shadow_y = 3
+		break;
+	case "large"    :
+		sprite_index = global.sprLargeItemChest
+		spr_open = global.sprLargeItemChestOpen
+		spr_shadow = shd32
+		spr_shadow_y = 2
+		break;
+		case "cursed" :
+			sprite_index = global.sprCursedItemChest
+			spr_open = global.sprCursedItemChestOpen
+			spr_shadow_y = 1
+			break;
+}
+
+#define reorder()
+var amount_common   = 0,
+		amount_uncommon = 0,
+		amount_rare     = 0,
+		amount_unique   = 0;
+cursed_array [0,0] = -4
+for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 0{amount_common   += global.PlayerItems[i].count}};
+for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 1{amount_uncommon += global.PlayerItems[i].count}};
+for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 2{amount_rare     += global.PlayerItems[i].count}};
+for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 4{amount_unique   += global.PlayerItems[i].count}};
+for (var i = 0, j = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 3{cursed_array[j,0] = global.PlayerItems[i];cursed_array[j,1] = global.PlayerItems[i].count; j++}};
+global.PlayerItems =  []
+global.PlayerItems[0] = item[? "none"]
+if amount_common   > 0 {global.PlayerItems[1] = global.CommonItems[random_range(0, array_length(global.CommonItems))]     ;global.PlayerItems[1].count = amount_common  }
+if amount_uncommon > 0 {global.PlayerItems[2] = global.UncommonItems[random_range(0, array_length(global.UncommonItems))] ;global.PlayerItems[2].count = amount_uncommon}
+if amount_rare     > 0 {global.PlayerItems[3] = global.RareItems[random_range(0, array_length(global.RareItems))]         ;global.PlayerItems[3].count = amount_rare    }
+if amount_unique   > 0 {global.PlayerItems[4] = global.UniqueItems[random_range(0, array_length(global.UniqueItems))]     ;global.PlayerItems[4].count = amount_unique  }
+for (var i = 0, iLen = array_length_1d(cursed_array); i < iLen; i++){global.PlayerItems[5 + i] = cursed_array[i,0]; repeat(cursed_array[i,1])add_item(cursed_array[i,0])}

@@ -19,7 +19,7 @@ item_none = {
 	description_small : "THIS SHOULDNT APPEAR", // item description for the popup
 	description_large : "THIS SHOUDLN'T APPEAR#IF IT DOES#PLEASE CONTACT GOBLET ABOUT IT", // more detailed description for the pause menu
 	spr_index         : 0,  // index of the frame of the sprite for items
-	tier              : -1,  // -1 = untiered, 0 = common, 1 = uncommon, 2 = rare
+	tier              : -1,  // -1 = untiered, 0 = common, 1 = uncommon, 2 = rare, 3 = cursed, 4 = unique
   key               : "none"
 
 };
@@ -259,7 +259,7 @@ item_cryo_rounds = {
 #macro item_forgotten_gift item[? "gift"]
 item_forgotten_gift = {
   name              : "Forgotten Gift",
-	description_small : "+2 Items!",
+	description_small : "+2 @sCommon @wItems!",
 	description_large : "-",
 	spr_index         : 22,
 	tier              : 1
@@ -347,7 +347,7 @@ item_ammo_extractor = {
 #macro item_firewood item[? "firewood"]
 item_firewood = {
   name              : "Firewood",
-	description_small : "@sKilling gains @ycharge,@s release @ycharge @swhen @whit",
+	description_small : "@sKilling gains @ycharge@s, release @ycharge @son @whit",
 	description_large : "-",
 	spr_index         : 30,
 	tier              : 1
@@ -358,10 +358,87 @@ item_firewood = {
 #macro item_chopper item[? "chopper"]
 item_chopper = {
   name              : "Chopper",
-	description_small : "@sAuto @wslash@s at nearby enemies",
+	description_small : "@sAuto @wshank @snearby enemies",
 	description_large : "-",
 	spr_index         : 31,
 	tier              : 1
+
+};
+
+// ITEM 32: BROKEN LOCKET
+#macro item_broken_locket item[? "locket"]
+item_broken_locket = {
+  name              : "Broken Locket",
+	description_small : "@wEnemies @sdrop @wRusty Chests @son @wDeath",
+	description_large : "-",
+	spr_index         : 32,
+	tier              : 0
+
+};
+
+// ITEM 33: ANOMAL ENERGY
+#macro item_anomal_energy item[? "energy"]
+item_anomal_energy = {
+  name              : "Anomal Energy",
+	description_small : "@rTeleporters @sfinish @w10% earlier",
+	description_large : "-",
+	spr_index         : 33,
+	tier              : 4
+
+};
+
+// ITEM 34: CHAOTIC DICE
+#macro item_chaotic_dice item[? "dice"]
+item_chaotic_dice = {
+  name              : "Chaotic Dice",
+	description_small : "@w+2 @gUncommon @wItems@s, @wreorder @severy @warea",
+	description_large : "-",
+	spr_index         : 34,
+	tier              : 3
+
+};
+
+// ITEM 35: SOULFUL HEATER
+#macro item_soulful_heater item[? "heater"]
+item_soulful_heater = {
+  name              : "Soulful Heater",
+	description_small : "@sTurn all @gHealth @sinto @yArmor",
+	description_large : "-",
+	spr_index         : 35,
+	tier              : 3
+
+};
+
+// ITEM 36: LUCKY COIN
+#macro item_lucky_coin item[? "coin"]
+item_lucky_coin = {
+  name              : "Lucky Coin",
+	description_small : "@gLuck @sis on your side",
+	description_large : "-",
+	spr_index         : 36,
+	tier              : 1
+
+};
+
+// ITEM 37: GLOWING FERN
+#macro item_glowing_fern item[? "fern"]
+item_glowing_fern = {
+  name              : "Glowing Fern",
+	description_small : "@gHeal @sbeyond @rmax health",
+	description_large : "-",
+	spr_index         : 37,
+	tier              : 2
+
+};
+
+// ITEM 38: HARD TIMES
+#macro item_hard_times item[? "times"]
+item_hard_times = {
+  name              : "Hard Times",
+	description_small : "@wEnemies @sget @wstronger faster",
+	description_large : "-",
+	spr_index         : 38,
+	tier              : 4
 
 };
 
