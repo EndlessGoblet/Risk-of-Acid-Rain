@@ -1,0 +1,5 @@
+/loadmod itemlib
+/loadmod main
+/loadmod balancing
+/loadmod items
+/loadmod bounce
