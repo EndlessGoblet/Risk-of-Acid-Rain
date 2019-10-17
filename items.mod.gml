@@ -131,24 +131,24 @@ global.descriptionTimer = 0;
 //SPAWN OBJECTS ON LEVEL START
 var floors = instances_matching(Floor, mod_current, undefined);
 if global.doubleChests == false {
-var roll = round(random_range(1, 2))
-if (skill_get(28) == 1) roll = round(random_range(1, 3))
+var _roll = round(random_range(1, 2))
+if (skill_get(28) == 1) _roll = round(random_range(1, 3))
 } else {
-var roll = round(random_range(2, 4))
-if (skill_get(28) == 1) roll = round(random_range(2, 6))
+var _roll = round(random_range(2, 4))
+if (skill_get(28) == 1) _roll = round(random_range(2, 6))
 }
-if (GameCont.area = 100) var roll = 0;
-for(i = 0; i < roll; i++) {
+if (GameCont.area = 100) var _roll = 0;
+for(i = 0; i < _roll; i++) {
 var my_floor = floors[irandom(array_length(floors) - 1)];
 with(my_floor){ obj_create(x - sprite_xoffset + sprite_width / 2, y - sprite_yoffset + sprite_height / 2, "ItemChest" ); }
 }
 if global.doubleShrines != true {
-var roll = round(random_range(0, 2)) //SHRINE AMOUNTS-------------
+var _roll = round(random_range(0, 2)) //SHRINE AMOUNTS-------------
 } else {
-var roll = round(random_range(2, 4))
+var _roll = round(random_range(2, 4))
 }
-if (GameCont.area = 100) var roll = 0;
-for(i = 0; i < roll; i++) {
+if (GameCont.area = 100) var _roll = 0;
+for(i = 0; i < _roll; i++) {
 var my_floor = floors[irandom(array_length(floors) - 1)];
     with instance_create(my_floor.x, my_floor.y, CustomObject) {
     var roll2 = round(random_range(1, 80)) //CHANCES FOR EACH SHRINE----------
@@ -348,11 +348,11 @@ if (type == "Balance") { //BALANCE SHRINE---------------------
     popoSpawn();
 
         } else {
-            var roll = round(random_range(1, 4))
-           if (roll = 1) text = "NO"
-           if (roll = 2) text = "NAH"
-           if (roll = 3) text = "NOPE"
-           if (roll = 4) text = "NU"
+            var _roll = round(random_range(1, 4))
+           if (_roll = 1) text = "NO"
+           if (_roll = 2) text = "NAH"
+           if (_roll = 3) text = "NOPE"
+           if (_roll = 4) text = "NU"
            sound_play_pitch(sprProtoStatueDone, 1)
             }
     time = 10
@@ -390,8 +390,8 @@ if (type == "Printing") {
 	if array_length(global.PlayerItems) > 1 {
 	  print_array = []
 		for (var i = 0, j = 0, iLen = array_length(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 0{print_array[j] = global.PlayerItems[i];j++}};
-		var roll = print_array[random_range(0, array_length(print_array) -1)];
-		roll.count--
+		var _roll = print_array[random_range(0, array_length(print_array) -1)];
+		_roll.count--
 		get_item(itemPrint)
     if roll == global.CommonItems[itemPrint] {
     with instance_create(x,y,GreenExplosion) { damage = 0; mask_index = mskNone; }
@@ -415,12 +415,12 @@ global.popoChance = 10
     }
     } else {
     with instance_create(Player.x, Player.y, PopupText) {
-    var roll = round(random_range(1, 5))
-    if (roll == 1) text = "GO GET ITEMS"
-    if (roll == 2) text = "TOO POOR"
-    if (roll == 3) text = "FEED ME"
-    if (roll == 4) text = "NO"
-    if (roll == 5) text = "NEED ITEMS"
+    var _roll = round(random_range(1, 5))
+    if (_roll == 1) text = "GO GET ITEMS"
+    if (_roll == 2) text = "TOO POOR"
+    if (_roll == 3) text = "FEED ME"
+    if (_roll == 4) text = "NO"
+    if (_roll == 5) text = "NEED ITEMS"
     sound_play_pitch(sprProtoStatueDone, 1)
     time = 10
 }
@@ -447,7 +447,7 @@ switch(obj_name) {
 			spr_open = global.sprItemChestOpen;
 			sprite_index = global.sprItemChest;
 			if roll(1) tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
-			if tag = "none" && roll(2) tag = "large"
+			if tag = "none" && roll(4) tag = "large"
 			chest_setup(tag)
 			on_open = itemchest_open;
 	}
@@ -477,23 +477,16 @@ if ITEM = item[? "dice"] repeat(2)
 }
 add_item(ITEM)
 
-#define end_step
-with instances_matching(enemy, "walled", true) if global.MaskCounter > 0
-{
-	if speed> 0 speed = 0
-	x = xprevious
-	y = yprevious
-}
-
-
 #define step
 //Armor Mechanic
-with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal) && instance_exists(Player) { //When you get hit
-    var damageTaken = (Player.lsthealth - Player.my_health)
-   var add = Player.armor; if (Player.armor > damageTaken) add = damageTaken
-        Player.my_health += add
-        if (Player.armor > 0) Player.armor--
-        sound_play_pitch(sndSplinterPistol, 1)
+if instance_exists(Player) && Player.nexthurt = current_frame + 5 && !instance_exists(Portal)
+{ //When you get hit
+	if Player.my_health < Player.lsthealth
+	{
+		Player.my_health = Player.lsthealth
+    if (Player.armor > 0) Player.armor--
+	}
+	sound_play_pitch(sndSplinterPistol, 1)
 }
 
 with instances_matching(enemy, "walled", true)
@@ -605,10 +598,7 @@ with (choice) {
     effect = true;
     }}}}
 with instances_matching_le(choice,"my_health",0){
-    var sub = amount * 1
-    if (sub >= 4) sub = 4
-    var roll = round(random_range(1, (5 - sub)))
-    if (roll == 1) { instance_create(Player.x, Player.y, AmmoPickup); } }
+    if roll(10 * amount) { instance_create(Player.x, Player.y, AmmoPickup); } }
 }
 //inside information (more damage to IDPD and they drop more stuff)
 
@@ -627,39 +617,53 @@ if (my_health > maxhealth) my_health = maxhealth
 
 //Mechanical Lens (Homing)
 var amount = item_get_count("lens");
-if amount >= 1 {
-with instances_matching(projectile, "team", 2) {
-    if object_index != Laser && object_index != Lightning && instance_exists(Player) {
-        if (global.forceSupport == true) || object_index != CustomProjectile {
-       if "slowed" not in self {
-           speed /= 1.5
-           slowed = 1;
-       }
-       if distance_to_object(enemy) <= (16 + (16 * amount)) {
-       near = instance_nearest(x, y, enemy);
-       if(instance_exists(near)) {
-   //direction = point_direction(Player.x, Player.y, n.x, n.y);
-	 var _s = speed
-   motion_add(point_direction(x, y, near.x, near.y), speed / clamp(4 - amount / 2, 1.5, 4));
-   speed = _s;
-   image_angle = direction;
-       }}}}}}
+if amount >= 1
+{
+	with instances_matching(projectile, "team", 2)
+	{
+    if object_index != Laser && object_index != Lightning && instance_exists(Player)
+		{
+    	if (global.forceSupport == true) || object_index != CustomProjectile
+			{
+       	if "slowed" not in self
+			 	{
+          speed /= 1.5;
+          slowed = 1;
+        }
+        if distance_to_object(enemy) <= (16 + (4 * amount))
+				{
+        	near = instance_nearest(x, y, enemy);
+       		if(instance_exists(near))
+					{
+	 					var _s = speed
+   					motion_add(point_direction(x, y, near.x, near.y), speed / clamp(4 - amount / 2, 1.5, 4));
+   					speed = _s;
+   					image_angle = direction;
+					}
+				}
+			}
+		}
+	}
+}
 //Mechanical Lens (Homing
 
 //Golden Shots (random crits)
 var amount = item_get_count("golden");
-if amount >= 1 {
-    with instances_matching(projectile, "team", 2) {
-if roll(10 * amount) && "crit" not in self{
-		image_xscale = 1.5
-    image_yscale = 1.5
-    damage *= 2
-    crit = 1;
-    image_blend = merge_color(c_red, c_white, 0.3)
-} else {
-crit = 1;
+if amount >= 1
+{
+	with instances_matching(projectile, "team", 2)
+	{
+		if roll(10 * amount) && "crit" not in self
+		{
+				image_xscale = 1.25
+		    image_yscale = 1.25
+		    damage *= 2
+		    crit = 1;
+		    image_blend = merge_color(c_red, c_white, 0.3)
+		}
+	 else {crit = 1}
+	}
 }
-}}
 //Golden Shots (random crits)
 
 //Radiated Snack
@@ -746,8 +750,7 @@ if amount >= 1
     if "OnFire" in self
 		{
     	image_blend = merge_color(c_orange, c_white, 0.3)
-    	var roll = round(random_range(1, 10))
-    	if (roll = 1) instance_create(x, y, Debris) my_health -= (0.04 * amount)
+    	if roll(10) instance_create(x, y, Debris) my_health -= (0.04 * amount)
     }
 		else{image_blend = merge_color(c_orange, c_white, 1)}
 	}
@@ -771,9 +774,7 @@ if amount >= 1
 {
 	with instances_matching_le(enemy,"my_health",0)
 	{
-		var chance = (100 / amount); if (chance <= 20) chance = 20;
-		var roll = round(random_range(1, chance))
-		if instance_exists(Player) repeat(size + 1) if (roll <= 45) with instance_create(x + random_range(-5, 5), y + random_range(-5, 5), MeatExplosion) team = Player.team
+		if instance_exists(Player) if roll(10 + 15 * amount) repeat(size + 1) with instance_create(x + random_range(-5, 5), y + random_range(-5, 5), MeatExplosion) team = Player.team
 	}
 }
 //Occult Artifact
@@ -1042,9 +1043,8 @@ var amount = item_get_count("chopper");
 if amount >= 1 {
     with (Player) {
 if distance_to_object(enemy) <= (15 + (amount * 5)) {
-    var roll = round(random_range(1, (30 / amount)))
     var Near = instance_nearest(x, y, enemy)
-        if (roll == 1) with instance_create(x, y, Shank) {
+        if round(100 - 100 / (amount * 6)) with instance_create(x, y, Shank) {
         direction = point_direction(x, y, Near.x, Near.y);
         image_angle = direction
         team = 2;
@@ -1060,7 +1060,7 @@ if amount >= 1
 {
 	with instances_matching(enemy, "my_health", 0)
 	{
-		if roll/7 + 2 * amount // 7% base chance to drop chest + 2% per stack
+		if roll(7 + 2 * amount) // 7% base chance to drop chest + 2% per stack
 		{
 			with obj_create(x, y, "ItemChest")
 			{
@@ -1284,8 +1284,8 @@ IMPORTANT - Remember that projectiles have creators, allowning you to buff certa
 */
 
 #define popoSpawn
-var roll = round(random_range(1, (100)))
-if (roll <= global.popoChance) repeat(2)instance_create(Player.x, Player.y, IDPDSpawn)
+var _roll = round(random_range(1, (100)))
+if (_roll <= global.popoChance) repeat(2)instance_create(Player.x, Player.y, IDPDSpawn)
 
 #define add_item(item)
 var itemarray = global.PlayerItems,
@@ -1340,25 +1340,25 @@ sound_play(sndAmmoChest);
 var tem = 0
 if "tag" in self
 {
-	var roll = irandom(99);
+	var _roll = irandom(99);
 	switch tag
 	{
-		case "gold"   : if roll <= 99 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
+		case "gold"   : if _roll <= 99 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
 									  break;
-		case "rusty"  : if roll <= 94 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
+		case "rusty"  : if _roll <= 94 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
 									  else          {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
 									  break;
-		case "large"  : if roll <= 79 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
+		case "large"  : if _roll <= 79 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
 									  else          {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
 									  break;
-		case "cursed"	: if roll <= 99 {tem = global.CursedItems[round(random_range(0, array_length_1d(global.CursedItems) - 1))]    }
+		case "cursed"	: if _roll <= 99 {tem = global.CursedItems[round(random_range(0, array_length_1d(global.CursedItems) - 1))]    }
 										break;
 		case "test"   : tem = item[? "dice"] // this is for testing
 								    break;
 		case "none"   :
-		default       : if roll <= 64 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
-									  if roll >  69 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
-                    if roll >= 94 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
+		default       : if _roll <= 64 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
+									  if _roll >  69 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
+                    if _roll >= 94 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
 									  break;
 	}
 }
@@ -1432,22 +1432,3 @@ else
 {
 	if _chance <= VALUE return true else return false
 }
-
-#define reorder()
-var amount_common   = 0,
-		amount_uncommon = 0,
-		amount_rare     = 0,
-		amount_unique   = 0;
-cursed_array [0,0] = -4
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 0{amount_common   += global.PlayerItems[i].count}};
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 1{amount_uncommon += global.PlayerItems[i].count}};
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 2{amount_rare     += global.PlayerItems[i].count}};
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 4{amount_unique   += global.PlayerItems[i].count}};
-for (var i = 0, j = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 3{cursed_array[j,0] = global.PlayerItems[i];cursed_array[j,1] = global.PlayerItems[i].count; j++}};
-global.PlayerItems =  []
-global.PlayerItems[0] = item[? "none"]
-if amount_common   > 0 {global.PlayerItems[1] = global.CommonItems[random_range(0, array_length(global.CommonItems))]     ;global.PlayerItems[1].count = amount_common  }
-if amount_uncommon > 0 {global.PlayerItems[2] = global.UncommonItems[random_range(0, array_length(global.UncommonItems))] ;global.PlayerItems[2].count = amount_uncommon}
-if amount_rare     > 0 {global.PlayerItems[3] = global.RareItems[random_range(0, array_length(global.RareItems))]         ;global.PlayerItems[3].count = amount_rare    }
-if amount_unique   > 0 {global.PlayerItems[4] = global.UniqueItems[random_range(0, array_length(global.UniqueItems))]     ;global.PlayerItems[4].count = amount_unique  }
-for (var i = 0, iLen = array_length_1d(cursed_array); i < iLen; i++){global.PlayerItems[5 + i] = cursed_array[i,0]; repeat(cursed_array[i,1])add_item(cursed_array[i,0])}
