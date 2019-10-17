@@ -74,7 +74,6 @@ while(true){
 }
 
 #define game_start
-Player.armor = 5;
 Player.reloadspeed_base = Player.reloadspeed;
 Player.speed_base       = Player.maxspeed;
 Player.firewoodCharge = 0;
@@ -84,6 +83,7 @@ Player.s_Challenge = 0;
 global.PlayerItems = [item[? "none"]]
 global.descriptionTimer = 0;
 global.settings = false;
+Player.armor = 5;
 #define level_start
 var amount = item_get_count("dice");
 if amount >= 1{reorder()}
@@ -489,6 +489,7 @@ with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal) && inst
    var add = Player.armor; if (Player.armor > damageTaken) add = damageTaken
         Player.my_health += add
         if (Player.armor > 0) Player.armor--
+        sound_play_pitch(sndSplinterPistol, 1)
 }
 
 with instances_matching(enemy, "walled", true)
@@ -1084,7 +1085,7 @@ with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction inst
 
 #define draw_gui
 //Draw Armor Number
-if (Player.armor != 0) draw_text_nt(120, 7, string(Player.armor))
+if instance_exists(Player) && (Player.armor != 0) draw_text_nt(120, 7, string(Player.armor))
 //Drawing Boss Health Bar
 if global.bossBars == true {
 var Boss = [BanditBoss, HyperCrystal, FrogQueen, OasisBoss, LilHunter, Nothing2, Nothing, ScrapBoss, TechnoMancer]
