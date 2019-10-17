@@ -84,6 +84,7 @@ Player.s_Challenge = 0;
 global.PlayerItems = [item[? "none"]]
 global.descriptionTimer = 0;
 global.settings = false;
+Player.armor = 5;
 #define level_start
 var amount = item_get_count("dice");
 if amount >= 1{reorder()}
@@ -486,6 +487,15 @@ with instances_matching(enemy, "walled", true) if global.MaskCounter > 0
 
 
 #define step
+//Armor Mechanic
+with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal) && instance_exists(Player) { //When you get hit
+    var damageTaken = (Player.lsthealth - Player.my_health)
+   var add = Player.armor; if (Player.armor > damageTaken) add = damageTaken
+        Player.my_health += add
+        if (Player.armor > 0) Player.armor--
+        sound_play_pitch(sndSplinterPistol, 1)
+}
+
 with instances_matching(enemy, "walled", true)
 {
 	if speed> 0 speed = 0
@@ -1072,6 +1082,8 @@ if instance_exists(Player)
 with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction instance_destroy()}
 
 #define draw_gui
+//Draw Armor Number
+if instance_exists(Player) && (Player.armor != 0) draw_text_nt(120, 7, string(Player.armor))
 //Drawing Boss Health Bar
 if global.bossBars == true {
 var Boss = [BanditBoss, HyperCrystal, FrogQueen, OasisBoss, LilHunter, Nothing2, Nothing, ScrapBoss, TechnoMancer]
@@ -1420,3 +1432,22 @@ else
 {
 	if _chance <= VALUE return true else return false
 }
+
+#define reorder()
+var amount_common   = 0,
+		amount_uncommon = 0,
+		amount_rare     = 0,
+		amount_unique   = 0;
+cursed_array [0,0] = -4
+for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 0{amount_common   += global.PlayerItems[i].count}};
+for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 1{amount_uncommon += global.PlayerItems[i].count}};
+for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 2{amount_rare     += global.PlayerItems[i].count}};
+for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 4{amount_unique   += global.PlayerItems[i].count}};
+for (var i = 0, j = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 3{cursed_array[j,0] = global.PlayerItems[i];cursed_array[j,1] = global.PlayerItems[i].count; j++}};
+global.PlayerItems =  []
+global.PlayerItems[0] = item[? "none"]
+if amount_common   > 0 {global.PlayerItems[1] = global.CommonItems[random_range(0, array_length(global.CommonItems))]     ;global.PlayerItems[1].count = amount_common  }
+if amount_uncommon > 0 {global.PlayerItems[2] = global.UncommonItems[random_range(0, array_length(global.UncommonItems))] ;global.PlayerItems[2].count = amount_uncommon}
+if amount_rare     > 0 {global.PlayerItems[3] = global.RareItems[random_range(0, array_length(global.RareItems))]         ;global.PlayerItems[3].count = amount_rare    }
+if amount_unique   > 0 {global.PlayerItems[4] = global.UniqueItems[random_range(0, array_length(global.UniqueItems))]     ;global.PlayerItems[4].count = amount_unique  }
+for (var i = 0, iLen = array_length_1d(cursed_array); i < iLen; i++){global.PlayerItems[5 + i] = cursed_array[i,0]; repeat(cursed_array[i,1])add_item(cursed_array[i,0])}
