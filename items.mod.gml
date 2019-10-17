@@ -499,8 +499,8 @@ with (Player) if my_health < lsthealth {
         if (Player.armorKeep > 0) {
         var roll = random_range(1, 100)
         if (roll > Player.armorKeep) {
-        Player.armor--
-        sound_play_pitch(sndSwapPistol, 2)
+        if (Player.armor > 0)Player.armor--
+        if (Player.armor > 0)sound_play_pitch(sndSwapPistol, 2)
         }
         } else {
             if (Player.armor > 0) Player.armor--
@@ -1109,6 +1109,7 @@ with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction inst
 
 #define draw_gui
 //Draw Armor Number
+if instance_exists(Player) {
 draw_set_halign(fa_left)
 if (Player.shakeText > 0) {
 Player.shakeText--
@@ -1120,6 +1121,7 @@ var shake_x = round(random_range(-1, 1)); var shake_y = round(random_range(-1, 1
 if instance_exists(Player) && (Player.armor != 0) {
 draw_sprite(global.sprArmor, 1, 119, 16)
 draw_text_nt(110 + shake_x, 7 + shake_y, string(Player.armor))  
+}
 }
 draw_set_halign(fa_right)
 //Drawing Boss Health Bar
