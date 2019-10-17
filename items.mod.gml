@@ -45,7 +45,7 @@ global.PlusItems = 0;
 global.hideDes = 0;
 global.hurtFloor = false;
 global.forceSupport = false;
-global.popoChance = 0; //Bandit mask is temporarily disabled item[? "mask"]
+global.popoChance = 0; //Bandit mask is temporarily disabled item [? "mask"]
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"], item[? "chopper"], item[? "locket"]] //TO DO: None
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"], item[? "plate"] , item[? "firewood"] , item[? "coin"]] //To-Do: coin, Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "fern"]] //To-Do: Fern
@@ -74,6 +74,7 @@ while(true){
 }
 
 #define game_start
+Player.armor = 5;
 Player.reloadspeed_base = Player.reloadspeed;
 Player.speed_base       = Player.maxspeed;
 Player.firewoodCharge = 0;
@@ -482,6 +483,14 @@ with instances_matching(enemy, "walled", true) if global.MaskCounter > 0
 
 
 #define step
+//Armor Mechanic
+with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal) && instance_exists(Player) { //When you get hit
+    var damageTaken = (Player.lsthealth - Player.my_health)
+   var add = Player.armor; if (Player.armor > damageTaken) add = damageTaken
+        Player.my_health += add
+        if (Player.armor > 0) Player.armor--
+}
+
 with instances_matching(enemy, "walled", true)
 {
 	if speed> 0 speed = 0
@@ -1074,6 +1083,8 @@ if instance_exists(Player)
 with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction instance_destroy()}
 
 #define draw_gui
+//Draw Armor Number
+if (Player.armor != 0) draw_text_nt(120, 7, string(Player.armor))
 //Drawing Boss Health Bar
 if global.bossBars == true {
 var Boss = [BanditBoss, HyperCrystal, FrogQueen, OasisBoss, LilHunter, Nothing2, Nothing, ScrapBoss, TechnoMancer]
