@@ -442,6 +442,16 @@ item_hard_times = {
 
 };
 
+// ITEM 39: STEEL PLATING
+#macro item_steel_plating item[? "steel"]
+item_steel_plating = {
+  name              : "Steel Plating",
+	description_small : "@s+5 @wArmor, @schance to not lose @warmor @son hit",
+	description_large : "@sGain 5 @warmor @son pickup, and have a small chance to not lose armor upon being hit",
+	spr_index         : 39,
+	tier              : 0
+
+};
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),

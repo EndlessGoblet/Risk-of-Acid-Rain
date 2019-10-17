@@ -13,6 +13,7 @@ global.sprGoldItemChestOpen   = sprite_add("sprites/chests/sprGoldItemChestOpen.
 global.sprRustyItemChestOpen  = sprite_add("sprites/chests/sprRustyItemChestOpen.png"     , 1,  8, 8);
 global.sprLargeItemChestOpen  = sprite_add("sprites/chests/sprLargeItemChestOpen.png"     , 1, 12, 8);
 global.sprCursedItemChestOpen = sprite_add("sprites/chests/sprCursedItemChestOpen.png"    , 1, 11, 8);
+global.sprArmor = sprite_add("sprites/other/sprArmor.png", 1, 11, 11)
 
 global.sprItems = sprite_add("sprites/items/sprItems.png", 101, 17, 17);
 
@@ -46,8 +47,8 @@ global.PlusItems = 0;
 global.hideDes = 0;
 global.hurtFloor = false;
 global.forceSupport = false;
-global.popoChance = 0; //Bandit mask is temporarily disabled item[? "mask"]
-global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"], item[? "chopper"], item[? "locket"]] //TO DO: None
+global.popoChance = 0; //Bandit mask is temporarily disabled item [? "mask"]
+global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"], item[? "chopper"], item[? "locket"],    item[? "steel"]] //TO DO: None
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"], item[? "plate"] , item[? "firewood"] , item[? "coin"]] //To-Do: coin, Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "fern"]] //To-Do: Fern
 global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice, heater
@@ -84,7 +85,9 @@ Player.s_Challenge = 0;
 global.PlayerItems = [item[? "none"]]
 global.descriptionTimer = 0;
 global.settings = false;
-Player.armor = 5;
+Player.armor = 5; //For Testing
+Player.armorKeep = 0;
+Player.shakeText = 0;
 #define level_start
 var amount = item_get_count("dice");
 if amount >= 1{reorder()}
@@ -475,18 +478,30 @@ if ITEM = item[? "dice"] repeat(2)
 {
 	get_item(global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))])
 }
+if ITEM = item[? "steel"]
+{
+    Player.armor += 5
+}
 add_item(ITEM)
 
 #define step
 //Armor Mechanic
-if instance_exists(Player) && Player.nexthurt = current_frame + 5 && !instance_exists(Portal)
-{ //When you get hit
-	if Player.my_health < Player.lsthealth
-	{
-		Player.my_health = Player.lsthealth
-    if (Player.armor > 0) Player.armor--
-	}
-	sound_play_pitch(sndSplinterPistol, 1)
+//with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal) && instance_exists(Player) { //When you get hit
+with (Player) if my_health < lsthealth {
+    var damageTaken = (Player.lsthealth - Player.my_health)
+   var add = Player.armor; if (Player.armor > damageTaken) add = damageTaken
+        Player.my_health += add
+        if (Player.armorKeep > 0) {
+        var roll = random_range(1, 100)
+        if (roll > Player.armorKeep) {
+        Player.armor--
+        sound_play_pitch(sndSwapPistol, 2)
+        }
+        } else {
+            if (Player.armor > 0) Player.armor--
+            sound_play_pitch(sndSwapPistol, 2)
+        }
+        Player.shakeText += (room_speed / 10)
 }
 
 with instances_matching(enemy, "walled", true)
@@ -539,13 +554,13 @@ with (Player) if round(my_health)
 Player.debug2 = array_length_1d(global.PlayerItems) - 1
 
 //Check if hurt this floor--------
-with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal){
+with (Player) if my_health < lsthealth {
 global.hurtFloor = true;
 }
 //Cheats--------------------------------------------------------------------------------------------------------------------------------------------------------
 with (Player) {
 if(button_pressed(index, "horn")) {
-	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth"
+	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too
 	{
 		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
@@ -574,8 +589,7 @@ if(button_pressed(index, "horn")) {
 			chest_setup(tag)
 		}*/
 	}
-      var FreeItem = "Chopper" //Cheats
-      //global.PlayerItems[array_length_1d(global.PlayerItems)] = FreeItem; var amount = 0; for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) { if (global.PlayerItems[i] == FreeItem) amount++    }
+      get_item(global.CommonItems[11])
 	}
 }
 //Timer
@@ -1072,6 +1086,14 @@ if amount >= 1
 }
 //Broken Locket
 
+//Steel Plating
+var amount = item_get_count("steel");
+if amount >= 1 && instance_exists(Player)
+{
+Player.armorKeep = ( (10 * amount) / (amount / 10 + 1) ) //Diminishing returns (Did I do this right?)
+}
+//Steel Plating
+
 //Stat changes
 if instance_exists(Player)
 {
@@ -1083,7 +1105,19 @@ with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction inst
 
 #define draw_gui
 //Draw Armor Number
-if instance_exists(Player) && (Player.armor != 0) draw_text_nt(120, 7, string(Player.armor))
+draw_set_halign(fa_left)
+if (Player.shakeText > 0) {
+Player.shakeText--
+var shake_x = round(random_range(-1, 1)); var shake_y = round(random_range(-1, 1))
+} else {
+    var shake_x = 0;
+    var shake_y = 0;
+}
+if instance_exists(Player) && (Player.armor != 0) {
+draw_sprite(global.sprArmor, 1, 119, 16)
+draw_text_nt(110 + shake_x, 7 + shake_y, string(Player.armor))  
+}
+draw_set_halign(fa_right)
 //Drawing Boss Health Bar
 if global.bossBars == true {
 var Boss = [BanditBoss, HyperCrystal, FrogQueen, OasisBoss, LilHunter, Nothing2, Nothing, ScrapBoss, TechnoMancer]
