@@ -32,6 +32,7 @@ with(instances_matching(chestprop, "name", "ItemChest")) {
 instance_delete(self);
 }
 global.PlayerItems = [item[? "none"]]
+global.GemCoeff = choose(-1, 1)
 global.frame = 0;
 global.RadiGumdropTimer = 0;
 global.RadiatedSnackCounter = 0;
@@ -49,7 +50,7 @@ global.popoChance = 0; //Bandit mask is temporarily disabled item[? "mask"]
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"], item[? "chopper"], item[? "locket"]] //TO DO: None
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"], item[? "plate"] , item[? "firewood"] , item[? "coin"]] //To-Do: coin, Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "fern"]] //To-Do: Fern
-global.CursedItems   = [item[? "dice"]      , item[? "heater"]] // Todo: dice, heater
+global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice, heater
 global.UniqueItems   = [item[? "energy"]    , item[? "times"]]
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
@@ -89,6 +90,8 @@ if amount >= 1{reorder()}
 
 Player.s_Combat = 0;
 Player.s_Challenge = 0;
+
+global.GemCoeff = choose(-1, 1)
 
 //Perfect Prize
 if global.hurtFloor = false
@@ -442,7 +445,8 @@ switch(obj_name) {
 			spr_shadow = shd24;
 			spr_open = global.sprItemChestOpen;
 			sprite_index = global.sprItemChest;
-			if irandom(99) = 0 tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
+			if roll(1) tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
+			if tag = "none" && roll(2) tag = "large"
 			chest_setup(tag)
 			on_open = itemchest_open;
 	}
@@ -636,8 +640,7 @@ with instances_matching(projectile, "team", 2) {
 var amount = item_get_count("golden");
 if amount >= 1 {
     with instances_matching(projectile, "team", 2) {
-var roll = round(random_range(1, (100 / amount)))
-if roll <= 10 && "crit" not in self{
+if roll(10 * amount) && "crit" not in self{
 		image_xscale = 1.5
     image_yscale = 1.5
     damage *= 2
@@ -821,15 +824,11 @@ with (projectile) {
 //R-Wing
 
 //Sabotage Tools
-var amount = item_get_count("jam");
+var amount = item_get_count("tools");
 if amount >= 1 {
 with (projectile) {
     if "jam" not in self && team != 2 {
-        var jamm = (6 - amount * 2);
-        if (jamm <= 1) jamm = 1;
-    var roll = round(random_range(1, jamm))
-    jam = true;
-    if (roll = 1) instance_destroy(); break;
+    if roll(15 * amount) instance_destroy(); break;
     }
     jam = true;
 }
@@ -878,7 +877,7 @@ if amount >= 1
 {
 	with (enemy) if "Shrink" not in self
 	{
-    var chance = round(random_range(1, (10 / amount)))
+    var chance = roll(6 + 8 * amount)
     Shrink = true
     if chance == 1
 		{
@@ -946,8 +945,7 @@ with (Player) {
 var amount = item_get_count("blessing");
 if amount >= 1 {
     with (projectile) if "blessed" not in self && "sacred" not in self && team = 2{
-        var roll = round(random_range(1, 100))
-				if (roll <= (25 * amount))with instance_create(x,y,object_index){
+				if roll((1 - 1/(.25 * amount + 1))*100) with instance_create(x,y,object_index){ // hyperbolic item stacking
 			motion_set(other.direction,other.speed*1.2)
 			image_angle = direction
 			//damage = originalDamage;
@@ -1052,7 +1050,7 @@ if amount >= 1
 {
 	with instances_matching(enemy, "my_health", 0)
 	{
-		if irandom(91 - amount * 3) = 0 // 5% base chance to drop chest + 2% per stack
+		if roll/7 + 2 * amount // 7% base chance to drop chest + 2% per stack
 		{
 			with obj_create(x, y, "ItemChest")
 			{
@@ -1347,8 +1345,8 @@ if "tag" in self
 								    break;
 		case "none"   :
 		default       : if roll <= 64 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
-									  if roll >  64 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
-                    if roll >= 89 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
+									  if roll >  69 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
+                    if roll >= 94 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
 									  break;
 	}
 }
@@ -1399,3 +1397,26 @@ if amount_uncommon > 0 {global.PlayerItems[2] = global.UncommonItems[random_rang
 if amount_rare     > 0 {global.PlayerItems[3] = global.RareItems[random_range(0, array_length(global.RareItems))]         ;global.PlayerItems[3].count = amount_rare    }
 if amount_unique   > 0 {global.PlayerItems[4] = global.UniqueItems[random_range(0, array_length(global.UniqueItems))]     ;global.PlayerItems[4].count = amount_unique  }
 for (var i = 0, iLen = array_length_1d(cursed_array); i < iLen; i++){global.PlayerItems[5 + i] = cursed_array[i,0]; repeat(cursed_array[i,1])add_item(cursed_array[i,0])}
+
+#define roll(VALUE)
+var _chance = irandom_range(1,100),
+    _luck   = item_get_count("coin") + item_get_count("gem") * global.GemCoeff;
+if _luck != 0
+{
+	for (i = 0; i < abs(_luck); i++ )
+	{
+		if _luck > 0
+		{
+			if _chance <= VALUE return true
+		}
+		if _luck < 0
+		{
+			if _chance <= VALUE return false
+		}
+	}
+	if _chance <= VALUE return true else return false
+}
+else
+{
+	if _chance <= VALUE return true else return false
+}
