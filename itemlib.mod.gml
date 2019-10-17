@@ -402,7 +402,7 @@ item_chaotic_dice = {
 #macro item_soulful_heater item[? "heater"]
 item_soulful_heater = {
   name              : "Soulful Heater",
-	description_small : "@sTurn all @gHealth @sinto @yArmor",
+	description_small : "@sTurn 25% @rMax HP @sinto @ypermanent armor",
 	description_large : "-",
 	spr_index         : 35,
 	tier              : 3
@@ -446,12 +446,47 @@ item_hard_times = {
 #macro item_steel_plating item[? "steel"]
 item_steel_plating = {
   name              : "Steel Plating",
-	description_small : "@s+5 @wArmor, @schance to not lose @warmor @son hit",
-	description_large : "@sGain 5 @warmor @son pickup, and have a small chance to not lose armor upon being hit",
+	description_small : "@s+@w2 @yArmor @sper @warea",
+	description_large : "-",
 	spr_index         : 39,
 	tier              : 0
 
 };
+
+// ITEM 40: CRACKED GEM
+#macro item_cracked_gem item[? "gem"]
+item_cracked_gem = {
+  name              : "Cracked Gem",
+	description_small : "@sYour @gluck @sis fluctuating",
+	description_large : "At the start of an area, gain +5 or -5 luck (+/-2 per stack)",
+	spr_index         : 40,
+	tier              : 4
+
+};
+
+
+// ITEM 41: CELESTEEL
+#macro item_celesteel item[? "celesteel"]
+item_celesteel = {
+  name              : "CELESTEEL",
+	description_small : "@s+@w5 @yArmor@s, chance to not lose @yarmor",
+	description_large : "@sGain 5 @warmor @son pickup, and have a small chance to not lose armor upon being hit",
+	spr_index         : 41,
+	tier              : 1
+
+};
+
+// ITEM 42: SCRAP CANNON
+#macro item_scrap_cannon item[? "cannon"]
+item_scrap_cannon = {
+  name              : "Scrap Cannon",
+	description_small : "@s+@w8 @yArmor@s, scale @wdamage @swith @yarmor",
+	description_large : "-",
+	spr_index         : 42,
+	tier              : 2
+
+};
+
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),

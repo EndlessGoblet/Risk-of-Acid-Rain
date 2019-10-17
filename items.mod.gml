@@ -1,6 +1,7 @@
 #macro item mod_variable_get("mod", "itemlib", "ItemDirectory")
 
 #define init
+
 global.preformanceMode = false //Turn on to avoid lag (recommended)
 
 global.sprItemChest           = sprite_add_weapon("sprites/chests/sprItemChest.png"       ,     8, 8);
@@ -13,7 +14,7 @@ global.sprGoldItemChestOpen   = sprite_add("sprites/chests/sprGoldItemChestOpen.
 global.sprRustyItemChestOpen  = sprite_add("sprites/chests/sprRustyItemChestOpen.png"     , 1,  8, 8);
 global.sprLargeItemChestOpen  = sprite_add("sprites/chests/sprLargeItemChestOpen.png"     , 1, 12, 8);
 global.sprCursedItemChestOpen = sprite_add("sprites/chests/sprCursedItemChestOpen.png"    , 1, 11, 8);
-global.sprArmor = sprite_add("sprites/other/sprArmor.png", 1, 11, 11)
+global.sprArmor = sprite_add("sprites/other/sprArmor.png", 2, 9, 9)
 
 global.sprItems = sprite_add("sprites/items/sprItems.png", 101, 17, 17);
 
@@ -48,9 +49,9 @@ global.hideDes = 0;
 global.hurtFloor = false;
 global.forceSupport = false;
 global.popoChance = 0; //Bandit mask is temporarily disabled item [? "mask"]
-global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"], item[? "chopper"], item[? "locket"],    item[? "steel"]] //TO DO: None
-global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"], item[? "plate"] , item[? "firewood"] , item[? "coin"]] //To-Do: coin, Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
-global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "fern"]] //To-Do: Fern
+global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"] , item[? "chopper"], item[? "locket"]   , item[? "steel"]] //TO DO: None
+global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"], item[? "plate"]  , item[? "firewood"] , item[? "coin"]  , item[? "celesteel"]] //To-Do: coin, Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
+global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "cannon"]] //To-Do: Fern
 global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice, heater
 global.UniqueItems   = [item[? "energy"]    , item[? "times"]]
 //set new level function
@@ -78,6 +79,10 @@ while(true){
 #define game_start
 Player.reloadspeed_base = Player.reloadspeed;
 Player.speed_base       = Player.maxspeed;
+Player.accuracy_base    = Player.accuracy;
+Player.health_base      = Player.maxhealth;
+Player.damage_base      = 1
+
 Player.firewoodCharge = 0;
 Player.firewoodKills = 0;
 Player.s_Combat = 0;
@@ -85,10 +90,18 @@ Player.s_Challenge = 0;
 global.PlayerItems = [item[? "none"]]
 global.descriptionTimer = 0;
 global.settings = false;
-Player.armor = 5; //For Testing
-Player.armorKeep = 0;
+Player.armor       = 0;
+Player.perma_armor = 0;
 Player.shakeText = 0;
+
 #define level_start
+
+var amount = item_get_count("steel");
+if amount >= 1
+{
+    Player.armor += 2 * amount
+}
+
 var amount = item_get_count("dice");
 if amount >= 1{reorder()}
 
@@ -396,7 +409,7 @@ if (type == "Printing") {
 		var _roll = print_array[random_range(0, array_length(print_array) -1)];
 		_roll.count--
 		get_item(itemPrint)
-    if roll == global.CommonItems[itemPrint] {
+    if _roll == global.CommonItems[itemPrint] {
     with instance_create(x,y,GreenExplosion) { damage = 0; mask_index = mskNone; }
     instance_destroy()
     with instance_create(Player.x, Player.y, PopupText) {
@@ -443,8 +456,9 @@ draw_sprite(global.shrineIcons, sprite, x + 6, y-20)
 var _obj = -4
 switch(obj_name) {
 	case "ItemChest":
-	_obj = instance_create(_x, _y, chestprop)
-	with(_obj){
+		_obj = instance_create(_x, _y, chestprop)
+		with(_obj)
+		{
 			name = "ItemChest";
 			spr_shadow = shd24;
 			spr_open = global.sprItemChestOpen;
@@ -453,8 +467,8 @@ switch(obj_name) {
 			if tag = "none" && roll(4) tag = "large"
 			chest_setup(tag)
 			on_open = itemchest_open;
-	}
-	return _obj;
+		}
+		return _obj;
 }
 
 switch(obj_name) {
@@ -478,30 +492,38 @@ if ITEM = item[? "dice"] repeat(2)
 {
 	get_item(global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))])
 }
-if ITEM = item[? "steel"]
+if ITEM = item[? "celesteel"]
 {
     Player.armor += 5
+}
+if ITEM = item[? "cannon"]
+{
+    Player.armor += 8
+}
+if ITEM = item[? "heater"]
+{
+	Player.health_base = round(max(Player.health_base * .75, 1))
+	Player.perma_armor += 2
 }
 add_item(ITEM)
 
 #define step
 //Armor Mechanic
 //with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal) && instance_exists(Player) { //When you get hit
-with (Player) if my_health < lsthealth {
-    var damageTaken = (Player.lsthealth - Player.my_health)
-   var add = Player.armor; if (Player.armor > damageTaken) add = damageTaken
-        Player.my_health += add
-        if (Player.armorKeep > 0) {
-        var roll = random_range(1, 100)
-        if (roll > Player.armorKeep) {
-        if (Player.armor > 0)Player.armor--
-        if (Player.armor > 0)sound_play_pitch(sndSwapPistol, 2)
-        }
-        } else {
-            if (Player.armor > 0) Player.armor--
-            sound_play_pitch(sndSwapPistol, 2)
-        }
-        Player.shakeText += (room_speed / 10)
+with (Player) if my_health < lsthealth
+{
+	var damageTaken = (Player.lsthealth - Player.my_health),
+	    _ord        = damageTaken
+	damageTaken = clamp(damageTaken - perma_armor, 1, damageTaken)
+	damageTaken = clamp(damageTaken - armor, 0, damageTaken)
+	Player.my_health += (_ord - damageTaken)
+	lsthealth = my_health
+  if !roll(((10 * item_get_count("celesteel")) / (item_get_count("celesteel") / 10 + 1))) && Player.armor > 0
+	{
+    Player.armor--
+    sound_play_pitch(sndSwapPistol, 2)
+		Player.shakeText += (room_speed / 10)
+  }
 }
 
 with instances_matching(enemy, "walled", true)
@@ -517,6 +539,7 @@ with instances_matching(chestprop, "name", "ItemChest"){
 	 {
 		 case "gold"   : if irandom(19) = 0 with instance_create( x+random_range(-8, 8), y+random_range(-13,13), CaveSparkle) depth = other.depth - 1; break;
 		 case "cursed" : if irandom( 4) = 0 instance_create(x+random_range(-5, 5), y+random_range( -8, 8), Curse); break;
+		 case "item"   : image_index  = item_index.spr_index; y -= sin(current_frame / 10) / 4 / (room_speed / 30); spr_shadow_y  += sin(current_frame / 10) / 4 / (room_speed / 30); break;
 	 }
 
 	 if place_meeting(x, y, Player) || place_meeting(x, y, PortalShock) || instance_exists(BigPortal){
@@ -560,9 +583,9 @@ global.hurtFloor = true;
 //Cheats--------------------------------------------------------------------------------------------------------------------------------------------------------
 with (Player) {
 if(button_pressed(index, "horn")) {
-	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too
+	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too // yeah because you set Player.debug to true is my guess
 	{
-		with obj_create(mouse_x, mouse_y, "ItemChest")
+		/*with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "gold"
 			chest_setup(tag)
@@ -582,22 +605,26 @@ if(button_pressed(index, "horn")) {
 			tag = "cursed"
 			chest_setup(tag)
 		}
-		obj_create(mouse_x, mouse_y, "ItemChest")
-		/*with obj_create(mouse_x, mouse_y, "ItemChest")
+		obj_create(mouse_x, mouse_y, "ItemChest")*/
+		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
-			tag = "test"
+			tag = "item"
+			item_index = choose(item[? "celesteel"], item[? "steel"])
 			chest_setup(tag)
-		}*/
+		}
 	}
-      get_item(global.CommonItems[11])
+      //get_item(item[? "chopper"])
 	}
 }
 //Timer
 global.frame += current_time_scale; if (global.frame == 60) global.frame = 0;
 //WHAT DO ITEMS DO YOU MAY ASK???
 
-var extra_reload = 0,
-    extra_speed  = 0;
+var extra_reload    = 0,
+    extra_speed     = 0,
+		extra_health = 0,
+		extra_accuracy  = 0,
+		extra_damage    = 0; // this one is a multiplier
 
 //inside information (more damage to IDPD and they drop more stuff)
 var amount = item_get_count("info");
@@ -650,7 +677,7 @@ if amount >= 1
        		if(instance_exists(near))
 					{
 	 					var _s = speed
-   					motion_add(point_direction(x, y, near.x, near.y), speed / clamp(4 - amount / 2, 1.5, 4));
+   					motion_add(point_direction(x, y, near.x, near.y), speed / clamp(8 - amount / 3, 2, 8));
    					speed = _s;
    					image_angle = direction;
 					}
@@ -669,9 +696,9 @@ if amount >= 1
 	{
 		if roll(10 * amount) && "crit" not in self
 		{
-				image_xscale = 1.25
-		    image_yscale = 1.25
-		    damage *= 2
+				image_xscale += .25
+		    image_yscale += .25
+		    extra_damage += 1
 		    crit = 1;
 		    image_blend = merge_color(c_red, c_white, 0.3)
 		}
@@ -828,8 +855,8 @@ if amount >= 1 {
         if "growth" not in self && object_index != Lightning {
         image_xscale = 1 + (amount * .2)
         image_yscale = 1 + (amount * .2)
-        damage *= 1 + (amount * .25)
-				speed *= 1.2
+        damage += amount * .5
+				speed *= 1.1
         growth = true;
         }}
 }
@@ -1054,18 +1081,23 @@ if amount >= 1 {
 
 //Chopper
 var amount = item_get_count("chopper");
-if amount >= 1 {
-    with (Player) {
-if distance_to_object(enemy) <= (15 + (amount * 5)) {
-    var Near = instance_nearest(x, y, enemy)
-        if round(100 - 100 / (amount * 6)) with instance_create(x, y, Shank) {
-        direction = point_direction(x, y, Near.x, Near.y);
-        image_angle = direction
-        team = 2;
-				damage =  6
-        }
+if amount >= 1
+{
+  with (Player)
+	{
+		var Near = instance_nearest(x, y, enemy)
+		if distance_to_object(Near) <= (16 + amount)
+		{
+      if current_frame mod max(room_speed * 3 - amount * 3, 1) = 0 with instance_create(x, y, Shank)
+			{
+	        motion_add(point_direction(x, y, Near.x, Near.y) + random_range(-5, 5), 4 + skill_get(mut_long_arms) * 2);
+	        image_angle = direction
+	        team = 2;
+					damage =  6
+      }
+		}
+	}
 }
-}}
 //Chopper
 
 //Broken Locket
@@ -1086,40 +1118,30 @@ if amount >= 1
 }
 //Broken Locket
 
-//Steel Plating
-var amount = item_get_count("steel");
+//Scrap Cannon
+var amount = item_get_count("cannon");
 if amount >= 1 && instance_exists(Player)
 {
-Player.armorKeep = ( (10 * amount) / (amount / 10 + 1) ) //Diminishing returns (Did I do this right?)
+	extra_damage += Player.armor * 2.5 * amount
 }
-//Steel Plating
+//Scrap Cannon
 
 //Stat changes
 if instance_exists(Player)
 {
-	Player.reloadspeed = Player.reloadspeed_base + extra_reload + (skill_get(mut_stress) * (1 - Player.my_health/Player.maxhealth)) + ultra_get(char_venuz,1) * .4
-	Player.maxspeed    = Player.speed_base       + extra_speed  + (skill_get(mut_extra_feet) * .5)
+	Player.reloadspeed = Player.reloadspeed_base + extra_reload    + (skill_get(mut_stress) * (1 - Player.my_health/Player.maxhealth)) + ultra_get(char_venuz, 1)   * .4
+	Player.maxspeed    = Player.speed_base       + extra_speed     + (skill_get(mut_extra_feet) * .5)
+	Player.maxhealth   = Player.health_base      + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6
+	with instances_matching(projectile, "team", Player.team)
+	{
+		damage *= Player.damage_base + extra_damage
+	}
 }
 
 with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction instance_destroy()}
 
 #define draw_gui
-//Draw Armor Number
-if instance_exists(Player) {
-draw_set_halign(fa_left)
-if (Player.shakeText > 0) {
-Player.shakeText--
-var shake_x = round(random_range(-1, 1)); var shake_y = round(random_range(-1, 1))
-} else {
-    var shake_x = 0;
-    var shake_y = 0;
-}
-if instance_exists(Player) && (Player.armor != 0) {
-draw_sprite(global.sprArmor, 1, 119, 16)
-draw_text_nt(110 + shake_x, 7 + shake_y, string(Player.armor))  
-}
-}
-draw_set_halign(fa_right)
+draw_armor()
 //Drawing Boss Health Bar
 if global.bossBars == true {
 var Boss = [BanditBoss, HyperCrystal, FrogQueen, OasisBoss, LilHunter, Nothing2, Nothing, ScrapBoss, TechnoMancer]
@@ -1273,6 +1295,8 @@ if (global.descriptionTimer > 0)
 }
 
 #define draw_pause
+draw_armor()
+
  var cx     = view_xview,
      cy     = view_yview,
 	   draw_x = 23,
@@ -1304,13 +1328,13 @@ for(i = 1; i < array_length_1d(global.PlayerItems); i++)
 			_hover = true;
 			var _biglength = clamp(cx + (itemx * 21) - 20, 0, view_xview + game_width - _boxwidth - 3)
 
-			draw_backdrop(_biglength - 1, cy + 55 + (20 * (maxline + 1)), _biglength - 1 + _boxwidth, cy + 53 + (22 * (maxline + 1)) + string_height(string_upper(global.PlayerItems[i].name)) + string_height(string_upper(global.PlayerItems[i].description_small)), string_upper(global.PlayerItems[i].name))
+			draw_backdrop(_biglength - 1, cy + 55 + (20 * (maxline + 1)), _biglength - 1 + _boxwidth, cy + 54 + (20 * (maxline + 1)) + string_height(string_upper(global.PlayerItems[i].name)) + string_height(string_upper(global.PlayerItems[i].description_small)), string_upper(global.PlayerItems[i].name))
 			draw_set_font(fntSmall)
 			draw_text_nt(_biglength + 2, cy + 64 + (20 * (maxline + 1)), string_upper(global.PlayerItems[i].description_small))
 		}
 		draw_sprite_ext(global.sprItems, global.PlayerItems[i].spr_index, cx + (itemx * 21) - 1, cy + 45 + (20 * (line + 1)) - _hover, 1, 1, 0, merge_colour(c_black, c_white, .9 + _hover * .1), 1) //sprUltraLevel
 		draw_set_font(fntChat)
-		if global.PlayerItems[i].count > 1 draw_text_nt(cx + (itemx * 21) - 1 - 7, cy + 45 + (20 * (line + 1)) - 8 - _hover,"x" + string(global.PlayerItems[i].count))
+		if global.PlayerItems[i].count > 1 draw_text_nt(cx + (itemx * 21) - 9, cy + 45 + (20 * (line + 1)) - 8 - _hover,"x" + string(global.PlayerItems[i].count))
 }
 
 
@@ -1379,13 +1403,14 @@ if "tag" in self
 	var _roll = irandom(99);
 	switch tag
 	{
+		case "item"   : tem = item_index break;
 		case "gold"   : if _roll <= 99 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
 									  break;
 		case "rusty"  : if _roll <= 94 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
-									  else          {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
+									  else           {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
 									  break;
 		case "large"  : if _roll <= 79 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
-									  else          {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
+									  else           {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
 									  break;
 		case "cursed"	: if _roll <= 99 {tem = global.CursedItems[round(random_range(0, array_length_1d(global.CursedItems) - 1))]    }
 										break;
@@ -1397,8 +1422,10 @@ if "tag" in self
                     if _roll >= 94 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
 									  break;
 	}
+	if tag = "item" with instance_create(x, y, CustomObject){on_step = antifx_step}
 }
 get_item(tem)
+
 
 #define chest_setup(TAG)
 switch TAG
@@ -1420,11 +1447,20 @@ switch TAG
 		spr_shadow = shd32
 		spr_shadow_y = 2
 		break;
-		case "cursed" :
-			sprite_index = global.sprCursedItemChest
-			spr_open = global.sprCursedItemChestOpen
-			spr_shadow_y = 1
-			break;
+	case "cursed" :
+		sprite_index = global.sprCursedItemChest
+		spr_open = global.sprCursedItemChestOpen
+		spr_shadow_y = 1
+		break;
+	case "item" :
+		sprite_index = global.sprItems
+		image_index  = item_index.spr_index
+		image_speed  = 0
+		spr_open   = mskNone
+		spr_shadow = shd16
+		spr_shadow_x = -8
+		spr_shadow_y = 2
+		break;
 }
 
 #define reorder()
@@ -1448,7 +1484,7 @@ for (var i = 0, iLen = array_length_1d(cursed_array); i < iLen; i++){global.Play
 
 #define roll(VALUE)
 var _chance = irandom_range(1,100),
-    _luck   = item_get_count("coin") + item_get_count("gem") * global.GemCoeff;
+    _luck   = item_get_count("coin") + ((item_get_count("gem") > 0 ? 3 : 0) + item_get_count("gem") * 2) * global.GemCoeff;
 if _luck != 0
 {
 	for (i = 0; i < abs(_luck); i++ )
@@ -1466,5 +1502,39 @@ if _luck != 0
 }
 else
 {
-	if _chance <= VALUE return true else return false
+	if _chance <= VALUE {return true} else {return false}
 }
+
+#define draw_armor
+//Draw Armor Number
+draw_set_halign(fa_left)
+if instance_exists(Player) && (Player.shakeText > 0) {
+Player.shakeText--
+var shake_x = round(random_range(-1, 1)); var shake_y = round(random_range(-1, 1))
+} else {
+    var shake_x = 0;
+    var shake_y = 0;
+}
+if instance_exists(Player)
+{
+	var _rogue = + (Player.race = "rogue" ? sprite_get_width(sprRogueAmmoHUDTB) : 0)
+	draw_set_halign(fa_center)
+	draw_set_font(fntChat)
+	if (Player.armor != 0)
+	{
+		draw_sprite(global.sprArmor, 0, 117 + _rogue, 12)
+		draw_text_nt(118 + _rogue + shake_x, 4 + shake_y, string(Player.armor))
+		_rogue += sprite_get_width(global.sprArmor) - 2
+	}
+	if (Player.perma_armor != 0)
+	{
+		draw_sprite(global.sprArmor, 1, 117 + _rogue, 12)
+		draw_text_nt(118 + _rogue + shake_x, 4 + shake_y, string(Player.perma_armor))
+	}
+}
+draw_set_halign(fa_left)
+draw_set_font(fntM)
+
+#define antifx_step
+with FXChestOpen instance_delete(self)
+instance_delete(self)
