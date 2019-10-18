@@ -515,12 +515,13 @@ if !instance_exists(CharSelect) {
 draw_set_halign(fa_left) //_draw x = 115
   var	_drawX   = game_width - 73,
 	    _drawY   = 82,
-			y_offset = GameCont.level > 0 ? 20 : 0
-  draw_backdrop(_drawX-20, _drawY-60 - y_offset, _drawX+68, _drawY-32 - y_offset, ""); //drawing black box
+			y_offset = GameCont.level > 0 ? 20 : 0,
+			_mutY    = !is_undefined(skill_get_at(0)) ? 20 : 0;
+  draw_backdrop(_drawX-20, _drawY-60 - y_offset + _mutY, _drawX+68, _drawY-32 - y_offset + _mutY, ""); //drawing black box
 //DRAWING THE PROGRESS BAR
 var BarLength = (global.time * 83) / global.timeControl
 draw_X = game_width - 89
-draw_Y = 35
+draw_Y = 35  + _mutY
 
 easy       = make_colour_rgb(66, 154, 60);  //easy
 hard       = make_colour_rgb(132, 94, 57)   //hard
@@ -559,24 +560,24 @@ if (global.difficulty == 8) difficultyName = "HAHAHAHAHA"
 draw_set_color(c_white);
 draw_set_alpha(1);
 
-draw_text_nt(game_width - 87, 38 - y_offset, string(difficultyName));
+draw_text_nt(game_width - 87, 38 - y_offset + _mutY, string(difficultyName));
 //DRAWING THE PROGRESS BAR END
 
 //DRAW TIME SYSTEM
 draw_set_halign(fa_left)
 draw_set_font(fntM)
 draw_x = 68
-draw_text_nt(game_width- 131 + draw_x, 28 - y_offset, ":");
-draw_text_nt(game_width- 151 + draw_x, 28 - y_offset, ":");
+draw_text_nt(game_width- 131 + draw_x, 28 - y_offset + _mutY, ":");
+draw_text_nt(game_width- 151 + draw_x, 28 - y_offset + _mutY, ":");
 draw_set_halign(fa_right)
-draw_text_nt(game_width - 110 + draw_x, 28 - y_offset, string(global.seconds));
-draw_text_nt(game_width - 130 + draw_x, 28 - y_offset, string(global.minutes));
-draw_text_nt(game_width - 149 + draw_x, 28 - y_offset, string(global.hours));
+draw_text_nt(game_width - 110 + draw_x, 28 - y_offset + _mutY, string(global.seconds));
+draw_text_nt(game_width - 130 + draw_x, 28 - y_offset + _mutY, string(global.minutes));
+draw_text_nt(game_width - 149 + draw_x, 28 - y_offset + _mutY, string(global.hours));
 if global.seconds < 10 {
-    draw_text_nt(game_width - 118 + draw_x, 28 - y_offset, " 0");
+    draw_text_nt(game_width - 118 + draw_x, 28 - y_offset + _mutY, " 0");
 }
 if global.minutes < 10 {
-    draw_text_nt(game_width - 138 + draw_x, 28 - y_offset, " 0");
+    draw_text_nt(game_width - 138 + draw_x, 28 - y_offset + _mutY, " 0");
 }
 //DRAW TIME SYSTEM END
 } else {

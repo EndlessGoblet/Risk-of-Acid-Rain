@@ -14,9 +14,11 @@ global.sprGoldItemChestOpen   = sprite_add("sprites/chests/sprGoldItemChestOpen.
 global.sprRustyItemChestOpen  = sprite_add("sprites/chests/sprRustyItemChestOpen.png"     , 1,  8, 8);
 global.sprLargeItemChestOpen  = sprite_add("sprites/chests/sprLargeItemChestOpen.png"     , 1, 12, 8);
 global.sprCursedItemChestOpen = sprite_add("sprites/chests/sprCursedItemChestOpen.png"    , 1, 11, 8);
-global.sprArmor = sprite_add("sprites/other/sprArmor.png", 2, 9, 9)
+global.sprArmor      = sprite_add("sprites/other/sprArmor.png", 3, 9, 9)
+global.sprArmorShine = sprite_add_weapon("sprites/other/sprArmorShine.png", 9, 9)
 
-global.sprItems = sprite_add("sprites/items/sprItems.png", 101, 17, 17);
+global.sprItems     = sprite_add(    "sprites/items/sprItems.png", 101, 17, 17);
+global.sprItemsBack = sprite_add("sprites/items/sprItemsBack.png",   5, 20, 20);
 
 global.sprText = sprite_add("sprites/other/sprText.png", 1, 8, 8);
 
@@ -87,12 +89,17 @@ Player.firewoodCharge = 0;
 Player.firewoodKills = 0;
 Player.s_Combat = 0;
 Player.s_Challenge = 0;
+
 global.PlayerItems = [item[? "none"]]
 global.descriptionTimer = 0;
 global.settings = false;
+
 Player.armor       = 0;
 Player.perma_armor = 0;
 Player.shakeText = 0;
+
+//Visuals
+Player.fx_celesteel = 0;
 
 #define level_start
 
@@ -520,10 +527,12 @@ with (Player) if my_health < lsthealth
 	lsthealth = my_health
   if !roll(((10 * item_get_count("celesteel")) / (item_get_count("celesteel") / 10 + 1))) && Player.armor > 0
 	{
+		Player.fx_steel = 1
     Player.armor--
     sound_play_pitch(sndSwapPistol, 2)
 		Player.shakeText += (room_speed / 10)
   }
+	else Player.fx_celesteel = 6.5
 }
 
 with instances_matching(enemy, "walled", true)
@@ -609,7 +618,7 @@ if(button_pressed(index, "horn")) {
 		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "item"
-			item_index = choose(item[? "celesteel"], item[? "steel"])
+			item_index = choose(item[? "celesteel"], item[? "steel"], item[? "heater"],  item[? "energy"],  item[? "prize"])
 			chest_setup(tag)
 		}
 	}
@@ -1290,7 +1299,10 @@ if (global.descriptionTimer > 0)
   draw_text_nt(game_width / 2 + draw_x + sprite_get_width(global.sprItems) + 40 + x_offset, 211, _item.description_small);
   draw_set_font(fntM0)
   draw_x = -100
-	draw_sprite(global.sprItems, _item.spr_index, game_width / 2 + draw_x + 35 + x_offset, 219);
+	draw_set_alpha(.15)
+	draw_sprite(global.sprItemsBack, _item.tier, game_width / 2 + draw_x + 34 + x_offset, 219);
+	draw_set_alpha(1)
+	draw_sprite(global.sprItems    , _item.spr_index, game_width / 2 + draw_x + 34 + x_offset, 219);
 	draw_set_alpha(1)
 }
 
@@ -1489,6 +1501,7 @@ if _luck != 0
 {
 	for (i = 0; i < abs(_luck); i++ )
 	{
+		_chance = irandom_range(1,100);
 		if _luck > 0
 		{
 			if _chance <= VALUE return true
@@ -1517,13 +1530,21 @@ var shake_x = round(random_range(-1, 1)); var shake_y = round(random_range(-1, 1
 }
 if instance_exists(Player)
 {
+	var _s = Player.shakeText > 0 ? "@r" : ""
 	var _rogue = + (Player.race = "rogue" ? sprite_get_width(sprRogueAmmoHUDTB) : 0)
 	draw_set_halign(fa_center)
 	draw_set_font(fntChat)
 	if (Player.armor != 0)
 	{
-		draw_sprite(global.sprArmor, 0, 117 + _rogue, 12)
-		draw_text_nt(118 + _rogue + shake_x, 4 + shake_y, string(Player.armor))
+		draw_sprite(global.sprArmor, item_get_count("celesteel") > 0 ? 2 : 0, 117 + _rogue, 12)
+		if Player.fx_celesteel > 0
+		{
+			draw_set_blend_mode(bm_add)
+			draw_sprite(global.sprArmorShine, 6 - Player.fx_celesteel, 117 + _rogue, 12)
+			draw_set_blend_mode(bm_normal)
+			Player.fx_celesteel-= .5
+		}
+		draw_text_nt(118 + _rogue + shake_x, 4 + shake_y, _s + string(Player.armor))
 		_rogue += sprite_get_width(global.sprArmor) - 2
 	}
 	if (Player.perma_armor != 0)
