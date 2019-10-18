@@ -50,11 +50,11 @@ global.PlusItems = 0;
 global.hideDes = 0;
 global.hurtFloor = false;
 global.forceSupport = false;
-global.popoChance = 0; //Bandit mask is temporarily disabled item [? "mask"]
-global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"] , item[? "chopper"], item[? "locket"]   , item[? "steel"]] //TO DO: None
-global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"], item[? "plate"]  , item[? "firewood"] , item[? "coin"]  , item[? "celesteel"]] //To-Do: coin, Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
-global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "cannon"]] //To-Do: Fern
-global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice, heater
+global.popoChance = 0;
+global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"] , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
+global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"], item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
+global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"]] //To-Do: Fern
+global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice
 global.UniqueItems   = [item[? "energy"]    , item[? "times"]]
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
@@ -103,7 +103,7 @@ Player.fx_celesteel = 0;
 
 #define level_start
 
-var amount = item_get_count("steel");
+var amount = item_get_count("metal");
 if amount >= 1
 {
     Player.armor += 2 * amount
@@ -147,7 +147,7 @@ global.hurtFloor = false;
 
 //Bandit Mask
 var amount = item_get_count("mask")
-if (amount >= 1) global.MaskCounter = (300 * amount)
+if (amount >= 1) global.MaskCounter = (room_speed * (1 + 4 *  amount))
 //Bandit Mask
 
 global.descriptionTimer = 0;
@@ -265,12 +265,23 @@ if amount >= 1 && instance_exists(Player)
 	}
 }
 
-var amount = item_get_count("mask") {
-    if amount >= 1 && global.MaskCounter >= 0 {
+var amount = item_get_count("mask")
+{
+  if amount >= 1 && global.MaskCounter >= 0 && instance_exists(Player)
+	{
+		if (global.MaskCounter > 1) with (Player) {image_blend = merge_color(c_aqua, c_white, 0.7); image_alpha = .6} else with (Player) {image_blend = merge_color(c_aqua, c_white, 1); image_alpha = 1}
+		global.MaskCounter--
     draw_set_halign(fa_center)
     var count = round(global.MaskCounter / room_speed)
-if instance_exists(Player) && global.MaskCounter > 0 draw_text_nt(Player.x, Player.y + 10, string(count));
-}}
+		if instance_exists(Player) && global.MaskCounter > 0 draw_text_nt(Player.x, Player.y + 10, string(count));
+		if Player.my_health < Player.lsthealth
+		{
+			sleep(70)
+			view_shake_at(Player.x, Player.y, 12)
+			global.MaskCounter = 0
+		}
+	}
+}
 //Shrine
 with(instances_matching(CustomObject, "name", "Shrine")) {
 if distance_to_object(Player) <= 2 && open == false {
@@ -491,25 +502,46 @@ switch(obj_name) {
 #define get_item(ITEM)
 global.itemGet = ITEM
 global.descriptionTimer = room_speed * 4
+var _ang = random(360),
+    _i   = 0
 if ITEM = item[? "gift"] repeat(2)
 {
-	get_item(global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))])
+	with obj_create(Player.x + lengthdir_x(26, _ang + _i * 180), Player.y + lengthdir_y(26, _ang + _i * 180), "ItemChest")
+	{
+		tag = "item"
+		item_index = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]
+		chest_setup(tag)
+	}
+	_i++
 }
 if ITEM = item[? "dice"] repeat(2)
 {
-	get_item(global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))])
+	with obj_create(Player.x + lengthdir_x(26, _ang + _i * 180), Player.y + lengthdir_y(26, _ang + _i * 180), "ItemChest")
+	{
+		tag = "item"
+		item_index = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]
+		chest_setup(tag)
+	}
+	_i++
 }
 if ITEM = item[? "celesteel"]
 {
     Player.armor += 5
 }
-if ITEM = item[? "cannon"]
+if ITEM = item[? "missile"]
 {
     Player.armor += 8
 }
 if ITEM = item[? "heater"]
 {
-	Player.health_base = round(max(Player.health_base * .75, 1))
+	var _l = round(max(Player.health_base * .75, 1))
+	Player.health_base = _l
+	if Player.my_health > Player.health_base
+	{
+		Player.my_health = Player.health_base
+		Player.lsthealth = Player.health_base
+
+	}
 	Player.perma_armor += 2
 }
 add_item(ITEM)
@@ -618,7 +650,7 @@ if(button_pressed(index, "horn")) {
 		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "item"
-			item_index = choose(item[? "celesteel"], item[? "steel"], item[? "heater"],  item[? "energy"],  item[? "prize"])
+			item_index = choose(item[? "mask"])
 			chest_setup(tag)
 		}
 	}
@@ -748,22 +780,17 @@ with (Player)
 {
   if global.MaskCounter > 0
 	{
-	  if instance_exists(enemy) with enemy if "walled" not in self
+	  if instance_exists(enemy) with enemy
 		{
-			walled = true
+			for(i = 0; i < 5; i++)
+			{
+				if(alarm_get(i) > 2)
+				{
+					alarm_set(i, alarm_get(i) + 1 + mod_variable_get("mod", "main", "HardmodeGet") * .5);
+				}
+			}
 		}
-	  image_alpha = 0.5
-	  if(button_pressed(Player.index, "fire")) || (button_pressed(Player.index, "spec"))
-		{
-    	global.MaskCounter -= room_speed * 2;
-  	}
-    global.MaskCounter--
-  }
-	else
-	{
-    team = 2;
-    image_alpha = 1
-  }
+	}
 }
 //Bandit Mask
 
@@ -903,11 +930,12 @@ with (projectile) {
 var amount = item_get_count("lust");
 if amount >= 1 {
 with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal){
-global.BloodCounter = (120 * amount)
+global.BloodCounter = (room_speed * 3 + room_speed * 2 * amount)
 }
 if global.BloodCounter > 0 {
     if (global.BloodCounter != 1) with (Player) image_blend = merge_color(c_red, c_white, 0.3)
-    if (global.BloodCounter != 1) with instances_matching(projectile, "team", 2) damage *= (1 + (amount * 0.2))
+    if (global.BloodCounter != 1) with instances_matching(projectile, "team", 2) extra_damage += .7
+		extra_speed += 1 // dont make this scale
     global.BloodCounter--
 }
 if (global.BloodCounter = 1) {
@@ -1048,7 +1076,7 @@ if (Player.speed) > speedLimit {
 var amount = item_get_count("siphon");
 if amount >= 1 && instance_exists(Player) {
 	if instance_exists(SmallGenerator) var _gen = instance_nearest(Player.x, Player.y, SmallGenerator)
-	if distance_to_object(SmallGenerator) < 150 && mod_variable_get("mod", "main", "teleporter")  = true
+	with Player if distance_to_object(_gen) < 150 && mod_variable_get("mod", "main", "teleporter")  = true
 	extra_reload += .1 + (.2 * amount)
 }
 //Teleporter Siphon
@@ -1115,7 +1143,7 @@ if amount >= 1
 {
 	with instances_matching(enemy, "my_health", 0)
 	{
-		if roll(7 + 2 * amount) // 7% base chance to drop chest + 2% per stack
+		if size > 0 && roll(7 + 2 * amount) // 7% base chance to drop chest + 2% per stack
 		{
 			with obj_create(x, y, "ItemChest")
 			{
@@ -1128,10 +1156,10 @@ if amount >= 1
 //Broken Locket
 
 //Scrap Cannon
-var amount = item_get_count("cannon");
+var amount = item_get_count("missile");
 if amount >= 1 && instance_exists(Player)
 {
-	extra_damage += Player.armor * 2.5 * amount
+	extra_damage += (Player.armor + Player.perma_armor) * .05 * amount
 }
 //Scrap Cannon
 
@@ -1470,6 +1498,7 @@ switch TAG
 		image_speed  = 0
 		spr_open   = mskNone
 		spr_shadow = shd16
+		x += sprite_get_width(global.sprItems) / 2
 		spr_shadow_x = -8
 		spr_shadow_y = 2
 		break;
