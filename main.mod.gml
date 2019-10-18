@@ -54,6 +54,7 @@ while(true){
 
 #define level_start
 //Reset vars
+global.BossesLeft = 0 // 0 at level start, after teleport activation = amount of boss enemies, at 0 spawns an item
 global.subareaChoice = 0
 global.areaChoice = 0
 //Spawn invincible anti-portal maggot
@@ -124,7 +125,7 @@ var ice = [Bandit, SnowTank, SnowBot, Wolf]
 var labs = [Freak, Turret, Freak, ExploFreak, Necromancer, RhinoFreak]
 var palace = [ExploGuardian, DogGuardian, Guardian, Guardian, ExploGuardian]
 var pizza = [Turtle, Rat]
-var oasis = [BoneFish, Crab, BoneFish, BoneFish]
+var oasis = [BoneFish, Crab, BoneFish, BoneFish, BoneFish, Bandit]
 var mansion = [FireBaller, SuperFireBaller, Jock, Molefish, Molesarge]
 var cursed = [InvLaserCrystal, InvSpider]
 var everything = [Bandit, Scorpion, BigMaggot, Maggot, Rat, Ratking, Gator, BuffGator, Raven, MeleeBandit, Sniper, Salamander, LaserCrystal, LightningCrystal, Spider, Bandit, SnowTank, SnowBot, Wolf, Turret, Freak, ExploFreak, Necromancer, RhinoFreak, ExploGuardian, Guardian, DogGuardian, Turtle, BoneFish, Crab, FireBaller, SuperFireBaller, Jock, Molefish, Molesarge, InvLaserCrystal, InvSpider]
@@ -187,6 +188,25 @@ var SpawnY = Player.y + y_
 }
 }
 #define step
+
+//bosses item spawn code
+with instances_matching(hitme, "tag", "boss")
+{
+	if my_health <= 0
+	{
+		global.BossesLeft--
+		if global.BossesLeft = 0
+		{
+			with obj_create(x, y, "ItemChest")
+			{
+				tag = "item"
+				item_index = mod_variable_get("mod", "items", "UncommonItems")[random_range(0, array_length(mod_variable_get("mod", "items", "UncommonItems")) - 1)]
+				chest_setup(tag)
+			}
+		}
+	}
+}
+
 var minutes_ = 3 //How many minutes for difficulty to go up
 if (global.mode = 1) var minutes_ = 2
 global.timeControl = 60 * 60 * (minutes_ * 2) //Time Control
@@ -197,51 +217,56 @@ with (enemy) {
 for(i = 0; i < 5; i++){
 
 			if(alarm_get(i) > 2){
-				alarm_set(i, alarm_get(i) - 0.5);
+				alarm_set(i, (alarm_get(i) - (.4 + .1 * item_get_count("times"))));
 			}
 		}
 
 if "convert" not in self {
-    _roll = round(random_range(1, 5))
+    _roll = round(max(random_range(1, 5.25 - .25 * item_get_count("times")), 1))
     if (_roll == 1) {
-if (object_index == Scorpion) { 
-instance_create(x, y, GoldScorpion); 
-instance_delete(self); 
+if (object_index == Scorpion) {
+instance_create(x, y, GoldScorpion);
+instance_delete(self);
 break;
 }
-if (object_index == Gator) { 
-instance_create(x, y, BuffGator); 
-instance_delete(self); 
+if (object_index == Gator) {
+instance_create(x, y, BuffGator);
+instance_delete(self);
 break;
 }
-if (object_index == Exploder) { 
-instance_create(x, y, SuperFrog); 
-instance_delete(self); 
+if (object_index == Exploder) {
+instance_create(x, y, SuperFrog);
+instance_delete(self);
 break;
 }
-if (object_index == FireBaller) { 
-instance_create(x, y, SuperFireBaller); 
-instance_delete(self); 
+if (object_index == FireBaller) {
+instance_create(x, y, SuperFireBaller);
+instance_delete(self);
 break;
 }
-if (object_index == Grunt) { 
-instance_create(x, y, EliteGrunt); 
-instance_delete(self); 
+if (object_index == Grunt) {
+instance_create(x, y, EliteGrunt);
+instance_delete(self);
 break;
 }
-if (object_index == Inspector) { 
-instance_create(x, y, EliteInspector); 
-instance_delete(self); 
+if (object_index == Inspector) {
+instance_create(x, y, EliteInspector);
+instance_delete(self);
 break;
 }
-if (object_index == Shielder) { 
-instance_create(x, y, EliteShielder); 
-instance_delete(self); 
+if (object_index == Shielder) {
+instance_create(x, y, EliteShielder);
+instance_delete(self);
 break;
 }
-if (object_index == SnowTank) { 
-instance_create(x, y, GoldSnowTank); 
-instance_delete(self); 
+if (object_index == SnowTank) {
+instance_create(x, y, GoldSnowTank);
+instance_delete(self);
+break;
+}
+if (object_index == LaserCrystal) {
+instance_create(x, y, LightningCrystal);
+instance_delete(self);
 break;
 }
 }
@@ -260,7 +285,7 @@ if global.AnomalyGet = false && instance_exists(Player) && Player.race = "horror
 		repeat(2) get_item(item[? "energy"])
 	}
 }
-if global.HardmodeGet = false && instance_exists(Player) && UberCont.hardmode = true && !instance_exists(SpiralCont)
+if global.HardmodeGet = false && global.mode = 1 && instance_exists(Player) && !instance_exists(SpiralCont)
 {
 	global.HardmodeGet = true
 	get_item(item[? "times"])
@@ -388,7 +413,7 @@ if global.minutes == 60 {
 
 
 //DIFFICULTY INCREASING TIMER
-if !instance_exists(GenCont) global.time += speed
+if !instance_exists(GenCont) && instance_exists(Player) global.time += speed *  (1 + item_get_count("times") * 1.2)
 if global.time >= global.timeControl && global.difficulty != 8 { //increases every 3 minutes //11520
 global.time = 0;
 global.difficulty++ //difficulty increase
@@ -407,7 +432,7 @@ if !instance_exists(Spiral) && global.teleporter == true && point_in_circle(x, y
 global.chargeF++
 if global.chargeF == round(room_speed / 1.5){
 global.chargeF = 0;
-global.charge += 1 + item_get_count("times") * .5 //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
+global.charge += 1 //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
 if (GameCont.area = 101) global.charge += 4 //Charge faster in oasis
 with instances_matching_le(enemy,"my_health",0){
 		if object_index != Maggot {
@@ -416,7 +441,8 @@ if (roll == 10) instance_create(x, y, AmmoPickup)
         }
 }
 }
-if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get_count("energy") * 10) {
+	 global.charge = clamp(global.charge, 0, 100)
+if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get_count("energy") * 10) && global.BossesLeft <= 0{
     instance_create(Gen.x, Gen.y, Portal)
     GameCont.hard += 2
     if (GameCont.area = 1) GameCont.subarea = 3;
@@ -541,13 +567,13 @@ draw_text_nt(game_width / 2, 20, "@wNORMAL MODE")
     var draw_x = -19
     var draw_y = 42
     draw_set_alpha(1)
-    for(var i = 0; i < 0.5; i += 1) {   
+    for(var i = 0; i < 0.5; i += 1) {
     if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x+15, draw_y-6, draw_x+4*10+2, draw_y+10) {
         draw_sprite(global.sprMode, 1, 20, 50)
         if button_pressed(i, "fire") {
-            
+
         if (global.modesMenu == false) { global.modesMenu = true; global.info = false; sound_play(sndClick) } else { global.modesMenu = false; sound_play(sndClick)}
-        
+
          }
     } else {
         draw_sprite(global.sprMode, 1, 20, 51)
@@ -597,40 +623,48 @@ draw_text_nt(game_width / 2, 20, "@wNORMAL MODE")
 
     }
     if global.modesMenu == true {
+				draw_x = 141
+				draw_y = 79
+				x_offset = 70
+				y_offset = 15
         draw_set_alpha(0.5)
-        draw_sprite(global.sprModes, 0, 111, 91)
-        draw_sprite(global.sprModes, 1, 111 + (60), 91)
+        draw_sprite(global.sprModes, 0, draw_x + 1           , draw_y + y_offset + 1)
+        draw_sprite(global.sprModes, 1, draw_x + 1 + x_offset, draw_y + y_offset + 1)
         draw_set_alpha(1)
-        draw_x = 121 + (global.mode * 60); draw_y = 79;
         draw_set_color(c_white)
-        draw_rectangle(draw_x -53, draw_y-31, draw_x-11, draw_y+11, 0)
-    
-        draw_sprite(global.sprModes, 0, 110, 90)
-        draw_sprite(global.sprModes, 1, 110 + (60), 90)
+        draw_rectangle(draw_x - 42 + global.mode * x_offset, draw_y - 27, draw_x + global.mode * x_offset, draw_y + 15, 0)
+
+        draw_sprite(global.sprModes, 0, draw_x           , draw_y + y_offset)
+        draw_sprite(global.sprModes, 1, draw_x + x_offset, draw_y + y_offset)
         draw_set_color(c_white); draw_set_alpha(0.2);
-        draw_x = 121; draw_y = 79; if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-30, draw_x-12, draw_y+10) {
-        draw_rectangle(draw_x -52, draw_y-30, draw_x-12, draw_y+10, 0)
-        draw_set_alpha(1)
-        draw_text_nt(60, 169, "@wNormal Mode-")
-        draw_text_nt(60, 169, "@s#The default difficulty, for those who #don't wanna die every 2 seconds")
-        if button_pressed(i, "fire") {
-        global.mode = 0;
-        sound_play_pitch(sndClick, 1.2)
+				var _textx = 9,
+				    _texty = 169,
+						_strModeNormal = "@sThe default difficulty, for those who#don't wanna die every 2 seconds",
+						_strModeHard   = "@s#Enemies have more @rhp@s, are more #@ragressive@s, @yelites@s spawn more often,#@wdifficulty@s scales faster, and #everything sucks"
+				draw_set_halign(fa_left)
+				draw_set_alpha(1)
+				if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-30, draw_x-12, draw_y+10)
+				{
+					draw_backdrop(_textx, _texty - string_height(_strModeNormal) / 2, _textx + 298,  _texty + string_height(_strModeNormal), "Normal Mode")
+	        draw_text_nt(_textx + 3, _texty, _strModeNormal)
+	        if button_pressed(i, "fire")
+					{
+		        global.mode = 0;
+		        sound_play_pitch(sndClick, 1.2)
+	        }
         }
+        draw_x += x_offset
+		  	if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-30, draw_x-12, draw_y+10)
+				{
+	        draw_backdrop(_textx, _texty - string_height(_strModeNormal) * 4 / 3 - 2, _textx + 298,  _texty + string_height(_strModeNormal), "Hard Mode")
+	        draw_text_nt(_textx + 3, _texty - string_height(_strModeNormal) * 4 / 3 - 2, _strModeHard)
+	        if button_pressed(i, "fire")
+					{
+		        global.mode = 1;
+		        sound_play_pitch(sndClick, 1)
+		        sound_play_pitch(sndMeatExplo, 1)
+	        }
         }
-        draw_set_alpha(0.2);
-        draw_x = 181; draw_y = 79; if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-30, draw_x-12, draw_y+10) {
-        draw_rectangle(draw_x -52, draw_y-30, draw_x-12, draw_y+10, 0)
-        draw_set_alpha(1)
-        draw_text_nt(60, 149, "@wHard Mode-")
-        //draw_text_nt(60, 149, "@w#Enemies have more hp, are more #agressive, elites spawn more often,#difficulty scales faster, and #everything sucks")
-        draw_text_nt(60, 149, "@s#Enemies have more @rhp@s, are more #@ragressive@s, @yelites@s spawn more often,#@wdifficulty@s scales faster, and #everything sucks")
-        if button_pressed(i, "fire") {
-        global.mode = 1;
-        sound_play_pitch(sndClick, 1)
-        sound_play_pitch(sndMeatExplo, 1)
-        }
-        } 
     }
 }
 }
@@ -799,25 +833,25 @@ if (GameCont.area == 2) var SpawnY = Player.y - (random_range(105, 115) * negati
 
  //Make Room via Explosion
  var repeatNumber = Player.s_Challenge + 1
-            repeat(repeatNumber) if (GameCont.area == 1) { sound_play_music(musBoss1); instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, BanditBoss); }
-            repeat(repeatNumber)if (GameCont.area == 2) { sound_play_music(musBoss5); instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, FrogQueen) }
-            repeat(repeatNumber)if (GameCont.area == 3) { sound_play_music(musBoss2); instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, ScrapBoss)GameCont.subarea = 3;  }
-            repeat(repeatNumber)if (GameCont.area == 4) { sound_play_music(musBoss6); instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, HyperCrystal) }
-            repeat(repeatNumber)if (GameCont.area == 5) { sound_play_music(musBoss3); instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, LilHunter)GameCont.subarea = 3; }
-            repeat(repeatNumber)if (GameCont.area == 6) { sound_play_music(musBoss7); instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, TechnoMancer) }
-            repeat(repeatNumber)if (GameCont.area == 7) { sound_play_music(musBoss4B); instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Nothing2)GameCont.subarea = 3;}
-            repeat(repeatNumber)if (GameCont.area == 0) { sound_play_music(musBoss8); instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Nothing2) }
+            repeat(repeatNumber) if (GameCont.area == 1) { sound_play_music( musBoss1); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, BanditBoss)  {global.BossesLeft++; tag = "boss"}}
+            repeat(repeatNumber) if (GameCont.area == 2) { sound_play_music( musBoss5); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, FrogQueen)   {global.BossesLeft++; tag = "boss"}}
+            repeat(repeatNumber) if (GameCont.area == 3) { sound_play_music( musBoss2); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, ScrapBoss)   {global.BossesLeft++; tag = "boss"}GameCont.subarea = 3}
+            repeat(repeatNumber) if (GameCont.area == 4) { sound_play_music( musBoss6); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, HyperCrystal){global.BossesLeft++; tag = "boss"}}
+            repeat(repeatNumber) if (GameCont.area == 5) { sound_play_music( musBoss3); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, LilHunter)   {global.BossesLeft++; tag = "boss"}GameCont.subarea = 3}
+            repeat(repeatNumber) if (GameCont.area == 6) { sound_play_music( musBoss7); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, TechnoMancer){global.BossesLeft++; tag = "boss"}}
+            repeat(repeatNumber) if (GameCont.area == 7) { sound_play_music(musBoss4B); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Nothing2)    {global.BossesLeft++; tag = "boss"}GameCont.subarea = 3}
+            repeat(repeatNumber) if (GameCont.area == 0) { sound_play_music( musBoss8); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Nothing2)    {global.BossesLeft++; tag = "boss"}}
 
-            repeat(repeatNumber)if (GameCont.area == 101) { sound_play_music(musBoss3); instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, OasisBoss); }
+            repeat(repeatNumber)if (GameCont.area == 101) { sound_play_music(musBoss3); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, OasisBoss){global.BossesLeft++; tag = "boss"}}
             if (GameCont.area == 102) { sound_play_music(musBoss3);
-            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_orange, c_white, 0.3); my_health *= 2; maxhealth *= 2}
-            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_red, c_white, 0.3); my_health *= 2; maxhealth *= 2}
-            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_blue, c_white, 0.3); my_health *= 2; maxhealth *= 2}
-            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_purple, c_white, 0.3); my_health *= 2; maxhealth *= 2}
+            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_orange, c_white, 0.3); my_health *= 2; maxhealth *= 2; global.BossesLeft++; tag = "boss"}
+            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_red, c_white, 0.3)   ; my_health *= 2; maxhealth *= 2; global.BossesLeft++; tag = "boss"}
+            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_blue, c_white, 0.3)  ; my_health *= 2; maxhealth *= 2; global.BossesLeft++; tag = "boss"}
+            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_purple, c_white, 0.3); my_health *= 2; maxhealth *= 2; global.BossesLeft++; tag = "boss"}
             }
 
             if (GameCont.area == 103) { sound_play_music(mus104);
-            repeat(repeatNumber) instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, SuperFireBaller);
+            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, SuperFireBaller){global.BossesLeft++; tag = "boss"};
             }
 
     }
@@ -833,6 +867,8 @@ if (GameCont.area == 2) var SpawnY = Player.y - (random_range(105, 115) * negati
 	}
 }
 
+#define chest_setup(TAG)																 return mod_script_call("mod", "items","chest_setup"   , TAG)
+#define obj_create(X, Y, OBJ_NAME)											 return mod_script_call("mod", "items","obj_create"    , X, Y, OBJ_NAME)
 #define add_item(ITEM)																	 return mod_script_call("mod", "items","add_item"      , ITEM)
 #define get_item(ITEM)     			                         return mod_script_call("mod", "items","get_item"      , ITEM)
 #define item_get_count(ITEM)                             return mod_script_call("mod", "items","item_get_count", ITEM)

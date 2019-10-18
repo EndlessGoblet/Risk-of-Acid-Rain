@@ -182,7 +182,7 @@ item_sabotage_tools = {
 #macro item_bandit_mask item[? "mask"]
 item_bandit_mask = {
   name              : "Bandit Mask",
-	description_small : "@sStart new @wareas @swith @winvincibility",
+	description_small : "@sStart new @wareas @winvisible",
 	description_large : "-",
 	spr_index         : 15,
 	tier              : 0
@@ -369,7 +369,7 @@ item_chopper = {
 #macro item_broken_locket item[? "locket"]
 item_broken_locket = {
   name              : "Broken Locket",
-	description_small : "@wEnemies @sdrop @wRusty Chests @son @wDeath",
+	description_small : "@wEnemies @sdrop @wRusty Chests @son @wdeath",
 	description_large : "-",
 	spr_index         : 32,
 	tier              : 0
@@ -435,7 +435,7 @@ item_glowing_fern = {
 #macro item_hard_times item[? "times"]
 item_hard_times = {
   name              : "Hard Times",
-	description_small : "@wEnemies @sget @wstronger faster",
+	description_small : "@sEverything is more @wdangerous",
 	description_large : "-",
 	spr_index         : 38,
 	tier              : 4
@@ -443,9 +443,9 @@ item_hard_times = {
 };
 
 // ITEM 39: STEEL PLATING
-#macro item_steel_plating item[? "steel"]
-item_steel_plating = {
-  name              : "Steel Plating",
+#macro item_metal_plating item[? "metal"]
+item_metal_plating = {
+  name              : "Metal Plating",
 	description_small : "@s+@w2 @yArmor @sper @warea",
 	description_large : "-",
 	spr_index         : 39,
@@ -476,9 +476,9 @@ item_celesteel = {
 
 };
 
-// ITEM 42: SCRAP CANNON
-#macro item_scrap_cannon item[? "cannon"]
-item_scrap_cannon = {
+// ITEM 42: SCRAP MISSILE
+#macro item_scrap_missile item[? "missile"]
+item_scrap_missile = {
   name              : "Scrap Cannon",
 	description_small : "@s+@w8 @yArmor@s, scale @wdamage @swith @yarmor",
 	description_large : "-",
