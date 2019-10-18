@@ -613,7 +613,7 @@ if(button_pressed(index, "horn")) {
 			chest_setup(tag)
 		}
 	}
-      //get_item(item[? "chopper"])
+     // get_item(item[? "info"])
 	}
 }
 //Timer

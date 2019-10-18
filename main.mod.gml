@@ -3,7 +3,7 @@
 #define init
 if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
 //DEBUG
-global.debug = true;
+global.debug = false;
 //Create important initial variables
 global.AnomalyGet  = 0;
 global.HardmodeGet = 0;
@@ -26,8 +26,8 @@ global.BarLength = 0;
 global.DarkCircle = false;
 global.respawn = 0;
 global.info = false;
-var minutes_ = 3
-global.timeControl = 60 * 60 * (minutes_ * 2)
+global.modesMenu = false;
+global.mode = 0;
 if (instance_exists(CharSelect)) CharSelect.closeSettings = true;
 if (instance_exists(Player)) Player.debug = false;
 //Main Menu (Splash screen?)
@@ -35,6 +35,8 @@ global.menu = false;
 global.sprSplash  = sprite_add("sprites/other/splash.png", 1, 320, 240);
 global.sprVersion = sprite_add("sprites/other/sprVersion.png", 1, 93, 20);
 global.sprOutline = sprite_add("sprites/other/sprOutline.png", 1, 93, 20);
+global.sprMode = sprite_add("sprites/other/sprMode.png", 1, 19, 13);
+global.sprModes = sprite_add("sprites/other/sprModes.png", 2, 41, 41);
 if (instance_exists(CharSelect)) global.menu = true;
 //set new level function
 global.newLevel = instance_exists(GenCont);
@@ -175,6 +177,76 @@ var SpawnY = Player.y + y_
 }
 }
 #define step
+var minutes_ = 3 //How many minutes for difficulty to go up
+if (global.mode = 1) var minutes_ = 2
+global.timeControl = 60 * 60 * (minutes_ * 2) //Time Control
+
+//Hard Mode
+if (global.mode == 1) {
+with (enemy) {
+for(i = 0; i < 5; i++){
+
+			if(alarm_get(i) > 2){
+				alarm_set(i, alarm_get(i) - 0.5);
+			}
+		}
+
+if "convert" not in self {
+    _roll = round(random_range(1, 5))
+    if (_roll == 1) {
+if (object_index == Scorpion) { 
+instance_create(x, y, GoldScorpion); 
+instance_delete(self); 
+break;
+}
+if (object_index == Gator) { 
+instance_create(x, y, BuffGator); 
+instance_delete(self); 
+break;
+}
+if (object_index == Exploder) { 
+instance_create(x, y, SuperFrog); 
+instance_delete(self); 
+break;
+}
+if (object_index == FireBaller) { 
+instance_create(x, y, SuperFireBaller); 
+instance_delete(self); 
+break;
+}
+if (object_index == Grunt) { 
+instance_create(x, y, EliteGrunt); 
+instance_delete(self); 
+break;
+}
+if (object_index == Inspector) { 
+instance_create(x, y, EliteInspector); 
+instance_delete(self); 
+break;
+}
+if (object_index == Shielder) { 
+instance_create(x, y, EliteShielder); 
+instance_delete(self); 
+break;
+}
+if (object_index == SnowTank) { 
+instance_create(x, y, GoldSnowTank); 
+instance_delete(self); 
+break;
+}
+}
+convert = true;
+}
+}
+
+with (WeaponChest) {
+    if (GameCont.area == 1 || GameCont.area == 101) {
+        instance_create(x, y, BigWeaponChest)
+        instance_delete(self);
+    }
+}
+}
+
 if global.AnomalyGet = false && instance_exists(Player) && Player.race = "horror"
 {
 	if ultra_get("horror", 2) = true
@@ -249,14 +321,14 @@ with(FloorMaker) if GameCont.area != 0 && GameCont.area != 2 && GameCont.area !=
 //Difficulty Changes
 with (enemy) {
     if ("boost") not in self { //Boost non-boosted enemies based on difficulty
-if (global.difficulty == 1) {maxhealth *= 1.3; my_health *= 1.3;if (meleedamage >= 1) meleedamage *= 1; boost = true; }
+if (global.difficulty == 1) {maxhealth *= 1.3; my_health *= 1.3;if (meleedamage >= 1) meleedamage = round(meleedamage * 1.5); boost = true; }
 if (global.difficulty == 2) {maxhealth *= 1.6; my_health *= 1.6;if (meleedamage >= 1) meleedamage *= 2; boost = true; }
 if (global.difficulty == 3) {maxhealth *= 1.9; my_health *= 1.9;if (meleedamage >= 1) meleedamage *= 3; boost = true; }
 if (global.difficulty == 4) {maxhealth *= 2.2; my_health *= 2.2;if (meleedamage >= 1) meleedamage *= 4; boost = true; }
 if (global.difficulty == 5) {maxhealth *= 2.5; my_health *= 2.5;if (meleedamage >= 1) meleedamage *= 5; boost = true; }
-if (global.difficulty == 6) {maxhealth *= 2.8; my_health *= 2.8;if (meleedamage >= 1) meleedamage *= 6; boost = true; }
-if (global.difficulty == 7) {maxhealth *= 3.1; my_health *= 3.1;if (meleedamage >= 1) meleedamage *= 7; boost = true; }
-if (global.difficulty == 8) {maxhealth *= 3.4; my_health *= 3.4;if (meleedamage >= 1) meleedamage *= 8; boost = true; }
+if (global.difficulty == 6) {maxhealth *= 2.8; my_health *= 2.8;if (meleedamage >= 1) meleedamage = round(meleedamage * 6.5); boost = true; }
+if (global.difficulty == 7) {maxhealth *= 3.1; my_health *= 3.1;if (meleedamage >= 1) meleedamage *= 8; boost = true; }
+if (global.difficulty == 8) {maxhealth *= 3.4; my_health *= 3.4;if (meleedamage >= 1) meleedamage *= 10; boost = true; }
     }
 }
 
@@ -441,28 +513,49 @@ global.seconds = 0;
 global.minutes = 0;
 global.hours = 0;
 global.teleporter = false;
-
+global.modesMenu = false;
+global.info = false;
 
 
 
 #define draw_gui
 //TO-DO
 if instance_exists(CharSelect)  {
-    if global.debug == true {
+    draw_set_halign(fa_center)
+    if (global.mode == 1) {
+    draw_set_alpha(0.7)
+    draw_text_nt(game_width / 2 + random_range(-2, 2), 20 + random_range(-2, 2), "@rHARD MODE")
     draw_set_alpha(1)
-    draw_text_nt(2, 40, "TO-DO:")
-    draw_text_nt(2, 50, "-SAVE OPTIONS IN A FILE")
-    draw_text_nt(2, 70, "-MORE ITEMS")
-    draw_text_nt(2, 80, "-MUST BEAT BOSS TO LEAVE AREA")
+    draw_text_nt(game_width / 2, 20, "@rHARD MODE")
     }
+    if (global.mode == 0) {
+        draw_set_alpha(1)
+draw_text_nt(game_width / 2, 20, "@wNORMAL MODE")
+    }
+        draw_set_halign(fa_left)
+    var draw_x = -19
+    var draw_y = 42
     draw_set_alpha(1)
+    for(var i = 0; i < 0.5; i += 1) {   
+    if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x+15, draw_y-6, draw_x+4*10+2, draw_y+10) {
+        draw_sprite(global.sprMode, 1, 20, 50)
+        if button_pressed(i, "fire") {
+            
+        if (global.modesMenu == false) { global.modesMenu = true; global.info = false; sound_play(sndClick) } else { global.modesMenu = false; sound_play(sndClick)}
+        
+         }
+    } else {
+        draw_sprite(global.sprMode, 1, 20, 51)
+    }
+
     var draw_x = game_width - 47; var draw_y = 44; draw_set_alpha(0); draw_rectangle(0+draw_x-52, draw_y-6, draw_x+4*10+2, draw_y+10, 0); draw_set_alpha(1) draw_set_color(c_white)
     if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-6, draw_x+4*10+2, draw_y+10) {
     draw_sprite_ext(global.sprOutline, 1, game_width - 5, 55, 1, 1, 0, c_white, 1 );
     draw_sprite_ext(global.sprVersion, 1, game_width - 5, 55, 1, 1, 0, c_white, 1 );
-    for(var i = 0; i < 0.5; i += 1) {  if button_pressed(i, "fire") {
+    if button_pressed(i, "fire") {
     if (global.info) == false {
         global.info = true;
+        global.modesMenu = false;
         CharSelect.closeSettings = true;
         sound_play_pitch(sndClick, 0.8)
         wait(2)
@@ -477,12 +570,13 @@ if instance_exists(CharSelect)  {
         wait(2)
         sound_play_pitch(sndClick, 0.8)
     }
-    }}
+    }
     } else {
     draw_sprite(global.sprVersion, 1, game_width - 5, 55)
     }
-    if global.info == true {
-        draw_x = game_width / 2 + 35; draw_y = 20; draw_set_alpha(0.85); draw_set_color(c_black); draw_rectangle(120+draw_x, 20+draw_y, -190+draw_x, 180+draw_y, 0)
+    if (global.modesMenu==true) || (global.info ==true) { draw_x = game_width / 2 + 35; draw_y = 20; draw_set_alpha(0.85); draw_set_color(c_black); draw_rectangle(120+draw_x, 20+draw_y, -190+draw_x, 180+draw_y, 0) }
+    if global.info == true { //Draw menues here--------------
+        //draw_x = game_width / 2 + 35; draw_y = 20; draw_set_alpha(0.85); draw_set_color(c_black); draw_rectangle(120+draw_x, 20+draw_y, -190+draw_x, 180+draw_y, 0)
         draw_set_alpha(1)
         //draw_text_nt(game_width / 2 - 152, 42, "@pVERSION 1.5")
          draw_text_nt(game_width / 2 - 152, 42, (floor(current_frame/8)*30 % 20 ? "@wVERSION 1.6" : "@gVERSION 1.6"));
@@ -497,8 +591,44 @@ if instance_exists(CharSelect)  {
         draw_text_nt(game_width / 2 - 152, 191 + draw_y, "SHRINES: 8")
 
     }
+    if global.modesMenu == true {
+        draw_set_alpha(0.5)
+        draw_sprite(global.sprModes, 0, 111, 91)
+        draw_sprite(global.sprModes, 1, 111 + (60), 91)
+        draw_set_alpha(1)
+        draw_x = 121 + (global.mode * 60); draw_y = 79;
+        draw_set_color(c_white)
+        draw_rectangle(draw_x -53, draw_y-31, draw_x-11, draw_y+11, 0)
+    
+        draw_sprite(global.sprModes, 0, 110, 90)
+        draw_sprite(global.sprModes, 1, 110 + (60), 90)
+        draw_set_color(c_white); draw_set_alpha(0.2);
+        draw_x = 121; draw_y = 79; if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-30, draw_x-12, draw_y+10) {
+        draw_rectangle(draw_x -52, draw_y-30, draw_x-12, draw_y+10, 0)
+        draw_set_alpha(1)
+        draw_text_nt(60, 169, "@wNormal Mode-")
+        draw_text_nt(60, 169, "@s#The default difficulty, for those who #don't wanna die every 2 seconds")
+        if button_pressed(i, "fire") {
+        global.mode = 0;
+        sound_play_pitch(sndClick, 1.2)
+        }
+        }
+        draw_set_alpha(0.2);
+        draw_x = 181; draw_y = 79; if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-30, draw_x-12, draw_y+10) {
+        draw_rectangle(draw_x -52, draw_y-30, draw_x-12, draw_y+10, 0)
+        draw_set_alpha(1)
+        draw_text_nt(60, 149, "@wHard Mode-")
+        //draw_text_nt(60, 149, "@w#Enemies have more hp, are more #agressive, elites spawn more often,#difficulty scales faster, and #everything sucks")
+        draw_text_nt(60, 149, "@s#Enemies have more @rhp@s, are more #@ragressive@s, @yelites@s spawn more often,#@wdifficulty@s scales faster, and #everything sucks")
+        if button_pressed(i, "fire") {
+        global.mode = 1;
+        sound_play_pitch(sndClick, 1)
+        sound_play_pitch(sndMeatExplo, 1)
+        }
+        } 
+    }
 }
-
+}
 //DEBUG
 if global.debug == true && instance_exists(Player) {
     draw_set_halign(fa_right)
@@ -606,7 +736,6 @@ current_time_scale=1
 }
 
 }
-
 
 #define draw
 
