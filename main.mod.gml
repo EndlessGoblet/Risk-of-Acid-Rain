@@ -67,6 +67,16 @@ if (GameCont.area != 100) with instance_create(Player.x-500, Player.y-500, Maggo
     my_health = 999999999;
     tag = "god"
 }
+if (global.mode == 1) {
+with (WeaponChest) {
+    if (GameCont.area == 1 || GameCont.area == 101) {
+        wait(2)
+        if instance_exists(WeaponChest) {
+        instance_create(x, y, BigWeaponChest)
+        instance_delete(self);
+        }
+    }
+}}
 //SPAWN OBJECTS ON LEVEL START
 var floors = instances_matching(Floor, mod_current, undefined);
 var my_floor = floors[irandom(array_length(floors) - 1)];
@@ -239,12 +249,7 @@ convert = true;
 }
 }
 
-with (WeaponChest) {
-    if (GameCont.area == 1 || GameCont.area == 101) {
-        instance_create(x, y, BigWeaponChest)
-        instance_delete(self);
-    }
-}
+
 }
 
 if global.AnomalyGet = false && instance_exists(Player) && Player.race = "horror"
