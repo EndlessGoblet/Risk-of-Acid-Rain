@@ -39,7 +39,7 @@ item_ancient_armor_plate = {
 #macro item_inside_information item[? "info"]
 item_inside_information = {
   name              : "Inside Information",
-	description_small : "@sDeal more @wdamage @sto @bIDPD",
+	description_small : "@bIDPD @sare @wweaker @sand drop @wmore",
 	description_large : "@sIncreases @wdamage @sdealt to @bIDPD @smembers by @w20% @d(+20% per stack)#@sand gives them a @w25% @d(+25% per stack)@schance for them to drop an @yammo pickup",
 	spr_index         : 2,
 	tier              : 0
