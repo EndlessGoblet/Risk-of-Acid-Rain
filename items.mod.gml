@@ -510,6 +510,7 @@ add_item(ITEM)
 #define step
 //Armor Mechanic
 //with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal) && instance_exists(Player) { //When you get hit
+
 with (Player) if my_health < lsthealth
 {
 	var damageTaken = (Player.lsthealth - Player.my_health),
@@ -613,7 +614,7 @@ if(button_pressed(index, "horn")) {
 			chest_setup(tag)
 		}
 	}
-     // get_item(item[? "info"])
+      get_item(item[? "chopper"])
 	}
 }
 //Timer
@@ -1126,7 +1127,19 @@ if amount >= 1 && instance_exists(Player)
 }
 //Scrap Cannon
 
+//Scale health with level
+if (GameCont.level >= 2)   { extra_health += 3;} // 4
+    if (GameCont.level >= 3)  { extra_health += 3;  } // 4
+    if (GameCont.level >= 4)   { extra_health += 4; } // 8
+    if (GameCont.level >= 5)  { extra_health += 5;  } // 18
+    if (GameCont.level >= 6) { extra_health += 5;} // 30 //Health currently doesn't increase with level due to the stat chanes /!\
+    if (GameCont.level >= 7) { extra_health += 5; } //50
+    if (GameCont.level >= 8)  { extra_health += 5;  } // 80
+    if (GameCont.level >= 9)  { extra_health += 5;  }  // 100
+
+
 //Stat changes
+
 if instance_exists(Player)
 {
 	Player.reloadspeed = Player.reloadspeed_base + extra_reload    + (skill_get(mut_stress) * (1 - Player.my_health/Player.maxhealth)) + ultra_get(char_venuz, 1)   * .4
@@ -1137,6 +1150,8 @@ if instance_exists(Player)
 		damage *= Player.damage_base + extra_damage
 	}
 }
+
+
 
 with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction instance_destroy()}
 
