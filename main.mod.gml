@@ -208,8 +208,9 @@ with instances_matching(hitme, "tag", "boss")
 }
 
 var minutes_ = 3 //How many minutes for difficulty to go up
-if (global.mode = 1) var minutes_ = 2
-global.timeControl = 60 * 60 * (minutes_ * 2) //Time Control
+if (global.mode == 1) var minutes_ = 4.5
+//global.timeControl = 60 * 60 * (21600) //Time Control
+global.timeControl = (minutes_ * 2) * (60 * 60)
 
 //Hard Mode
 if (global.mode == 1) {

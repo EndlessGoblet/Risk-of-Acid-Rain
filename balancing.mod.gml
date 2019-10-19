@@ -21,6 +21,7 @@ if roll == 1 {
 }
 
 with (GameCont) {
+    /*
     if (level == 2)  if ("boost1") not in self { Player.my_health += 3;Player.boost1 = 1; } // 4
     if (level == 3)  if ("boost2") not in self { Player.my_health += 3;Player.boost2 = 1; } // 4
     if (level == 4)  if ("boost3") not in self {  Player.my_health += 4;Player.boost3 = 1; } // 8
@@ -29,7 +30,7 @@ with (GameCont) {
     if (level == 7)  if ("boost6") not in self {  Player.my_health += 5;Player.boost6 = 1; } //50
     if (level == 8)  if ("boost7") not in self {  Player.my_health += 5;Player.boost7 = 1; } // 80
     if (level == 9)  if ("boost8") not in self {  Player.my_health += 5;Player.boost8 = 1; }  // 100
-
+*/
 }
 
 with (Rad) {
