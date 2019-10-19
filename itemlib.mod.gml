@@ -361,7 +361,7 @@ item_chopper = {
 	description_small : "@sAuto @wshank @snearby enemies",
 	description_large : "-",
 	spr_index         : 31,
-	tier              : 1
+	tier              : 0
 
 };
 
@@ -460,7 +460,7 @@ item_cracked_gem = {
 	description_small : "@sYour @gluck @sis fluctuating",
 	description_large : "At the start of an area, gain +5 or -5 luck (+/-2 per stack)",
 	spr_index         : 40,
-	tier              : 4
+	tier              : 3
 
 };
 

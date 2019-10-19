@@ -633,7 +633,7 @@ draw_text_nt(game_width / 2, 20, "@wNORMAL MODE")
         draw_sprite(global.sprModes, 1, draw_x + 1 + x_offset, draw_y + y_offset + 1)
         draw_set_alpha(1)
         draw_set_color(c_white)
-        draw_rectangle(draw_x - 42 + global.mode * x_offset, draw_y - 27, draw_x + global.mode * x_offset, draw_y + 15, 0)
+        draw_rectangle(draw_x - 42 + global.mode * x_offset, draw_y - 27 , draw_x + global.mode * x_offset, draw_y + 15, 0)
 
         draw_sprite(global.sprModes, 0, draw_x           , draw_y + y_offset)
         draw_sprite(global.sprModes, 1, draw_x + x_offset, draw_y + y_offset)
