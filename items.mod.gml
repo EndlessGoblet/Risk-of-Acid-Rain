@@ -51,8 +51,8 @@ global.hideDes = 0;
 global.hurtFloor = false;
 global.forceSupport = false;
 global.popoChance = 0;
-global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"] , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
-global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"], item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
+global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
+global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"]] //To-Do: Fern
 global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice
 global.UniqueItems   = [item[? "energy"]    , item[? "times"]]
@@ -544,6 +544,23 @@ if ITEM = item[? "heater"]
 	}
 	Player.perma_armor += 2
 }
+
+//fx
+
+var _pitch = random_range(.8, 1.2)
+if ITEM.tier = 3 _pitch  *= .7
+sound_play_pitchvol(sndTVOn, 1.1 * _pitch, .4)
+if ITEM.tier >= 1{sound_play_pitchvol(sndMutHover, _pitch, 1)}
+if ITEM.tier != 4
+{
+	if ITEM.tier >= 2{sleep(3);sound_play_pitchvol(sndBasicUltra, 1.5 * _pitch, 1)}
+	if ITEM.tier  = 2{sound_play_pitchvol(sndGoldPickup, 1.11* _pitch, .2)}
+	if ITEM.tier  = 3{sleep(7);sound_play_pitchvol(sndCursedChest,1.2 * _pitch, .3); sound_play_pitchvol(sndCursedPickup, _pitch, .8)}
+}
+else
+{
+	// unique item pickup sound goes here
+}
 add_item(ITEM)
 
 #define step
@@ -561,19 +578,14 @@ with (Player) if my_health < lsthealth
 	{
 		Player.fx_steel = 1
     Player.armor--
-    sound_play_pitch(sndSwapPistol, 2)
+		var _pitch = random_range(.8, 1.2)
+    sound_play_pitch(sndSnowTankHurt, 1.2 * _pitch)
+		sound_play_pitch(sndHitMetal, 1.2 *  _pitch)
 		Player.shakeText += (room_speed / 10)
   }
 	else Player.fx_celesteel = 6.5
 }
 
-with instances_matching(enemy, "walled", true)
-{
-	if speed> 0 speed = 0
-	x -= hspeed
-	y -= vspeed
-	with instances_matching_ne(projectile, "team", 2)instance_delete(self)
-}
 // chest step
 with instances_matching(chestprop, "name", "ItemChest"){
 	 if "tag" in self switch tag
@@ -650,7 +662,7 @@ if(button_pressed(index, "horn")) {
 		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "item"
-			item_index = choose(item[? "mask"])
+			item_index = choose(item[? "incendiary"])
 			chest_setup(tag)
 		}
 	}
@@ -663,7 +675,7 @@ global.frame += current_time_scale; if (global.frame == 60) global.frame = 0;
 
 var extra_reload    = 0,
     extra_speed     = 0,
-		extra_health = 0,
+		extra_health    = 0,
 		extra_accuracy  = 0,
 		extra_damage    = 0; // this one is a multiplier
 
@@ -742,6 +754,7 @@ if amount >= 1
 		    extra_damage += 1
 		    crit = 1;
 		    image_blend = merge_color(c_red, c_white, 0.3)
+				sleep(10)
 		}
 	 else {crit = 1}
 	}
@@ -760,6 +773,7 @@ if floor(global.RadiatedSnackCounter) >= 1 {
    with (Player) if (my_health < maxhealth) my_health += round(global.RadiatedSnackCounter)
 with (Player) if (my_health > maxhealth) my_health = maxhealth
 global.RadiatedSnackCounter = 0;
+sound_play_pitch(sndHPPickup, 1.3)
 }}}}}
 //Radiated Snack
 
@@ -817,19 +831,26 @@ if amount >= 1
 var amount = item_get_count("incendiary");
 if amount >= 1
 {
-  with (enemy)
-	{
-    if nexthurt == current_frame+5 && !instance_exists(Portal)
-		{
-			OnFire = true
-    }
+	with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFire = 3 + amount}}
 
-    if "OnFire" in self
+  with instances_matching_ge(enemy, "OnFire", 1)
+	{
+    image_blend = merge_color(c_orange, c_white, 0.3)
+		if (current_frame + id) mod max(40 - amount * 3, 4) = 0
 		{
-    	image_blend = merge_color(c_orange, c_white, 0.3)
-    	if roll(10) instance_create(x, y, Debris) my_health -= (0.04 * amount)
-    }
-		else{image_blend = merge_color(c_orange, c_white, 1)}
+			with instance_create(x, y, Flame)
+			{
+				team = -100
+				damage = 1 + amount * .03
+				image_speed = 3
+				force = 0
+				direction = random(360)
+			}
+			instance_create(x + random_range(-4, 4), y + random_range(-4, 4), Smoke)
+			OnFire--
+			if OnFire = 0{image_blend = merge_color(c_orange, c_white, 1)}
+			if my_health = 0 instance_create(x, y, GroundFlame)
+		}
 	}
 	with (projectile)
 	{
@@ -1040,7 +1061,8 @@ if amount >= 1 {
 			//damage = originalDamage;
 			team = other.team;
 			sprite_index = other.sprite_index
-            sound_play_pitch(sndPopPop, 1)
+      sound_play_pitch(sndPopgun, random_range(.8, 1.2))
+			sound_play_pitchvol(sndPopPop, random_range(.8, 1.2), .3)
 			blessed = 1}
             blessed = 1;
 }
@@ -1337,6 +1359,16 @@ if (global.descriptionTimer > 0)
 #define draw_pause
 draw_armor()
 
+// dont make item collection draw when not on the main pause screen
+var _e = false;
+if !instance_exists(menubutton){_e = true}
+with OptionMenuButton  _e = true
+with AudioMenuButton   _e = true
+with VisualsMenuButton _e = true
+with GameMenuButton    _e = true
+with ControlMenuButton _e = true
+if _e = true exit
+
  var cx     = view_xview,
      cy     = view_yview,
 	   draw_x = 23,
@@ -1345,10 +1377,9 @@ draw_armor()
 // ":(", -Karmelyth
 
 draw_backdrop(cx + draw_x-23, cy + draw_y-58, cx + draw_x+293, cy + draw_y-54 + 20 * (ceil(array_length(global.PlayerItems) / 15)), "")
-
 for(i = 1; i < array_length_1d(global.PlayerItems); i++)
 {
-		var _hover   = false,
+		var _hover   = true,
 		    maxitems = 15, // 15 items per line
 		    line     = 0,  // what line the item is on
 		    itemx    = i,  // xposition (first item, second item... 15th item)
