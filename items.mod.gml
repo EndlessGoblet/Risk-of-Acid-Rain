@@ -927,7 +927,7 @@ if amount >= 1
 		    image_blend = merge_color(c_red, c_white, 0.2)
 				sleep(10)
 		}
-	 else {crit = 1}
+	 else {crit = 0}
 	}
 }
 //Golden Shots (random crits)
@@ -1418,7 +1418,7 @@ if instance_exists(Player)
 	Player.maxhealth   = Player.health_base      + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6
 	with instances_matching(projectile, "team", Player.team)
 	{
-		damage *= (Player.damage_base + extra_damage) * ("crit" in self && crit = true ? 2 : 1)
+		damage *= (Player.damage_base + extra_damage + crit)
 	}
 }
 
