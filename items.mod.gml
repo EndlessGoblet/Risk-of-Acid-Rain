@@ -189,10 +189,10 @@ var my_floor = floors[irandom(array_length(floors) - 1)];
     if (roll2 > 50) && (roll2 <= 60) && (GameCont.area > 2) && (GameCont.area != 101) && (GameCont.area != 102) {type = "Order"; sprite = 5; }
     if (roll2 > 60) && (roll2 <= 70 ) {type = "Printing"; sprite = 6; }
     if (roll2 > 70) && (roll2 <= 80 ) {type = "Crowns"; sprite = 7; }
-    if (roll2 > 80) && (roll2 <= 90 ) {type = "Transport"; sprite = 8; }
-    if (roll2 > 90) && (roll2 <= 100 ) {type = "Sacrifice"; sprite = 9; }
-    if (roll2 > 100) && (roll2 <= 110 ) {type = "Carnage"; sprite = 13; }
-    if (roll2 > 110) && (roll2 <= 120 ) {type = "Reroll"; sprite = 15; }
+    //if (roll2 > 80) && (roll2 <= 90 ) {type = "Transport"; sprite = 8; }
+    //if (roll2 > 90) && (roll2 <= 100 ) {type = "Sacrifice"; sprite = 9; }
+    if (roll2 > 80) && (roll2 <= 90 ) {type = "Carnage"; sprite = 13; }
+    //if (roll2 > 110) && (roll2 <= 120 ) {type = "Reroll"; sprite = 15; }
 		if type = "Printing"{type = "Gold";sprite = 0} // remove this once printing code is fixed
     if type = "Printing" {
     var item = round(random_range(0, array_length(global.CommonItems) - 1))
@@ -419,7 +419,7 @@ if (type == "Order")
 	instance_destroy()
 	exit
 }
-
+/*
 if (type == "Printing") {
 	if array_length(global.PlayerItems) > 1 {
 	  print_array = []
@@ -434,6 +434,8 @@ if (type == "Printing") {
     text = "*SNAP*"
     time = 10
 }
+
+
 global.popoChance = 50
     popoSpawn();
 break;
@@ -459,6 +461,41 @@ global.popoChance = 10
     time = 10
 }
     }
+}
+*/
+if (type == "Printing") { // /!\ Still Doesn't Work /!\
+
+	_roll = round(random_range(1, (array_length(global.PlayerItems)-1))) //Pick random player item
+	var count_ = global.PlayerItems[_roll].count //Amount of that specific item
+	
+	if count_ > 1 {
+	global.PlayerItems[_roll].count--
+	get_item(global.CommonItems[itemPrint])
+	} else {
+
+	global.PlayerItems[_roll] = global.CommonItems[itemPrint]
+	global.PlayerItems[_roll].count = 1
+	}
+	  with instance_create(Player.x, Player.y, PopupText) {
+    text = "-" + string(global.PlayerItems[_roll].name)
+    time = 5
+}
+
+	instance_create(Player.x, Player.y, PopupText) {
+	text = "-" + global.PlayerItems[_roll].name
+	}
+	break;
+	
+}
+
+if (type == "Carnage") {
+var carnage = round((Player.maxhealth * 0.2))
+with instance_create(Player.x, Player.y, PopupText) {
+text = "-" + string(carnage) + " MAX HP"
+}
+sound_play_pitch(sndFreakDead,0.8)
+sound_play_pitch(sndBloodLauncherExplo, 1)
+base_health -= carnage
 }
 
 }
@@ -1634,3 +1671,11 @@ draw_set_font(fntM)
 #define antifx_step
 with FXChestOpen instance_delete(self)
 instance_delete(self)
+
+#define array_delete(_array, _index)
+    var i = _index,
+        _new = array_slice(_array, 0, i);
+
+    array_copy(_new, array_length(_new), _array, i + 1, array_length(_array) - (i + 1))
+
+    return _new;
