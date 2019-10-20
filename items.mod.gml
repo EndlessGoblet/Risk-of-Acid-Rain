@@ -177,7 +177,7 @@ if (GameCont.area = 100) var _roll = 0;
 for(i = 0; i < _roll; i++) {
 var my_floor = floors[irandom(array_length(floors) - 1)];
     with instance_create(my_floor.x, my_floor.y, CustomObject) {
-    var roll2 = round(random_range(80, 71)) //CHANCES FOR EACH SHRINE----------
+    var roll2 = round(random_range(1, 90)) //CHANCES FOR EACH SHRINE----------
     name = "Shrine"
     sprite_index = sprThroneStatue
     open = false
@@ -308,7 +308,7 @@ draw_rectangle(draw_x+x + 47 , draw_y+y - 9 , x+draw_x-50 ,y+draw_y , false)
         if (type == "Legends") draw_text_nt(x, y+20, "[2 ITEMS]");
         if (type == "Curse") draw_text_nt(x, y+20, "[FREE?]");
         if (type == "Unknown") draw_text_nt(x, y+20, "[???]");
-        if (type == "Carnage") draw_text_nt(x, y+20, "@r[" + string(round((Player.maxhealth * 0.2)))+" MAX HP]");
+        if (type == "Carnage") draw_text_nt(x, y+20, "@r[-20% MAX HP]");
         if (type == "Gift") draw_text_nt(x, y+20, "emptiness");
         if (type == "Reroll") draw_text_nt(x, y+20, "Reroll Gun");
         if(button_pressed(Player.index, "pick")) { //When they open it

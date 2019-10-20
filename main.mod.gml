@@ -193,9 +193,7 @@ var SpawnY = Player.y + y_
 //Crown Vault Fix
 
 if instance_exists(CrownPed) global.crownVault = true;
-trace(global.crownVault)
 if instance_exists(Portal) && global.crownVault == true {
-	trace("yeehaw")
   GameCont.area = (GameCont.lastarea ); 
   GameCont.subarea = 3; 
 }
