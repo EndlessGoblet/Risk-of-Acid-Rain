@@ -513,7 +513,7 @@ item_injury = {
 #macro item_blood item[? "blood"]
 item_blood = {
   name              : "Blood God's Armor",
-	description_small : "@s+10 @yArmor, @wdeath@s sacrifices @yarmor@s instead",
+	description_small : "@sUpon @pdeath@s revive with @yinvincibility",
 	description_large : "-",
 	spr_index         : 45,
 	tier              : 2
@@ -525,6 +525,16 @@ item_paper= {
 	description_small : "@dWorthless",
 	description_large : "-",
 	spr_index         : 46,
+	tier              : 4
+};
+
+// ITEM 46: Shattered Heart
+#macro item_paper item[? "heart"]
+item_paper= {
+  name              : "@sShattered Heart",
+	description_small : "@dWas used to revive you",
+	description_large : "-",
+	spr_index         : 47,
 	tier              : 4
 };
 #define items_finalize()

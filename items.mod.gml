@@ -39,6 +39,7 @@ global.shrineIcons = sprite_add("sprites/shrines/shrineIcons.png", 16, 13, 13)
 with(instances_matching(chestprop, "name", "ItemChest")) {
 instance_delete(self);
 }
+Player.invincibility = 0;
 global.PlayerItems = [item[? "none"]]
 global.GemCoeff = choose(-1, 1)
 global.frame = 0;
@@ -59,7 +60,7 @@ global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "blood"]] //To-Do: Fern
 global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice
-global.UniqueItems   = [item[? "energy"]    , item[? "times"],  item[? "injury"], item[? "paper"]]
+global.UniqueItems   = [item[? "energy"]    , item[? "times"],  item[? "injury"], item[? "paper"], item[? "heart"]]
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
 if instance_exists(CharSelect) CharSelect.debug = false;
@@ -89,6 +90,7 @@ Player.accuracy_base    = Player.accuracy;
 Player.health_base      = Player.maxhealth;
 Player.damage_base      = 1
 
+Player.invincibility = 0;
 Player.firewoodCharge = 0;
 Player.firewoodKills = 0;
 Player.s_Combat = 0;
@@ -200,6 +202,7 @@ var my_floor = floors[irandom(array_length(floors) - 1)];
     var item = round(random_range(0, array_length(global.CommonItems) - 1))
     itemPrint = item
     }
+	type = "Order"
     //if (roll2 > 120) && (roll2 <= 130) type = "Gold"
     //if (roll2 > 130) && (roll2 <= 140 ) type = "Gold"
     //if (roll2 > 140) && (roll2 <= 150 ) type = "Gold"
@@ -464,7 +467,7 @@ global.popoChance = 10
     }
 }
 */
-if (type == "Printing") { // /!\ Still Doesn't Work /!\
+if (type == "Printing") { 
 if array_length(global.PlayerItems) > 1 {
 	_roll = round(random_range(1, (array_length(global.PlayerItems)-1))) //Pick random player item
 	var count_ = global.PlayerItems[_roll].count //Amount of that specific item
@@ -632,10 +635,6 @@ if ITEM = item[? "heater"]
 	Player.perma_armor += 2
 }
 
-if ITEM = item[? "blood"] 
-{
-	Player.armor += 10;
-}
 //fx
 
 var _pitch = random_range(.8, 1.2)
@@ -655,6 +654,17 @@ else
 add_item(ITEM)
 
 #define step
+//Invincibility
+with (Player) {
+if invincibility > 0 {
+invincibility--
+if my_health < lsthealth {
+	my_health = lsthealth
+}
+if ((invincibility % 2) == 1) with instance_create(x + random_range(-20, 20), y + random_range(-20, 20), FrogHeal) {
+	image_blend = c_red;
+}
+}}
 //Destroy shrine of challenge during teleporter
 if mod_variable_get("mod", "main", "teleporter") == true {
 	with (CustomObject) {
@@ -861,7 +871,8 @@ if(button_pressed(index, "horn")) {
 			tag = "fern"
 		}*/
 	}
-      get_item(item[? "fern"])
+    //  get_item(item[? "blood"])
+	//Player.invincibility += room_speed * 8
 	}
 }
 //Timer
@@ -1403,17 +1414,23 @@ if amount >= 1 && instance_exists(Player)
 var amount = item_get_count("blood");
 if amount >= 1 && instance_exists(Player)
 {
-	if Player.my_health <= 0 && Player.armor > 0 {
-		Player.my_health = Player.maxhealth
-		if (Player.armor > 10) Player.armor = 10;
-		Player.armor -= round(10 / amount)
+	if Player.my_health <= 0  {
+		Player.my_health = 1
+		Player.armor += 5;
+		Player.invincibility += (room_speed) * 8;
 		Player.redFlash = 10;
 		sound_play_pitch(sndCrownBlood, 1.2)
 		sound_play_pitch(sndLevelUltra, 0.8)
 		with instance_create(Player.x, Player.y, PopupText) {
 			text = "@q@rREVIVED"
 		}
+		if item_get_count("blood") > 1 {
+		for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == "blood"{global.PlayerItems[i].count--; break}}
+		} else {
+		for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == "blood" {global.PlayerItems[i] = item[? "heart"]; global.PlayerItems[i].count = 1;break}}	
+		}
 	}
+
 }
 //Blood Gods Armor
 
@@ -1447,7 +1464,7 @@ if instance_exists(Player)
 var amount = item_get_count("injury");
 if amount >= 1 && instance_exists(Player)
 {
-	Player.maxhealth -= (round((Player.maxhealth) * 0.2) * amount)
+	Player.maxhealth -= (round((Player.maxhealth) * (0.2 * amount)))
 }
 //injury  Always keep this item last /!\
 
