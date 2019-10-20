@@ -923,9 +923,10 @@ if amount >= 1
 	{
 		if "crit" not in self
 		{
-		    crit = roll(10 * amount);
+		    extra_damage += roll(10 * amount);
 		    image_blend = merge_color(c_red, c_white, 0.2)
 				sleep(10)
+				crit = 0
 		}
 	 else {crit = 0}
 	}
@@ -1418,7 +1419,7 @@ if instance_exists(Player)
 	Player.maxhealth   = Player.health_base      + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6
 	with instances_matching(projectile, "team", Player.team)
 	{
-		damage *= (Player.damage_base + extra_damage + "crit" in self && crit = true)
+		damage *= (Player.damage_base + extra_damage)
 	}
 }
 
