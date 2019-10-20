@@ -7,6 +7,7 @@ global.debug = false;
 //Create important initial variables
 global.AnomalyGet  = 0;
 global.HardmodeGet = 0;
+global.teleDone = false;
 
 global.difficulty = 0;
 global.time = 0;
@@ -54,6 +55,7 @@ while(true){
 }
 
 #define level_start
+global.teleDone = false;
 global.crownVault = false;
 //Reset vars
 global.BossesLeft = 0 // 0 at level start, after teleport activation = amount of boss enemies, at 0 spawns an item
@@ -190,8 +192,14 @@ var SpawnY = Player.y + y_
 }
 }
 #define step
+//No teleporter fix
+/*
+if (GameCont.area != 100) && global.teleDone != true && !instance_exists(SmallGenerator) {
+var my_floor = floors[irandom(array_length(floors) - 1)];
+with(my_floor){ instance_create(x - sprite_xoffset + sprite_width / 2, y - sprite_yoffset + sprite_height / 2, SmallGenerator ); 
+}}
+*/
 //Crown Vault Fix
-
 if instance_exists(CrownPed) global.crownVault = true;
 if instance_exists(Portal) && global.crownVault == true {
   GameCont.area = (GameCont.lastarea ); 
@@ -206,7 +214,7 @@ with instances_matching(hitme, "tag", "boss")
 		global.BossesLeft--
 		if global.BossesLeft = 0
 		{
-			with obj_create(x, y, "ItemChest")
+			repeat(Player.s_Challenge) with obj_create(x, y, "ItemChest")
 			{
 				tag = "item"
 				item_index = mod_variable_get("mod", "items", "UncommonItems")[random_range(0, array_length(mod_variable_get("mod", "items", "UncommonItems")) - 1)]
@@ -393,6 +401,8 @@ speed = (0) + (room_speed / 30)
 //MAKE TELEPORTER INVINCIBLE
 with (SmallGenerator) {
     my_health = 999999999;
+    mask_index = mskNone;
+
 }
 //INCREASE GLOBAL.RADI
 if global.radi < 150 && global.teleporter == true{
@@ -504,6 +514,8 @@ if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get
 
     global.charge = 0;
     global.teleporter = false;
+    global.teleDone = true;
+    with(SmallGenerator) instance_destroy();
 }
 
 
@@ -623,15 +635,22 @@ draw_text_nt(game_width / 2, 20, "@wNORMAL MODE")
         draw_set_alpha(1)
         //draw_text_nt(game_width / 2 - 152, 42, "@pVERSION 1.5")
          draw_text_nt(game_width / 2 - 152, 42, (floor(current_frame/8)*30 % 20 ? "@wVERSION 1.6" : "@gVERSION 1.6"));
-        draw_text_nt(game_width / 2 - 152, 52, "@s10/5/19")
-        draw_text_nt(game_width / 2 - 152, 42, "@s            [BIG UPDATE]")
+        draw_text_nt(game_width / 2 - 152, 52, "@s10/20/19")
+        draw_text_nt(game_width / 2 - 152, 42, "@s            [ITEMS AND ARMOR GALOR]")
         var draw_y = -5
         draw_text_nt(game_width / 2 - 152, 66 + draw_y, "@s-PATCH NOTES-")
         draw_set_font(fntChat)
         draw_text_nt(game_width / 2 - 152, 72 + draw_y, "@w-More balanced items")
-
-        draw_text_nt(game_width / 2 - 152, 182 + draw_y, "ITEMS: 25 @g+3 NEW ONES")
-        draw_text_nt(game_width / 2 - 152, 191 + draw_y, "SHRINES: 8")
+        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "#@w-Added Armor")
+        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "##@w-Added @rHARDMODE @dVia controller on the top-right")
+        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "###@y-8 New Items")
+        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "####@w-I'm 99% sure you can't get stuck in the crown vault anymore")
+        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "#####@w-Added shrine of @rcarnage")
+        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "######@w-Tons of bug fixes")
+        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "#######@w-Added @gbig chests@w that give better items")
+        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "########@w-Reverted back to teleporter not being able to be hit")
+        draw_text_nt(game_width / 2 - 152, 182 + draw_y, "ITEMS: 38")
+        draw_text_nt(game_width / 2 - 152, 191 + draw_y, "SHRINES: 9")
 
     }
     if global.modesMenu == true {

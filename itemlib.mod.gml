@@ -499,7 +499,7 @@ item_mercenary_canteen = {
 };
 
 // ITEM 44: INJURY
-#macro item_scrap_missile item[? "injury"]
+#macro item_injury item[? "injury"]
 item_injury = {
   name              : "Injury",
 	description_small : "@r-20% Max HP",
@@ -517,7 +517,15 @@ item_blood = {
 	description_large : "-",
 	spr_index         : 45,
 	tier              : 2
-
+};
+// ITEM 46: RUINED PAPER
+#macro item_paper item[? "paper"]
+item_paper= {
+  name              : "@sPrinter Paper",
+	description_small : "@dWorthless",
+	description_large : "-",
+	spr_index         : 46,
+	tier              : 4
 };
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),

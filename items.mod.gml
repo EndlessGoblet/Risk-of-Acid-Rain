@@ -59,7 +59,7 @@ global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "blood"]] //To-Do: Fern
 global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice
-global.UniqueItems   = [item[? "energy"]    , item[? "times"],  item[? "injury"]]
+global.UniqueItems   = [item[? "energy"]    , item[? "times"],  item[? "injury"], item[? "paper"]]
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
 if instance_exists(CharSelect) CharSelect.debug = false;
@@ -195,7 +195,7 @@ var my_floor = floors[irandom(array_length(floors) - 1)];
     //if (roll2 > 90) && (roll2 <= 100 ) {type = "Sacrifice"; sprite = 9; }
     if (roll2 > 80) && (roll2 <= 90 ) {type = "Carnage"; sprite = 13; }
     //if (roll2 > 110) && (roll2 <= 120 ) {type = "Reroll"; sprite = 15; }
-		if type = "Printing"{type = "Gold";sprite = 0} // remove this once printing code is fixed
+		//if type = "Printing"{type = "Gold";sprite = 0} // remove this once printing code is fixed
     if type = "Printing" {
     var item = round(random_range(0, array_length(global.CommonItems) - 1))
     itemPrint = item
@@ -356,7 +356,6 @@ if (type == "Challenge") { //CHALLENGE SHRINE------------------------------
 with (Player) s_Challenge += 1;
 sound_play_pitch(sndLevelUltra, 1)
 with instance_create(x, y, GreenExplosion) { damage = 0; mask_index = mskNone; }
-obj_create(x + 8, y + 8, "ItemChest")
 instance_destroy();
 with instance_create(Player.x, Player.y, PopupText) {
     text = "CHALLENGE ACCEPTED"
@@ -466,28 +465,51 @@ global.popoChance = 10
 }
 */
 if (type == "Printing") { // /!\ Still Doesn't Work /!\
-
+if array_length(global.PlayerItems) > 1 {
 	_roll = round(random_range(1, (array_length(global.PlayerItems)-1))) //Pick random player item
 	var count_ = global.PlayerItems[_roll].count //Amount of that specific item
-	
+	var original_name = global.PlayerItems[_roll].name
+	if global.PlayerItems[_roll].name = "@sPrinter Paper" || global.PlayerItems[_roll].name == global.CommonItems[itemPrint].name {
+		with instance_create(x, y, GreenExplosion) { damage = 0; mask_index = mskNone;}
+		sound_play(sndExplosionL)
+		instance_destroy();
+		 with instance_create(Player.x, Player.y, PopupText) {
+    text = "*SNAP*"
+    time = 5
+}
+	 break;
+	}
+
+	 with instance_create(Player.x, Player.y, PopupText) {
+    text = "-" + string(global.PlayerItems[_roll].name)
+    time = 5
+}
 	if count_ > 1 {
 	global.PlayerItems[_roll].count--
 	get_item(global.CommonItems[itemPrint])
 	} else {
 
-	global.PlayerItems[_roll] = global.CommonItems[itemPrint]
+	global.PlayerItems[_roll] = item[? "paper"]
 	global.PlayerItems[_roll].count = 1
+	global.PlayerItems[_roll].description_small = "@dBreaks the printer"
+	get_item(global.CommonItems[itemPrint])
 	}
-	  with instance_create(Player.x, Player.y, PopupText) {
-    text = "-" + string(global.PlayerItems[_roll].name)
-    time = 5
-}
-
-	instance_create(Player.x, Player.y, PopupText) {
-	text = "-" + global.PlayerItems[_roll].name
-	}
+	sound_play_pitch(sndCrownProtection, 1)
+global.popoChance = 10
+    popoSpawn();
 	break;
-	
+} else {
+	with instance_create(Player.x, Player.y, PopupText) {
+    var _roll = round(random_range(1, 5))
+    if (_roll == 1) text = "GO GET ITEMS"
+    if (_roll == 2) text = "TOO POOR"
+    if (_roll == 3) text = "FEED ME"
+    if (_roll == 4) text = "NO"
+    if (_roll == 5) text = "NEED ITEMS"
+    sound_play_pitch(sprProtoStatueDone, 1)
+    time = 10
+}
+}
 }
 
 if (type == "Carnage") {
@@ -646,6 +668,10 @@ if mod_variable_get("mod", "main", "teleporter") == true {
 //Check if hurt this floor--------
 with (Player) if my_health < lsthealth {
 global.hurtFloor = true;
+if (item_get_count("prize") > 0) with instance_create(Player.x, Player.y, PopupText) {
+	text = "@yPrize Lost"
+	time = 10;
+}
 }
 
 //Armor Mechanic
@@ -835,7 +861,7 @@ if(button_pressed(index, "horn")) {
 			tag = "fern"
 		}*/
 	}
-      get_item(item[? "blood"])
+      get_item(item[? "fern"])
 	}
 }
 //Timer
@@ -1281,7 +1307,7 @@ with instances_matching_le(enemy,"my_health",0){
 Player.firewoodCharge += (amount)
 Player.firewoodKills++
 }
-with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal) {
+with (Player) if my_health < lsthealth {
 repeat(Player.firewoodCharge) with instance_create(Player.x, Player.y, FlameShell) {
 direction = random_range(1, 360)
 speed = random_range(10, 15)
