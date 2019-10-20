@@ -1418,7 +1418,7 @@ if instance_exists(Player)
 	Player.maxhealth   = Player.health_base      + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6
 	with instances_matching(projectile, "team", Player.team)
 	{
-		damage *= (Player.damage_base + extra_damage + crit)
+		damage *= (Player.damage_base + extra_damage + "crit" in self)
 	}
 }
 
