@@ -487,13 +487,24 @@ item_scrap_missile = {
 
 };
 
-// ITEM 43: INJURY
+// ITEM 43: MERC'S CANTEEN
+#macro item_mercenary_canteen item[? "canteen"]
+item_mercenary_canteen = {
+  name              : "Mercenary's Canteen",
+	description_small : "@wEnemies @sdrop @yarmor",
+	description_large : "-",
+	spr_index         : 43,
+	tier              : 1
+
+};
+
+// ITEM 44: INJURY
 #macro item_scrap_missile item[? "injury"]
 item_scrap_missile = {
   name              : "Injury",
 	description_small : "@r-20% Max HP",
 	description_large : "-",
-	spr_index         : 43,
+	spr_index         : 44,
 	tier              : 4
 
 };

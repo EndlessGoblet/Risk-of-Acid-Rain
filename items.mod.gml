@@ -56,7 +56,7 @@ global.hurtFloor = false;
 global.forceSupport = false;
 global.popoChance = 0;
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
-global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
+global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"]] //To-Do: Fern
 global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice
 global.UniqueItems   = [item[? "energy"]    , item[? "times"],  item[? "injury"]]
@@ -563,7 +563,7 @@ switch(obj_name) {
             name = "Shrine"
             sprite_index = sprThroneStatue;
 		}
-	return _obj
+		return _obj
 }
 #define get_item(ITEM)
 global.itemGet = ITEM
@@ -785,11 +785,11 @@ with (Player) {
 if(button_pressed(index, "horn")) {
 	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too // yeah because you set Player.debug to true is my guess
 	{
-		with obj_create(mouse_x, mouse_y, "ItemChest")
+		/*with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "none"
 			chest_setup(tag)
-		}/*
+		}
 		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "rusty"
@@ -817,7 +817,7 @@ if(button_pressed(index, "horn")) {
 			tag = "fern"
 		}*/
 	}
-      get_item(item[? "chopper"])
+      get_item(item[? "canteen"])
 	}
 }
 //Timer
@@ -1328,11 +1328,30 @@ if amount >= 1
 }
 //Broken Locket
 
+// Merc Canteen
+var amount = item_get_count("canteen");
+if amount >= 1
+{
+	with instances_matching_le(enemy, "my_health", 0)
+	{
+		if size > 0
+		{
+			if roll((1 - 1/(.17 * amount + 1))*100 * .6)
+			with obj_create(x, y, "CustomPickup")
+			{
+				tag = "armor"
+				sprite_index = global.sprArmorPickup
+			}
+		}
+	}
+}
+// Merc Canteen
+
 //Scrap Cannon
 var amount = item_get_count("missile");
 if amount >= 1 && instance_exists(Player)
 {
-	extra_damage += (Player.armor + Player.perma_armor) * .05 * amount
+	extra_damage += (Player.armor + Player.perma_armor) * .04 * amount
 }
 //Scrap Cannon
 
