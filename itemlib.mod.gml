@@ -479,7 +479,7 @@ item_celesteel = {
 // ITEM 42: SCRAP MISSILE
 #macro item_scrap_missile item[? "missile"]
 item_scrap_missile = {
-  name              : "Scrap Missile",
+  name              : "SCRAP MISSILE",
 	description_small : "@s+@w8 @yArmor@s, scale @wdamage @swith @yarmor",
 	description_large : "-",
 	spr_index         : 42,
@@ -490,7 +490,7 @@ item_scrap_missile = {
 // ITEM 43: MERC'S CANTEEN
 #macro item_mercenary_canteen item[? "canteen"]
 item_mercenary_canteen = {
-  name              : "Merc's Canteen",
+  name              : "MERC'S CANTEEN",
 	description_small : "@wEnemies @sdrop @yarmor",
 	description_large : "-",
 	spr_index         : 43,
@@ -501,7 +501,7 @@ item_mercenary_canteen = {
 // ITEM 44: INJURY
 #macro item_injury item[? "injury"]
 item_injury = {
-  name              : "Injury",
+  name              : "INJURY",
 	description_small : "@s-20% @rMax HP",
 	description_large : "-",
 	spr_index         : 44,
@@ -509,35 +509,26 @@ item_injury = {
 
 };
 
-// ITEM 45: BLOOD GOD'S SHIELD
-#macro item_blood item[? "blood"]
-item_blood = {
-  name              : "Blood God's Armor",
-	description_small : "@sUpon @pdeath@s revive with @yinvincibility",
+// ITEM 45: BACKUP HEART
+#macro item_backup_heart item[? "heart"]
+item_backup_heart = {
+  name              : "BACKUP HEART",
+	description_small : "@sPrevent @wdeath @sonce",
 	description_large : "-",
 	spr_index         : 45,
 	tier              : 2
 };
 
-// ITEM 46: MISPRINT
-#macro item_paper item[? "misprint"]
-item_paper= {
-  name              : "MISPRINT",
-	description_small : "@sA failed print",
+// ITEM 46: Shattered Heart
+#macro item_backup_heart_spent item[? "spent heart"]
+item_backup_heart_spent = {
+  name              : "SPENT HEART",
+	description_small : "@sIt's all used up",
 	description_large : "-",
 	spr_index         : 46,
 	tier              : 5
 };
 
-// ITEM 46: Shattered Heart
-#macro item_paper item[? "heart"]
-item_paper= {
-  name              : "@sShattered Heart",
-	description_small : "@dWas used to revive you",
-	description_large : "-",
-	spr_index         : 47,
-	tier              : 4
-};
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),

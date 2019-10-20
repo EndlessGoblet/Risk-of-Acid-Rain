@@ -60,7 +60,7 @@ global.forceSupport = false;
 global.popoChance = 0;
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
-global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "blood"]] //To-Do: Fern
+global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]] //To-Do: Fern
 global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice
 global.UniqueItems   = [item[? "energy"]    , item[? "times"],  item[? "injury"], item[? "paper"], item[? "heart"]]
 //set new level function
@@ -837,7 +837,7 @@ if(button_pressed(index, "horn")) {
 		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "item"
-			item_index = item[? "metal"]
+			item_index = item[? "heart"]
 			chest_setup(tag)
 		}
 	}
@@ -1377,29 +1377,24 @@ if amount >= 1 && instance_exists(Player)
 }
 //Scrap Cannon
 
-//Blood Gods Armor
-var amount = item_get_count("blood");
+//backup Heart
+var amount = item_get_count("heart");
 if amount >= 1 && instance_exists(Player)
 {
-	if Player.my_health <= 0  {
+	if Player.my_health <= 0
+	{
 		Player.my_health = 1
 		Player.armor += 5;
-		Player.invincibility += (room_speed) * 8;
+		Player.invincibility += (room_speed) * 5;
 		Player.redFlash = 10;
+		sleep(300)
 		sound_play_pitch(sndCrownBlood, 1.2)
 		sound_play_pitch(sndLevelUltra, 0.8)
-		with instance_create(Player.x, Player.y, PopupText) {
-			text = "@q@rREVIVED"
-		}
-		if item_get_count("blood") > 1 {
-		for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == "blood"{global.PlayerItems[i].count--; break}}
-		} else {
-		for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == "blood" {global.PlayerItems[i] = item[? "heart"]; global.PlayerItems[i].count = 1;break}}	
-		}
+		with instance_create(Player.x, Player.y, PopupText) {text = "@q@rREVIVED"}
+		for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == "heart"{global.PlayerItems[i].count--; add_item(item[? "spent heart"]) break}}
 	}
-
 }
-//Blood Gods Armor
+//backup heart
 
 //Scale health with level
 if (GameCont.level >= 2)   { extra_health += 3;} // 4
