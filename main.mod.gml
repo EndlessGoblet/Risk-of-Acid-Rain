@@ -28,6 +28,7 @@ global.respawn = 0;
 global.info = false;
 global.modesMenu = false;
 global.mode = 0;
+global.crownVault = false;
 if (instance_exists(CharSelect)) CharSelect.closeSettings = true;
 if (instance_exists(Player)) Player.debug = false;
 //Main Menu (Splash screen?)
@@ -53,6 +54,7 @@ while(true){
 }
 
 #define level_start
+global.crownVault = false;
 //Reset vars
 global.BossesLeft = 0 // 0 at level start, after teleport activation = amount of boss enemies, at 0 spawns an item
 global.subareaChoice = 0
@@ -188,6 +190,15 @@ var SpawnY = Player.y + y_
 }
 }
 #define step
+//Crown Vault Fix
+
+if instance_exists(CrownPed) global.crownVault = true;
+trace(global.crownVault)
+if instance_exists(Portal) && global.crownVault == true {
+	trace("yeehaw")
+  GameCont.area = (GameCont.lastarea ); 
+  GameCont.subarea = 3; 
+}
 
 //bosses item spawn code
 with instances_matching(hitme, "tag", "boss")
@@ -335,7 +346,7 @@ var scale = 3 + (round(GameCont.hard / 4) + (5 * GameCont.loops))
 var amountNum = 3
 if (global.teleporter == true) amountNum = 8 * (GameCont.loops + 1)
 with (Player) if ("s_Combat" in self) if AMOUNT <= scale || Player.s_Combat > 0 {
-if !instance_exists(Spiral) enemySpawn();
+if ( !instance_exists(Spiral) && global.crownVault != true ) enemySpawn();
 }
 
 with (Player) if "s_Combat" in self && (s_Combat > 0) {
@@ -437,8 +448,8 @@ global.charge += 1 //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
 if (GameCont.area = 101) global.charge += 4 //Charge faster in oasis
 with instances_matching_le(enemy,"my_health",0){
 		if object_index != Maggot {
-var roll = round(random_range(1, 10))
-if (roll == 10) instance_create(x, y, AmmoPickup)
+var _roll = round(random_range(1, 10))
+if (_roll == 10) instance_create(x, y, AmmoPickup)
         }
 }
 }
@@ -448,48 +459,50 @@ if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get
     GameCont.hard += 2
     if (GameCont.area = 1) GameCont.subarea = 3;
     //Area choose
-    var roll = round(random_range(1, 3))
+    var _roll = round(random_range(1, 3))
     global.areaChoice = GameCont.lastarea + 1
     global.subareaChoice = 1
 
     if (GameCont.area = 106) GameCont.area = 7;
     if (GameCont.area = 106) GameCont.subarea = 1;
 
-    if (GameCont.area = 105) && (roll = 1) GameCont.area = 106
-    if (GameCont.area = 105) && (roll != 1) {
+    if (GameCont.area = 105) && (_roll = 1) GameCont.area = 106
+    if (GameCont.area = 105) && (_roll != 1) {
     GameCont.area = 5
     GameCont.subarea = 3
     }
 
-    if (GameCont.area = 104) && (roll = 1) GameCont.area = 105
-    if (GameCont.area = 104) && (roll != 1) {
+    if (GameCont.area = 104) && (_roll = 1) GameCont.area = 105
+    if (GameCont.area = 104) && (_roll != 1) {
     GameCont.area = 4
     GameCont.subarea = 1
     }
 
-    if (GameCont.area = 103) && (roll = 1) GameCont.area = 104
-    if (GameCont.area = 103) && (roll != 1) {
+    if (GameCont.area = 103) && (_roll = 1) GameCont.area = 104
+    if (GameCont.area = 103) && (_roll != 1) {
     GameCont.area = 3
     GameCont.subarea = 3
     }
-    if (GameCont.area = 102) && (roll = 1) GameCont.area = 103
-    if (GameCont.area = 102) && (roll != 1) {
+    if (GameCont.area = 102) && (_roll = 1) GameCont.area = 103
+    if (GameCont.area = 102) && (_roll != 1) {
     GameCont.area = 2
     GameCont.subarea = 1
     }
 
-    if (GameCont.area = 101) && (roll = 1) GameCont.area = 102
-    if (GameCont.area = 101) && (roll != 1) {
+    if (GameCont.area = 101) && (_roll = 1) GameCont.area = 102
+    if (GameCont.area = 101) && (_roll != 1) {
     GameCont.area = 1
     GameCont.subarea = 3
 
     }
 
-    if (GameCont.area = 1) && (roll = 1) GameCont.area = 102
-    if (GameCont.area = 2) && (roll = 1) GameCont.area = 103
-    if (GameCont.area = 3) && (roll = 1) GameCont.area = 104
-    if (GameCont.area = 4) && (roll = 1) GameCont.area = 105
-    if (GameCont.area = 5) && (roll = 1) GameCont.area = 106
+
+
+    if (GameCont.area = 1) && (_roll = 1) GameCont.area = 102
+    if (GameCont.area = 2) && (_roll = 1) GameCont.area = 103
+    if (GameCont.area = 3) && (_roll = 1) GameCont.area = 104
+    if (GameCont.area = 4) && (_roll = 1) GameCont.area = 105
+    if (GameCont.area = 5) && (_roll = 1) GameCont.area = 106
 
     global.charge = 0;
     global.teleporter = false;

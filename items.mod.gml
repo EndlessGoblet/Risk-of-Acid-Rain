@@ -59,7 +59,7 @@ global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"]] //To-Do: Fern
 global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice
-global.UniqueItems   = [item[? "energy"]    , item[? "times"]]
+global.UniqueItems   = [item[? "energy"]    , item[? "times"],  item[? "injury"]]
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
 if instance_exists(CharSelect) CharSelect.debug = false;
@@ -106,7 +106,6 @@ Player.shakeText = 0;
 Player.fx_celesteel = 0;
 
 #define level_start
-
 var amount = item_get_count("metal");
 if amount >= 1
 {
@@ -178,7 +177,7 @@ if (GameCont.area = 100) var _roll = 0;
 for(i = 0; i < _roll; i++) {
 var my_floor = floors[irandom(array_length(floors) - 1)];
     with instance_create(my_floor.x, my_floor.y, CustomObject) {
-    var roll2 = round(random_range(1, 80)) //CHANCES FOR EACH SHRINE----------
+    var roll2 = round(random_range(80, 71)) //CHANCES FOR EACH SHRINE----------
     name = "Shrine"
     sprite_index = sprThroneStatue
     open = false
@@ -309,7 +308,7 @@ draw_rectangle(draw_x+x + 47 , draw_y+y - 9 , x+draw_x-50 ,y+draw_y , false)
         if (type == "Legends") draw_text_nt(x, y+20, "[2 ITEMS]");
         if (type == "Curse") draw_text_nt(x, y+20, "[FREE?]");
         if (type == "Unknown") draw_text_nt(x, y+20, "[???]");
-        if (type == "Carnage") draw_text_nt(x, y+20, "[@r1 MAX HP@w]");
+        if (type == "Carnage") draw_text_nt(x, y+20, "@r[" + string(round((Player.maxhealth * 0.2)))+" MAX HP]");
         if (type == "Gift") draw_text_nt(x, y+20, "emptiness");
         if (type == "Reroll") draw_text_nt(x, y+20, "Reroll Gun");
         if(button_pressed(Player.index, "pick")) { //When they open it
@@ -499,7 +498,15 @@ text = "-" + string(carnage) + " MAX HP"
 }
 sound_play_pitch(sndFreakDead,0.8)
 sound_play_pitch(sndBloodLauncherExplo, 1)
-base_health -= carnage
+var _ang = random(360),
+    _i   = 0
+with obj_create(Player.x + lengthdir_x(26, _ang + _i * 180), Player.y + lengthdir_y(26, _ang + _i * 180), "ItemChest")
+	{
+		tag = "item"
+		item_index = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]
+		chest_setup(tag)
+	}
+get_item(item[? "injury"]) //repeat(carnage) 
 }
 
 }
@@ -623,6 +630,8 @@ else
 add_item(ITEM)
 
 #define step
+
+
 //Armor Mechanic
 //with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal) && instance_exists(Player) { //When you get hit
 
@@ -1327,6 +1336,7 @@ if amount >= 1 && instance_exists(Player)
 }
 //Scrap Cannon
 
+
 //Scale health with level
 if (GameCont.level >= 2)   { extra_health += 3;} // 4
     if (GameCont.level >= 3)  { extra_health += 3;  } // 4
@@ -1336,6 +1346,8 @@ if (GameCont.level >= 2)   { extra_health += 3;} // 4
     if (GameCont.level >= 7) { extra_health += 5; } //50
     if (GameCont.level >= 8)  { extra_health += 5;  } // 80
     if (GameCont.level >= 9)  { extra_health += 5;  }  // 100
+
+
 
 
 //Stat changes
@@ -1351,7 +1363,13 @@ if instance_exists(Player)
 	}
 }
 
-
+//injury  Always keep this item last /!\
+var amount = item_get_count("injury");
+if amount >= 1 && instance_exists(Player)
+{
+	Player.maxhealth -= (round((Player.maxhealth) * 0.2) * amount)
+}
+//injury  Always keep this item last /!\
 
 with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction instance_destroy()}
 

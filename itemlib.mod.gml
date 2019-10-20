@@ -487,6 +487,16 @@ item_scrap_missile = {
 
 };
 
+// ITEM 43: INJURY
+#macro item_scrap_missile item[? "injury"]
+item_scrap_missile = {
+  name              : "Injury",
+	description_small : "@r-20% Max HP",
+	description_large : "-",
+	spr_index         : 43,
+	tier              : 4
+
+};
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),
