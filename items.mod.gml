@@ -39,7 +39,7 @@ global.shrineIcons = sprite_add("sprites/shrines/shrineIcons.png", 16, 13, 13)
 with(instances_matching(chestprop, "name", "ItemChest")) {
 instance_delete(self);
 }
-Player.invincibility = 0;
+if instance_exists(Player) Player.invincibility = 0;
 global.PlayerItems = [item[? "none"]]
 global.GemCoeff = choose(-1, 1)
 global.frame = 0;
@@ -202,7 +202,6 @@ var my_floor = floors[irandom(array_length(floors) - 1)];
     var item = round(random_range(0, array_length(global.CommonItems) - 1))
     itemPrint = item
     }
-	type = "Order"
     //if (roll2 > 120) && (roll2 <= 130) type = "Gold"
     //if (roll2 > 130) && (roll2 <= 140 ) type = "Gold"
     //if (roll2 > 140) && (roll2 <= 150 ) type = "Gold"
