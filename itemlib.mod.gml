@@ -487,6 +487,17 @@ item_scrap_missile = {
 
 };
 
+// ITEM 42: MERC'S CANTEEN
+#macro item_mercenary_canteen item[? "canteen"]
+item_mercenary_canteen = {
+  name              : "Mercenary's Canteen",
+	description_small : "@wEnemies @sdrop @yarmor",
+	description_large : "-",
+	spr_index         : 43,
+	tier              : 1
+
+};
+
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),
