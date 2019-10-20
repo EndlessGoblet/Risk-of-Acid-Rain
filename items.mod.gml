@@ -14,8 +14,12 @@ global.sprGoldItemChestOpen   = sprite_add("sprites/chests/sprGoldItemChestOpen.
 global.sprRustyItemChestOpen  = sprite_add("sprites/chests/sprRustyItemChestOpen.png"     , 1,  8, 8);
 global.sprLargeItemChestOpen  = sprite_add("sprites/chests/sprLargeItemChestOpen.png"     , 1, 12, 8);
 global.sprCursedItemChestOpen = sprite_add("sprites/chests/sprCursedItemChestOpen.png"    , 1, 11, 8);
-global.sprArmor      = sprite_add("sprites/other/sprArmor.png", 3, 9, 9)
-global.sprArmorShine = sprite_add_weapon("sprites/other/sprArmorShine.png", 9, 9)
+
+global.sprFernPickup  = sprite_add_weapon("sprites/chests/sprFernPickup.png"  , 7, 5);
+global.sprArmorPickup = sprite_add_weapon("sprites/chests/sprArmorPickup.png" , 5, 5);
+
+global.sprArmor      = sprite_add("sprites/other/sprArmor.png", 3, 9, 9);
+global.sprArmorShine = sprite_add_weapon("sprites/other/sprArmorShine.png", 9, 9);
 
 global.sprItems     = sprite_add(    "sprites/items/sprItems.png", 101, 17, 17);
 global.sprItemsBack = sprite_add("sprites/items/sprItemsBack.png",   5, 20, 20);
@@ -265,23 +269,23 @@ if amount >= 1 && instance_exists(Player)
 	}
 }
 
-var amount = item_get_count("mask")
+
+if global.MaskCounter >= 0 && instance_exists(Player)
 {
-  if amount >= 1 && global.MaskCounter >= 0 && instance_exists(Player)
+	if (global.MaskCounter > 15) with (Player) {image_blend = merge_color(c_aqua, c_white, 0.7); image_alpha = .6} else with (Player) {image_blend = merge_color(c_aqua, c_white, 1); image_alpha = 1}
+	global.MaskCounter--
+  draw_set_halign(fa_center)
+  var count = round(global.MaskCounter / room_speed)
+	if instance_exists(Player) && global.MaskCounter > 15 draw_text_nt(Player.x, Player.y + 10, string(count));
+	if Player.my_health < Player.lsthealth
 	{
-		if (global.MaskCounter > 1) with (Player) {image_blend = merge_color(c_aqua, c_white, 0.7); image_alpha = .6} else with (Player) {image_blend = merge_color(c_aqua, c_white, 1); image_alpha = 1}
-		global.MaskCounter--
-    draw_set_halign(fa_center)
-    var count = round(global.MaskCounter / room_speed)
-		if instance_exists(Player) && global.MaskCounter > 0 draw_text_nt(Player.x, Player.y + 10, string(count));
-		if Player.my_health < Player.lsthealth
-		{
-			sleep(70)
-			view_shake_at(Player.x, Player.y, 12)
-			global.MaskCounter = 0
-		}
+		sleep(70)
+		view_shake_at(Player.x, Player.y, 12)
+		global.MaskCounter = 0
 	}
+	if global.MaskCounter = 15  {sound_play_pitch(sndPickupDisappear, 1.3); sleep(20); view_shake_at(Player.x, Player.y, 6	); repeat(18) with instance_create(Player.x + random_range(-12, 12) + Player.hspeed, Player.y + random_range(-12, 12) + Player.vspeed, Smoke){depth = Player.depth - 1}}
 }
+
 //Shrine
 with(instances_matching(CustomObject, "name", "Shrine")) {
 if distance_to_object(Player) <= 2 && open == false {
@@ -524,17 +528,35 @@ switch(obj_name) {
 			on_open = itemchest_open;
 		}
 		return _obj;
+	case "CustomPickup":
+		_obj = instance_create(_x, _y, Pickup);
+		with _obj
+		{
+			name = "CustomPickup";
+			sprite_index = global.sprFernPickup
+			mask_index   = mskPickup
+			image_speed  = 0
+			friction = .2
+			num = 1 + (crown_current = 4 ? room_speed * 1 : 0)
+			tag  = "none"
+			anim = 20 + irandom(30)
+			lifetime = room_speed * 10 - (crown_current = 4 ? room_speed * 5 : 0) + irandom(15)
+			on_pickup = ror_pickup
+		}
+		return _obj;
 }
 
 switch(obj_name) {
 	case "Shrine":
-		with instance_create(_x, _y, CustomObject) {
+		var _obj instance_create(_x, _y, CustomObject)
+		with obj_
+		{
             //spr_shadow = shd32;
 			image_speed = 0.2;
             name = "Shrine"
             sprite_index = sprThroneStatue;
 		}
-	break;
+	return _obj
 }
 #define get_item(ITEM)
 global.itemGet = ITEM
@@ -624,8 +646,86 @@ with (Player) if my_health < lsthealth
 	else Player.fx_celesteel = 6.5
 }
 
+// Eyes Custom Pickup Attraction: (big yokin thanks)
+ with(instances_matching(Player, "race", "eyes"))
+ {
+	 if(canspec && button_check(index, "spec"))
+	 {
+		 var _vx = view_xview[index],
+				 _vy = view_yview[index];
+
+		 with(instances_matching(Pickup, "name", "CustomPickup")) if point_in_rectangle(x, y, _vx, _vy, _vx + game_width, _vy + game_height)
+		 {
+				 var l = (1 + skill_get(mut_throne_butt)) * current_time_scale,
+						 d = point_direction(x, y, other.x, other.y),
+						_x = x + lengthdir_x(l, d),
+						_y = y + lengthdir_y(l, d);
+
+					 if(place_free(_x, y)) x = _x;
+					 if(place_free(x, _y)) y = _y;
+		 }
+	}
+}
+
+// pickup step
+with instances_matching(Pickup, "name", "CustomPickup")
+{
+	//collision
+	if(mask_index == mskPickup && place_meeting(x, y, Pickup))
+	{
+		with(instances_meeting(x, y, instances_matching(Pickup, "mask_index", mskPickup)))
+		{
+			if(place_meeting(x, y, other))
+			{
+				if(object_index == AmmoPickup || object_index == HPPickup || object_index == RoguePickup)
+				{
+					motion_add_ct(point_direction(other.x, other.y, x, y) + random_range(-10, 10), 0.8);
+				}
+				with(other)
+				{
+					motion_add_ct(point_direction(other.x, other.y, x, y) + random_range(-10, 10), 0.8);
+				}
+			}
+		}
+	}
+
+	if place_meeting(x + hspeed, y + vspeed, Wall){move_bounce_solid(false)}
+
+	//animations
+	if anim > 0 anim-- else
+	{
+		if image_index = 0 && image_speed = .5
+		{
+			image_speed = 0
+			anim = 70 + irandom(20)
+		}
+		else{image_speed = .5}
+	}
+
+	//close range attraction
+	if distance_to_object(Player) <= (20 + 12 * skill_get(mut_plutonium_hunger)) motion_set(point_direction(x, y, Player.x, Player.y), 4)
+
+	//get picked up
+	if place_meeting(x, y, Player) || place_meeting(x, y, PortalShock) || instance_exists(BigPortal)
+	{
+			 // run open code
+			script_execute(on_pickup)
+
+			 // fx
+			instance_create(x, y,SmallChestPickup)
+			instance_delete(id);
+			exit;
+	}
+	//blink
+	if lifetime <= room_speed * 3{if current_frame mod 2 = 0 image_alpha++; if image_alpha > 1 image_alpha = 0}
+
+	//disappear after a while
+	if lifetime > 0 lifetime-- else{sound_play_pitch(sndPickupDisappear, random_range(.8, 1.2)); instance_create(x, y,SmallChestFade); instance_destroy()}
+}
+
 // chest step
-with instances_matching(chestprop, "name", "ItemChest"){
+with instances_matching(chestprop, "name", "ItemChest")
+{
 	 if "tag" in self switch tag
 	 {
 		 case "gold"   : if irandom(19) = 0 with instance_create( x+random_range(-8, 8), y+random_range(-13,13), CaveSparkle) depth = other.depth - 1; break;
@@ -676,11 +776,11 @@ with (Player) {
 if(button_pressed(index, "horn")) {
 	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too // yeah because you set Player.debug to true is my guess
 	{
-		/*with obj_create(mouse_x, mouse_y, "ItemChest")
+		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
-			tag = "gold"
+			tag = "none"
 			chest_setup(tag)
-		}
+		}/*
 		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "rusty"
@@ -696,13 +796,17 @@ if(button_pressed(index, "horn")) {
 			tag = "cursed"
 			chest_setup(tag)
 		}
-		obj_create(mouse_x, mouse_y, "ItemChest")*/
-		with obj_create(mouse_x, mouse_y, "ItemChest")
+		obj_create(mouse_x, mouse_y, "ItemChest")
+		with obj_create(mouse_x, mouse_y, "CustomPickup")
 		{
-			tag = "item"
-			item_index = choose(item[? "incendiary"])
-			chest_setup(tag)
+			tag = "armor"
+			sprite_index = global.sprArmorPickup
+			num = 4
 		}
+		with obj_create(mouse_x, mouse_y, "CustomPickup")
+		{
+			tag = "fern"
+		}*/
 	}
       get_item(item[? "chopper"])
 	}
@@ -1431,7 +1535,7 @@ if _e = true exit
 draw_backdrop(cx + draw_x-23, cy + draw_y-58, cx + draw_x+293, cy + draw_y-54 + 20 * (ceil(array_length(global.PlayerItems) / 15)), "")
 for(i = 1; i < array_length_1d(global.PlayerItems); i++)
 {
-		var _hover   = true,
+		var _hover   = false,
 		    maxitems = 15, // 15 items per line
 		    line     = 0,  // what line the item is on
 		    itemx    = i,  // xposition (first item, second item... 15th item)
@@ -1540,7 +1644,7 @@ if "tag" in self
 		case "test"   : tem = item[? "dice"] // this is for testing
 								    break;
 		case "none"   :
-		default       : if _roll <= 64 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
+		default       : if _roll <= 69 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
 									  if _roll >  69 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
                     if _roll >= 94 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
 									  break;
@@ -1672,10 +1776,41 @@ draw_set_font(fntM)
 with FXChestOpen instance_delete(self)
 instance_delete(self)
 
-#define array_delete(_array, _index)
-    var i = _index,
-        _new = array_slice(_array, 0, i);
+#define ror_pickup
+var _pitch = random_range(.8, 1.2);
+switch tag
+{
+	case "fern":
+		global.MaskCounter += room_speed * 4 + round(num);
+		with instance_create(x, y, PopupText)
+		{
+			target = Player;
+			mytext = "+" + string(4 * round(other.num)) + " invisibility"
+		}
+		sound_play_pitch(sndAmmoPickup, _pitch)
+		sound_play_pitchvol(sndBigCursedChest, 12 * _pitch, .1)
+		break;
+	case "armor":
+		Player.armor += round(num);
+		with instance_create(x, y, PopupText)
+		{
+			target = Player;
+			mytext = "+" + string(round(other.num)) + " ARMOR"
+		}
+		sound_play_pitch(sndAmmoPickup, _pitch)
+		sound_play_pitch(sndHitMetal, 3 * _pitch)
+		Player.fx_celesteel = 6.5;
+		break;
+	default: repeat(num) with instance_create(x, y, PopupText){mytext = "INVALID TAG"}
+}
 
-    array_copy(_new, array_length(_new), _array, i + 1, array_length(_array) - (i + 1))
+#define instances_meeting(_x, _y, _obj)
+var _tx = x,
+    _ty = y;
 
-    return _new;
+    x = _x;
+    y = _y;
+    var r = instances_matching_ne(instances_matching_le(instances_matching_ge(instances_matching_le(instances_matching_ge(_obj, "bbox_right", bbox_left), "bbox_left", bbox_right), "bbox_bottom", bbox_top), "bbox_top", bbox_bottom), "id", id);
+    x = _tx;
+    y = _ty;
+return r;

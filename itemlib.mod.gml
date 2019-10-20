@@ -479,7 +479,7 @@ item_celesteel = {
 // ITEM 42: SCRAP MISSILE
 #macro item_scrap_missile item[? "missile"]
 item_scrap_missile = {
-  name              : "Scrap Cannon",
+  name              : "Scrap Missile",
 	description_small : "@s+@w8 @yArmor@s, scale @wdamage @swith @yarmor",
 	description_large : "-",
 	spr_index         : 42,
