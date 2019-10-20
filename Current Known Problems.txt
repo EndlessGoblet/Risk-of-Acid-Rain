@@ -1,5 +1,0 @@
---------------------------Just write general bugs in here so I remember to fix them thx-------------------------------------
-
--You can't go from Sewers/Pizza Sewers to YV's mansion, it will instead bring you to 3-3.
--When the mode button arrangement was changed, the hit boxes are not off
--Glowing Fern does nothing?

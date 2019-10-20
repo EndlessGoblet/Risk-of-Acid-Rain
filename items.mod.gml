@@ -41,7 +41,7 @@ global.sprBackdropFill          = sprite_add_base64("iVBORw0KGgoAAAANSUhEUgAAAAE
 global.shrineIcons = sprite_add("sprites/shrines/shrineIcons.png", 16, 13, 13)
 with(instances_matching(chestprop, "name", "ItemChest")) {instance_delete(self)}
 
-Player.invincibility = 0;
+if instance_exists(Player) Player.invincibility = 0;
 global.PlayerItems = [item[? "none"]]
 global.GemCoeff = choose(-1, 1)
 global.frame = 0;
