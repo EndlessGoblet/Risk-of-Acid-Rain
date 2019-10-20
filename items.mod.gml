@@ -738,11 +738,11 @@ with (Player) {
 if(button_pressed(index, "horn")) {
 	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too // yeah because you set Player.debug to true is my guess
 	{
-		with obj_create(mouse_x, mouse_y, "ItemChest")
+		/*with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "none"
 			chest_setup(tag)
-		}/*
+		}
 		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "rusty"
@@ -770,7 +770,7 @@ if(button_pressed(index, "horn")) {
 			tag = "fern"
 		}*/
 	}
-     // get_item(item[? "info"])
+      get_item(item[? "canteen"])
 	}
 }
 //Timer
@@ -1282,17 +1282,19 @@ if amount >= 1
 //Broken Locket
 
 // Merc Canteen
-var amount = item_get_count("locket");
+var amount = item_get_count("canteen");
 if amount >= 1
 {
 	with instances_matching_le(enemy, "my_health", 0)
 	{
-		if roll((1 - 1/(.15 * amount + 1))*100 * .6)
-		with obj_create(x, y, "CustomPickup")
+		if size > 0
 		{
-			tag = "armor"
-			sprite_index = global.sprArmorPickup
-			num = 4
+			if roll((1 - 1/(.17 * amount + 1))*100 * .6)
+			with obj_create(x, y, "CustomPickup")
+			{
+				tag = "armor"
+				sprite_index = global.sprArmorPickup
+			}
 		}
 	}
 }
