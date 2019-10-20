@@ -28,7 +28,7 @@ item_none = {
 #macro item_ancient_armor_plate item[? "plate"]
 item_ancient_armor_plate = {
   name              : "Ancient Armor Plate",
-	description_small : "@sReduced @wdamage @sfrom touching @wenemies",
+	description_small : "@sReduced @wdamage @sfrom touching @wenemies. @s+2 @yArmor",
 	description_large : "@sTake @w50% @d(+50 per stack) from @wtouch damage",
 	spr_index         : 1,
 	tier              : 1

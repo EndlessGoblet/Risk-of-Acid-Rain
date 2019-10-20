@@ -203,7 +203,7 @@ var my_floor = floors[irandom(array_length(floors) - 1)];
     //if (roll2 > 90) && (roll2 <= 100 ) {type = "Sacrifice"; sprite = 9; }
     if (roll2 > 80) && (roll2 <= 90 ) {type = "Carnage"; sprite = 13; }
     //if (roll2 > 110) && (roll2 <= 120 ) {type = "Reroll"; sprite = 15; }
-		//if type = "Printing"{type = "Gold";sprite = 0} // remove this once printing code is fixed
+		if type = "Order"{type = "Gold";sprite = 0} // remove this once printing code is fixed
     if type = "Printing" {itemPrint = global.CommonItems[irandom_range(0, array_length(global.CommonItems) - 1)]}
     //if (roll2 > 120) && (roll2 <= 130) type = "Gold"
     //if (roll2 > 130) && (roll2 <= 140 ) type = "Gold"
@@ -601,6 +601,11 @@ if ITEM = item[? "blood"]
 {
 	Player.armor += 10;
 }
+
+if ITEM = item[? "plate"]
+{
+	Player.armor += 2;
+}
 //fx
 
 var _pitch = random_range(.8, 1.2)
@@ -620,6 +625,7 @@ else
 add_item(ITEM)
 
 #define step
+Player.my_health = round(Player.my_health)
 //Invincibility
 with (Player) {
 if invincibility > 0 {
@@ -794,7 +800,7 @@ if (global.preformanceMode == true) {
     }
 }
 with (Player) if (my_health > maxhealth) my_health = maxhealth
-with (Player) if round(my_health)
+with (Player) if round(Player.my_health)
 //DEBUG
 Player.debug2 = array_length_1d(global.PlayerItems) - 1
 
@@ -1361,7 +1367,7 @@ if amount >= 1
 	{
 		if size > 0
 		{
-			if roll((1 - 1/(.15 * amount + 1))*100 * .6)
+			if irandom(99) < ((1 - 1/(.08 * amount + 1))*100 * .6)
 			with obj_create(x, y, "CustomPickup")
 			{
 				tag = "armor"
@@ -1699,6 +1705,7 @@ with _itemarray
 }
 
 #define item_get_count(ITEM)
+if instance_exists(Player) {
 var amount
 for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM {amount = global.PlayerItems[i].count; break}}
 return amount
@@ -1726,7 +1733,7 @@ draw_sprite_stretched(global.sprBackdropFill, 0, STARTX + _HBorderWidth, STARTY 
 draw_sprite_stretched(global.sprBackdropVBorderTop, 0, STARTX + _TopCornerWidth, STARTY, _TitleHMargin, _VBorderTopHeight)
 draw_sprite_stretched(global.sprBackdropVBorderTop, 0, STARTX + _TopCornerWidth + _TitleHMargin + _TitleWidth, STARTY, ENDX - STARTX - _TitleHMargin - _TitleWidth, _VBorderTopHeight)
 draw_text_nt(STARTX + _TopCornerWidth + _TitleHMargin, STARTY - _TitleVMargin, TITLE)
-
+}
 #define itemchest_open
 sound_play(sndAmmoChest);
 

@@ -364,6 +364,7 @@ enemySpawn();
 with(FloorMaker) if GameCont.area != 0 && GameCont.area != 2 && GameCont.area != 4 && GameCont.area != 6 && GameCont.area != 100//Make areas larger
 		{
 		goal = 220
+        if (GameCont.area == 3) goal = 110
 		}
 
 //Difficulty Changes
