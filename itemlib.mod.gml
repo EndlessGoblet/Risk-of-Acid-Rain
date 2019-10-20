@@ -500,12 +500,23 @@ item_mercenary_canteen = {
 
 // ITEM 44: INJURY
 #macro item_scrap_missile item[? "injury"]
-item_scrap_missile = {
+item_injury = {
   name              : "Injury",
 	description_small : "@r-20% Max HP",
 	description_large : "-",
 	spr_index         : 44,
 	tier              : 4
+
+};
+
+// ITEM 45: BLOOD GOD'S SHIELD
+#macro item_blood item[? "blood"]
+item_blood = {
+  name              : "Blood God's Armor",
+	description_small : "@s+10 @yArmor, @wdeath@s sacrifices @yarmor@s instead",
+	description_large : "-",
+	spr_index         : 45,
+	tier              : 2
 
 };
 #define items_finalize()

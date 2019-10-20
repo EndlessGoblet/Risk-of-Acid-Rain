@@ -57,7 +57,7 @@ global.forceSupport = false;
 global.popoChance = 0;
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
-global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"]] //To-Do: Fern
+global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "blood"]] //To-Do: Fern
 global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice
 global.UniqueItems   = [item[? "energy"]    , item[? "times"],  item[? "injury"]]
 //set new level function
@@ -101,7 +101,6 @@ global.settings = false;
 Player.armor       = 0;
 Player.perma_armor = 0;
 Player.shakeText = 0;
-
 //Visuals
 Player.fx_celesteel = 0;
 
@@ -121,7 +120,7 @@ Player.s_Challenge = 0;
 global.GemCoeff = choose(-1, 1)
 
 //Perfect Prize
-if global.hurtFloor = false
+if global.hurtFloor == false
 {
 	var _floorq = ds_list_create(),
 	    _i      = 0;
@@ -611,6 +610,10 @@ if ITEM = item[? "heater"]
 	Player.perma_armor += 2
 }
 
+if ITEM = item[? "blood"] 
+{
+	Player.armor += 10;
+}
 //fx
 
 var _pitch = random_range(.8, 1.2)
@@ -630,7 +633,20 @@ else
 add_item(ITEM)
 
 #define step
+//Destroy shrine of challenge during teleporter
+if mod_variable_get("mod", "main", "teleporter") == true {
+	with (CustomObject) {
+		if name == "Shrine" && type = "Challenge" {
+			instance_destroy();
+		}
+	}
+}
 
+
+//Check if hurt this floor--------
+with (Player) if my_health < lsthealth {
+global.hurtFloor = true;
+}
 
 //Armor Mechanic
 //with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal) && instance_exists(Player) { //When you get hit
@@ -653,6 +669,11 @@ with (Player) if my_health < lsthealth
 		Player.shakeText += (room_speed / 10)
   }
 	else Player.fx_celesteel = 6.5
+
+	if (Player.armor < 0) {
+	Player.armor++
+	Player.shakeText += (room_speed / 10)
+	}
 }
 
 // Eyes Custom Pickup Attraction: (big yokin thanks)
@@ -776,14 +797,11 @@ with (Player) if round(my_health)
 //DEBUG
 Player.debug2 = array_length_1d(global.PlayerItems) - 1
 
-//Check if hurt this floor--------
-with (Player) if my_health < lsthealth {
-global.hurtFloor = true;
-}
+
 //Cheats--------------------------------------------------------------------------------------------------------------------------------------------------------
 with (Player) {
 if(button_pressed(index, "horn")) {
-	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too // yeah because you set Player.debug to true is my guess
+	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too // yeah because you set Player.debug to true is my guess //My brain is smol
 	{
 		/*with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
@@ -817,7 +835,7 @@ if(button_pressed(index, "horn")) {
 			tag = "fern"
 		}*/
 	}
-      get_item(item[? "canteen"])
+      get_item(item[? "blood"])
 	}
 }
 //Timer
@@ -1355,6 +1373,23 @@ if amount >= 1 && instance_exists(Player)
 }
 //Scrap Cannon
 
+//Blood Gods Armor 
+var amount = item_get_count("blood");
+if amount >= 1 && instance_exists(Player)
+{
+	if Player.my_health <= 0 && Player.armor > 0 {
+		Player.my_health = Player.maxhealth
+		if (Player.armor > 10) Player.armor = 10;
+		Player.armor -= round(10 / amount)
+		Player.redFlash = 10;
+		sound_play_pitch(sndCrownBlood, 1.2)
+		sound_play_pitch(sndLevelUltra, 0.8)
+		with instance_create(Player.x, Player.y, PopupText) {
+			text = "@q@rREVIVED"
+		}
+	}
+}
+//Blood Gods Armor
 
 //Scale health with level
 if (GameCont.level >= 2)   { extra_health += 3;} // 4
@@ -1393,6 +1428,14 @@ if amount >= 1 && instance_exists(Player)
 with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction instance_destroy()}
 
 #define draw_gui
+//Drawing Red flash from blood god's blood armor
+with (Player) if "redFlash" in self {
+draw_set_alpha(Player.redFlash / 10)
+draw_set_color(c_red)
+draw_rectangle(0, 0, game_width, game_height, 0);
+if (Player.redFlash > 0) Player.redFlash -= 0.5
+}
+draw_set_alpha(1)
 draw_armor()
 //Drawing Boss Health Bar
 if global.bossBars == true {
@@ -1784,6 +1827,7 @@ var shake_x = round(random_range(-1, 1)); var shake_y = round(random_range(-1, 1
 if instance_exists(Player)
 {
 	var _s = Player.shakeText > 0 ? "@r" : ""
+	if (Player.armor < 0) && (Player.shakeText > 0) _s = "@g"
 	var _rogue = + (Player.race = "rogue" ? sprite_get_width(sprRogueAmmoHUDTB) : 0)
 	draw_set_halign(fa_center)
 	draw_set_font(fntChat)
