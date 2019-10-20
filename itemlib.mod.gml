@@ -19,7 +19,7 @@ item_none = {
 	description_small : "THIS SHOULDNT APPEAR", // item description for the popup
 	description_large : "THIS SHOUDLN'T APPEAR#IF IT DOES#PLEASE CONTACT GOBLET ABOUT IT", // more detailed description for the pause menu
 	spr_index         : 0,  // index of the frame of the sprite for items
-	tier              : -1,  // -1 = untiered, 0 = common, 1 = uncommon, 2 = rare, 3 = cursed, 4 = unique
+	tier              : -1,  // -1 = untiered, 0 = common, 1 = uncommon, 2 = rare, 3 = cursed, 4 = unique, 5 = garbage
   key               : "none"
 
 };
@@ -171,7 +171,7 @@ item_golden_shot = {
 #macro item_sabotage_tools item[? "tools"]
 item_sabotage_tools = {
   name              : "Sabotage Tools",
-	description_small : "@wEnemy @sbullets sometimes get @wjammed",
+	description_small : "@wEnemy bullets @ssometimes get @wjammed",
 	description_large : "-",
 	spr_index         : 14,
 	tier              : 2
@@ -490,7 +490,7 @@ item_scrap_missile = {
 // ITEM 43: MERC'S CANTEEN
 #macro item_mercenary_canteen item[? "canteen"]
 item_mercenary_canteen = {
-  name              : "Mercenary's Canteen",
+  name              : "Merc's Canteen",
 	description_small : "@wEnemies @sdrop @yarmor",
 	description_large : "-",
 	spr_index         : 43,
@@ -502,7 +502,7 @@ item_mercenary_canteen = {
 #macro item_injury item[? "injury"]
 item_injury = {
   name              : "Injury",
-	description_small : "@r-20% Max HP",
+	description_small : "@s-20% @rMax HP",
 	description_large : "-",
 	spr_index         : 44,
 	tier              : 4
@@ -518,15 +518,17 @@ item_blood = {
 	spr_index         : 45,
 	tier              : 2
 };
-// ITEM 46: RUINED PAPER
-#macro item_paper item[? "paper"]
+
+// ITEM 46: MISPRINT
+#macro item_paper item[? "misprint"]
 item_paper= {
-  name              : "@sPrinter Paper",
-	description_small : "@dWorthless",
+  name              : "MISPRINT",
+	description_small : "@sA failed print",
 	description_large : "-",
 	spr_index         : 46,
-	tier              : 4
+	tier              : 5
 };
+
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),
