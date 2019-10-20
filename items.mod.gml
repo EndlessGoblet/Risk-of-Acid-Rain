@@ -837,7 +837,7 @@ if(button_pressed(index, "horn")) {
 		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "item"
-			item_index = item[? "heart"]
+			item_index = item[? "golden"]
 			chest_setup(tag)
 		}
 	}
@@ -923,12 +923,14 @@ if amount >= 1
 	{
 		if "crit" not in self
 		{
-		    extra_damage += roll(10 * amount);
-		    image_blend = merge_color(c_red, c_white, 0.2)
-				sleep(10)
+				if roll(10 * amount)
+				{
+		    	extra_damage++;
+		    	image_blend = merge_color(c_red, c_white, 0.2)
+					sleep(10)
+				}
 				crit = 0
 		}
-	 else {crit = 0}
 	}
 }
 //Golden Shots (random crits)
