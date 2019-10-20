@@ -196,14 +196,14 @@ var SpawnY = Player.y + y_
 /*
 if (GameCont.area != 100) && global.teleDone != true && !instance_exists(SmallGenerator) {
 var my_floor = floors[irandom(array_length(floors) - 1)];
-with(my_floor){ instance_create(x - sprite_xoffset + sprite_width / 2, y - sprite_yoffset + sprite_height / 2, SmallGenerator ); 
+with(my_floor){ instance_create(x - sprite_xoffset + sprite_width / 2, y - sprite_yoffset + sprite_height / 2, SmallGenerator );
 }}
 */
 //Crown Vault Fix
 if instance_exists(CrownPed) global.crownVault = true;
 if instance_exists(Portal) && global.crownVault == true {
-  GameCont.area = (GameCont.lastarea ); 
-  GameCont.subarea = 3; 
+  GameCont.area = (GameCont.lastarea );
+  GameCont.subarea = 3;
 }
 
 //bosses item spawn code
@@ -504,8 +504,6 @@ if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get
 
     }
 
-
-
     if (GameCont.area = 1) && (_roll = 1) GameCont.area = 102
     if (GameCont.area = 2) && (_roll = 1) GameCont.area = 103
     if (GameCont.area = 3) && (_roll = 1) GameCont.area = 104
@@ -636,19 +634,19 @@ draw_text_nt(game_width / 2, 20, "@wNORMAL MODE")
         //draw_text_nt(game_width / 2 - 152, 42, "@pVERSION 1.5")
          draw_text_nt(game_width / 2 - 152, 42, (floor(current_frame/8)*30 % 20 ? "@wVERSION 1.6" : "@gVERSION 1.6"));
         draw_text_nt(game_width / 2 - 152, 52, "@s10/20/19")
-        draw_text_nt(game_width / 2 - 152, 42, "@s            [ITEMS AND ARMOR GALOR]")
+        draw_text_nt(game_width / 2 - 152, 42, "@s            [ITEMS AND ARMOR GALORE]")
         var draw_y = -5
         draw_text_nt(game_width / 2 - 152, 66 + draw_y, "@s-PATCH NOTES-")
         draw_set_font(fntChat)
         draw_text_nt(game_width / 2 - 152, 72 + draw_y, "@w-More balanced items")
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "#@w-Added Armor")
+        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "#@w-Added @yArmor @wand @gLuck")
         draw_text_nt(game_width / 2 - 152, 72 + draw_y, "##@w-Added @rHARDMODE @dVia controller on the top-right")
         draw_text_nt(game_width / 2 - 152, 72 + draw_y, "###@y-8 New Items")
         draw_text_nt(game_width / 2 - 152, 72 + draw_y, "####@w-I'm 99% sure you can't get stuck in the crown vault anymore")
         draw_text_nt(game_width / 2 - 152, 72 + draw_y, "#####@w-Added shrine of @rcarnage")
         draw_text_nt(game_width / 2 - 152, 72 + draw_y, "######@w-Tons of bug fixes")
         draw_text_nt(game_width / 2 - 152, 72 + draw_y, "#######@w-Added @gbig chests@w that give better items")
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "########@w-Reverted back to teleporter not being able to be hit")
+        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "########@w-Reverted back to @rteleporter @wnot being able to be hit")
         draw_text_nt(game_width / 2 - 152, 182 + draw_y, "ITEMS: 38")
         draw_text_nt(game_width / 2 - 152, 191 + draw_y, "SHRINES: 9")
 

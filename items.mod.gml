@@ -15,6 +15,9 @@ global.sprRustyItemChestOpen  = sprite_add("sprites/chests/sprRustyItemChestOpen
 global.sprLargeItemChestOpen  = sprite_add("sprites/chests/sprLargeItemChestOpen.png"     , 1, 12, 8);
 global.sprCursedItemChestOpen = sprite_add("sprites/chests/sprCursedItemChestOpen.png"    , 1, 11, 8);
 
+global.sprDeathCauseInjury = sprite_add("sprites/items/sprDeathCauseInjury.png", 1, 9, 6);
+global.sprDeathCauseHeater = sprite_add("sprites/items/sprDeathCauseHeater.png", 1, 9, 6);
+
 global.sprFernPickup  = sprite_add_weapon("sprites/chests/sprFernPickup.png"  , 7, 5);
 global.sprArmorPickup = sprite_add_weapon("sprites/chests/sprArmorPickup.png" , 5, 5);
 
@@ -36,10 +39,9 @@ global.sprBackdropFill          = sprite_add_base64("iVBORw0KGgoAAAANSUhEUgAAAAE
 //global.sprHorrorBall = sprite_add("sprHorrorBall.png", 6, 48, 48);
 //global.sprIceExplosion = sprite_add("sprIceExplosion.png", 6, 32, 32);
 global.shrineIcons = sprite_add("sprites/shrines/shrineIcons.png", 16, 13, 13)
-with(instances_matching(chestprop, "name", "ItemChest")) {
-instance_delete(self);
-}
-if instance_exists(Player) Player.invincibility = 0;
+with(instances_matching(chestprop, "name", "ItemChest")) {instance_delete(self)}
+
+Player.invincibility = 0;
 global.PlayerItems = [item[? "none"]]
 global.GemCoeff = choose(-1, 1)
 global.frame = 0;
@@ -58,7 +60,7 @@ global.forceSupport = false;
 global.popoChance = 0;
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
-global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "blood"]] //To-Do: Fern
+global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]] //To-Do: Fern
 global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice
 global.UniqueItems   = [item[? "energy"]    , item[? "times"],  item[? "injury"], item[? "paper"], item[? "heart"]]
 //set new level function
@@ -84,27 +86,31 @@ while(true){
 }
 
 #define game_start
+//Stats
 Player.reloadspeed_base = Player.reloadspeed;
 Player.speed_base       = Player.maxspeed;
 Player.accuracy_base    = Player.accuracy;
 Player.health_base      = Player.maxhealth;
 Player.damage_base      = 1
 
+//Mechanic related
 Player.invincibility = 0;
 Player.firewoodCharge = 0;
-Player.firewoodKills = 0;
-Player.s_Combat = 0;
+Player.firewoodKills  = 0;
+Player.armor          = 0;
+Player.perma_armor    = 0;
+
+//Shrine
+Player.s_Combat    = 0;
 Player.s_Challenge = 0;
 
 global.PlayerItems = [item[? "none"]]
 global.descriptionTimer = 0;
 global.settings = false;
 
-Player.armor       = 0;
-Player.perma_armor = 0;
-Player.shakeText = 0;
 //Visuals
 Player.fx_celesteel = 0;
+Player.shakeText    = 0;
 
 #define level_start
 var amount = item_get_count("metal");
@@ -198,10 +204,7 @@ var my_floor = floors[irandom(array_length(floors) - 1)];
     if (roll2 > 80) && (roll2 <= 90 ) {type = "Carnage"; sprite = 13; }
     //if (roll2 > 110) && (roll2 <= 120 ) {type = "Reroll"; sprite = 15; }
 		//if type = "Printing"{type = "Gold";sprite = 0} // remove this once printing code is fixed
-    if type = "Printing" {
-    var item = round(random_range(0, array_length(global.CommonItems) - 1))
-    itemPrint = item
-    }
+    if type = "Printing" {itemPrint = global.CommonItems[irandom_range(0, array_length(global.CommonItems) - 1)]}
     //if (roll2 > 120) && (roll2 <= 130) type = "Gold"
     //if (roll2 > 130) && (roll2 <= 140 ) type = "Gold"
     //if (roll2 > 140) && (roll2 <= 150 ) type = "Gold"
@@ -302,7 +305,7 @@ draw_rectangle(draw_x+x + 47 , draw_y+y - 9 , x+draw_x-50 ,y+draw_y , false)
         if (type == "Challenge") draw_text_nt(x, y+20, "X2 BOSSES"); // DONE
         if (type == "Balance") draw_text_nt(x, y+20, "[@y-AMMO@w]");
         if (type == "Order") draw_text_nt(x, y+20, "@qAll @qinto @qone");
-        if (type == "Printing") draw_text_nt(x, y+20, "*" + string(global.CommonItems[itemPrint].name) + "*");
+        if (type == "Printing") draw_text_nt(x, y+20, itemPrint.name);
         if (type == "Crowns") draw_text_nt(x, y+20, "here we go");
         if (type == "Transport") draw_text_nt(x, y+20, "Let's leave");
         if (type == "Sacrifice") draw_text_nt(x, y+20, "[Primary Gun]");
@@ -422,116 +425,75 @@ if (type == "Order")
 	instance_destroy()
 	exit
 }
-/*
-if (type == "Printing") {
-	if array_length(global.PlayerItems) > 1 {
-	  print_array = []
-		for (var i = 0, j = 0, iLen = array_length(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 0{print_array[j] = global.PlayerItems[i];j++}};
-		var _roll = print_array[random_range(0, array_length(print_array) -1)];
-		_roll.count--
-		get_item(itemPrint)
-    if _roll == global.CommonItems[itemPrint] {
-    with instance_create(x,y,GreenExplosion) { damage = 0; mask_index = mskNone; }
-    instance_destroy()
-    with instance_create(Player.x, Player.y, PopupText) {
-    text = "*SNAP*"
-    time = 10
-}
 
+if (type == "Printing")
+{ // /!\ Still Doesn't Work /!\
+	if array_length(global.PlayerItems) > 1
+	{
+		var i = 0;
+		var _roll = irandom(array_length(global.PlayerItems)-1); //Pick random player item
+		do
+		{
+			_roll = irandom(array_length(global.PlayerItems)-1)
+			i++;
+		}
+		until global.PlayerItems[_roll].tier = itemPrint.tier && (global.PlayerItems[_roll] != itemPrint || i >= 10) // i literally dont care if this makes the game crash at least in theory it gives you the same tier
 
-global.popoChance = 50
-    popoSpawn();
-break;
-    } else {
-   // var item = global.PlayerItems[roll]
-with instance_create(Player.x, Player.y, PopupText) {
-    text = "-" + roll.name
-    time = 20
-}
-sound_play_pitch(sndCrownProtection, 1)
-global.popoChance = 10
-    popoSpawn();
-    }
-    } else {
-    with instance_create(Player.x, Player.y, PopupText) {
-    var _roll = round(random_range(1, 5))
-    if (_roll == 1) text = "GO GET ITEMS"
-    if (_roll == 2) text = "TOO POOR"
-    if (_roll == 3) text = "FEED ME"
-    if (_roll == 4) text = "NO"
-    if (_roll == 5) text = "NEED ITEMS"
-    sound_play_pitch(sprProtoStatueDone, 1)
-    time = 10
-}
-    }
-}
-*/
-if (type == "Printing") { 
-if array_length(global.PlayerItems) > 1 {
-	_roll = round(random_range(1, (array_length(global.PlayerItems)-1))) //Pick random player item
-	var count_ = global.PlayerItems[_roll].count //Amount of that specific item
-	var original_name = global.PlayerItems[_roll].name
-	if global.PlayerItems[_roll].name = "@sPrinter Paper" || global.PlayerItems[_roll].name == global.CommonItems[itemPrint].name {
-		with instance_create(x, y, GreenExplosion) { damage = 0; mask_index = mskNone;}
-		sound_play(sndExplosionL)
-		instance_destroy();
-		 with instance_create(Player.x, Player.y, PopupText) {
-    text = "*SNAP*"
-    time = 5
-}
-	 break;
+		if global.PlayerItems[_roll].key = itemPrint.key
+		{
+			with instance_create(Player.x, Player.y, PopupText)
+			{
+	    	text = "*SNAP*"
+	    	time = 5
+			}
+			sleep(7)
+			view_shake_at(x, y, 5)
+			with instance_create(x, y, GreenExplosion){damage = 0; mask_index = mskNone}
+			instance_destroy()
+			exit
+		}
+		else
+		{
+			remove_item(global.PlayerItems[_roll])
+			get_item(itemPrint)
+		}
+		sound_play_pitch(sndCrownProtection, 1)
+		global.popoChance = 10
+	  popoSpawn();
+		break;
 	}
-
-	 with instance_create(Player.x, Player.y, PopupText) {
-    text = "-" + string(global.PlayerItems[_roll].name)
-    time = 5
-}
-	if count_ > 1 {
-	global.PlayerItems[_roll].count--
-	get_item(global.CommonItems[itemPrint])
-	} else {
-
-	global.PlayerItems[_roll] = item[? "paper"]
-	global.PlayerItems[_roll].count = 1
-	global.PlayerItems[_roll].description_small = "@dBreaks the printer"
-	get_item(global.CommonItems[itemPrint])
+	else
+	{
+		with instance_create(Player.x, Player.y, PopupText)
+		{
+		  var _roll = round(random_range(1, 5))
+		  if (_roll == 1) text = "GO GET ITEMS"
+		  if (_roll == 2) text = "TOO POOR"
+		  if (_roll == 3) text = "FEED ME"
+		  if (_roll == 4) text = "NO"
+		  if (_roll == 5) text = "NEED ITEMS"
+		  sound_play_pitch(sprProtoStatueDone, 1)
+		  time = 10
+		}
 	}
-	sound_play_pitch(sndCrownProtection, 1)
-global.popoChance = 10
-    popoSpawn();
-	break;
-} else {
-	with instance_create(Player.x, Player.y, PopupText) {
-    var _roll = round(random_range(1, 5))
-    if (_roll == 1) text = "GO GET ITEMS"
-    if (_roll == 2) text = "TOO POOR"
-    if (_roll == 3) text = "FEED ME"
-    if (_roll == 4) text = "NO"
-    if (_roll == 5) text = "NEED ITEMS"
-    sound_play_pitch(sprProtoStatueDone, 1)
-    time = 10
-}
-}
 }
 
-if (type == "Carnage") {
-var carnage = round((Player.maxhealth * 0.2))
-with instance_create(Player.x, Player.y, PopupText) {
-text = "-" + string(carnage) + " MAX HP"
-}
-sound_play_pitch(sndFreakDead,0.8)
-sound_play_pitch(sndBloodLauncherExplo, 1)
-var _ang = random(360),
-    _i   = 0
-with obj_create(Player.x + lengthdir_x(26, _ang + _i * 180), Player.y + lengthdir_y(26, _ang + _i * 180), "ItemChest")
+if (type == "Carnage")
+{
+	var carnage = round((Player.maxhealth * 0.2))
+	with instance_create(Player.x, Player.y, PopupText) {text = "-" + string(carnage) + " MAX HP"; target = Player}
+	sound_play_pitch(sndFreakDead,0.8)
+	sound_play_pitch(sndBloodLauncherExplo, 1)
+	var _ang = random(360),
+	    _i   = 0;
+	with obj_create(Player.x + lengthdir_x(26, _ang + _i * 180), Player.y + lengthdir_y(26, _ang + _i * 180), "ItemChest")
 	{
 		tag = "item"
 		item_index = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]
 		chest_setup(tag)
 	}
-get_item(item[? "injury"]) //repeat(carnage) 
-}
-
+	get_item(item[? "injury"]) //repeat(carnage)
+	}
 }
 }
 draw_sprite_ext(global.shrineIcons, sprite, x + 7, y-20, 1, 1, 0, c_black, 0.5 );
@@ -553,7 +515,7 @@ switch(obj_name) {
 			spr_open = global.sprItemChestOpen;
 			sprite_index = global.sprItemChest;
 			if roll(1) tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
-			if tag = "none" && roll(4) tag = "large"
+			if tag = "none" && roll(4) tag = "large"  // 5% chance to turn into a large chest if gold chest roll failed
 			chest_setup(tag)
 			on_open = itemchest_open;
 		}
@@ -574,25 +536,23 @@ switch(obj_name) {
 			on_pickup = ror_pickup
 		}
 		return _obj;
+	case "Shrine":
+		_obj = instance_create(_x, _y, CustomObject)
+		with _obj
+		{
+			image_speed = 0.2;
+      name = "Shrine"
+      sprite_index = sprThroneStatue;
+	    itemPrint = global.CommonItems[irandom(array_length(global.CommonItems) - 1)]
+		}
+		return _obj;
 }
 
-switch(obj_name) {
-	case "Shrine":
-		var _obj instance_create(_x, _y, CustomObject)
-		with obj_
-		{
-            //spr_shadow = shd32;
-			image_speed = 0.2;
-            name = "Shrine"
-            sprite_index = sprThroneStatue;
-		}
-		return _obj
-}
 #define get_item(ITEM)
 global.itemGet = ITEM
 global.descriptionTimer = room_speed * 4
 var _ang = random(360),
-    _i   = 0
+    _i   = 0;
 if ITEM = item[? "gift"] repeat(2)
 {
 	with obj_create(Player.x + lengthdir_x(26, _ang + _i * 180), Player.y + lengthdir_y(26, _ang + _i * 180), "ItemChest")
@@ -623,17 +583,24 @@ if ITEM = item[? "missile"]
 }
 if ITEM = item[? "heater"]
 {
+	Player.lasthit = [global.sprDeathCauseHeater, "HEATER"]
 	var _l = round(max(Player.health_base * .75, 1))
 	Player.health_base = _l
 	if Player.my_health > Player.health_base
 	{
 		Player.my_health = Player.health_base
 		Player.lsthealth = Player.health_base
-
 	}
 	Player.perma_armor += 2
 }
-
+if ITEM = item[? "injury"]
+{
+	Player.lasthit = [global.sprDeathCauseInjury, "INJURY"]
+}
+if ITEM = item[? "blood"]
+{
+	Player.armor += 10;
+}
 //fx
 
 var _pitch = random_range(.8, 1.2)
@@ -673,19 +640,18 @@ if mod_variable_get("mod", "main", "teleporter") == true {
 	}
 }
 
-
 //Check if hurt this floor--------
-with (Player) if my_health < lsthealth {
-global.hurtFloor = true;
-if (item_get_count("prize") > 0) with instance_create(Player.x, Player.y, PopupText) {
-	text = "@yPrize Lost"
-	time = 10;
-}
+with (Player) if my_health < lsthealth && global.hurtFloor = false
+{
+	global.hurtFloor = true;
+	if (item_get_count("prize") > 0) with instance_create(Player.x, Player.y, PopupText)
+	{
+		text = "@yPrize Lost"
+		time = 10;
+	}
 }
 
 //Armor Mechanic
-//with (Player) if nexthurt == current_frame+5 && !instance_exists(Portal) && instance_exists(Player) { //When you get hit
-
 with (Player) if my_health < lsthealth
 {
 	var damageTaken = (Player.lsthealth - Player.my_health),
@@ -858,7 +824,6 @@ if(button_pressed(index, "horn")) {
 			tag = "cursed"
 			chest_setup(tag)
 		}
-		obj_create(mouse_x, mouse_y, "ItemChest")
 		with obj_create(mouse_x, mouse_y, "CustomPickup")
 		{
 			tag = "armor"
@@ -869,9 +834,13 @@ if(button_pressed(index, "horn")) {
 		{
 			tag = "fern"
 		}*/
+		with obj_create(mouse_x, mouse_y, "ItemChest")
+		{
+			tag = "item"
+			item_index = item[? "heart"]
+			chest_setup(tag)
+		}
 	}
-    //  get_item(item[? "blood"])
-	//Player.invincibility += room_speed * 8
 	}
 }
 //Timer
@@ -952,13 +921,10 @@ if amount >= 1
 {
 	with instances_matching(projectile, "team", 2)
 	{
-		if roll(10 * amount) && "crit" not in self
+		if "crit" not in self
 		{
-				image_xscale += .25
-		    image_yscale += .25
-		    extra_damage += 1
-		    crit = 1;
-		    image_blend = merge_color(c_red, c_white, 0.3)
+		    crit = roll(10 * amount);
+		    image_blend = merge_color(c_red, c_white, 0.2)
 				sleep(10)
 		}
 	 else {crit = 1}
@@ -1139,13 +1105,15 @@ with (projectile) {
 
 //Sabotage Tools
 var amount = item_get_count("tools");
-if amount >= 1 {
-with (projectile) {
-    if "jam" not in self && team != 2 {
-    if roll(15 * amount) instance_destroy(); break;
-    }
-    jam = true;
-}
+if amount >= 1
+{
+	with (projectile)
+	{
+	  if "jam" not in self && team != 2
+		{
+	  	if roll(clamp(8 * amount, 0, 40)){instance_destroy(); exit}else{jam = true}
+	  }
+	}
 }
 
 //Sabotage Tools
@@ -1390,7 +1358,7 @@ if amount >= 1
 	{
 		if size > 0
 		{
-			if roll((1 - 1/(.17 * amount + 1))*100 * .6)
+			if roll((1 - 1/(.15 * amount + 1))*100 * .6)
 			with obj_create(x, y, "CustomPickup")
 			{
 				tag = "armor"
@@ -1405,33 +1373,28 @@ if amount >= 1
 var amount = item_get_count("missile");
 if amount >= 1 && instance_exists(Player)
 {
-	extra_damage += (Player.armor + Player.perma_armor) * .04 * amount
+	extra_damage += (Player.armor + Player.perma_armor) * (.025 + .025 * amount)
 }
 //Scrap Cannon
 
-//Blood Gods Armor 
-var amount = item_get_count("blood");
+//backup Heart
+var amount = item_get_count("heart");
 if amount >= 1 && instance_exists(Player)
 {
-	if Player.my_health <= 0  {
+	if Player.my_health <= 0
+	{
 		Player.my_health = 1
 		Player.armor += 5;
-		Player.invincibility += (room_speed) * 8;
+		Player.invincibility += (room_speed) * 5;
 		Player.redFlash = 10;
+		sleep(300)
 		sound_play_pitch(sndCrownBlood, 1.2)
 		sound_play_pitch(sndLevelUltra, 0.8)
-		with instance_create(Player.x, Player.y, PopupText) {
-			text = "@q@rREVIVED"
-		}
-		if item_get_count("blood") > 1 {
-		for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == "blood"{global.PlayerItems[i].count--; break}}
-		} else {
-		for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == "blood" {global.PlayerItems[i] = item[? "heart"]; global.PlayerItems[i].count = 1;break}}	
-		}
+		with instance_create(Player.x, Player.y, PopupText) {text = "@q@rREVIVED"}
+		for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == "heart"{global.PlayerItems[i].count--; add_item(item[? "spent heart"]) break}}
 	}
-
 }
-//Blood Gods Armor
+//backup heart
 
 //Scale health with level
 if (GameCont.level >= 2)   { extra_health += 3;} // 4
@@ -1455,7 +1418,7 @@ if instance_exists(Player)
 	Player.maxhealth   = Player.health_base      + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6
 	with instances_matching(projectile, "team", Player.team)
 	{
-		damage *= Player.damage_base + extra_damage
+		damage *= (Player.damage_base + extra_damage) * ("crit" in self && crit = true ? 2 : 1)
 	}
 }
 
@@ -1696,21 +1659,40 @@ IMPORTANT - Remember that projectiles have creators, allowning you to buff certa
 var _roll = round(random_range(1, (100)))
 if (_roll <= global.popoChance) repeat(2)instance_create(Player.x, Player.y, IDPDSpawn)
 
-#define add_item(item)
-var itemarray = global.PlayerItems,
-    need_new_item = true;
-		//if array_length(global.PlayerItems) > 0
-with itemarray {              //iterating through the item list using with, can reference variables since they are LWOs
-		if self.key == item.key { //self = the instance of an item in the array
-        self.count++          //new item acquired, count increases
-        need_new_item = false //we dont need to create a new instance of an item
-        break                 //stop going through the list, because a match was found
+#define add_item(ITEM)
+var _itemarray     = global.PlayerItems,
+    _need_new_item = true;
+
+with _itemarray  //iterating through the item list using with, can reference variables since they are LWOs
+{
+		if self.key == ITEM.key //self = the instance of an item in the array
+		{
+        self.count++           //new item acquired, count increases
+        _need_new_item = false //we dont need to create a new instance of an item
+        break                  //stop going through the list, because a match was found
     }
 }
-if need_new_item {
-    var newitem = lq_clone(item);  //create a copy so that it isnt a pointer and can be freely manipulated
-    newitem.count = 1              //example of that manipulation, count = 1 because it is a newly acquired item and you only have one
-    array_push(itemarray, newitem) //add the new item to the list of items
+if _need_new_item
+{
+    var _newitem = lq_clone(ITEM);   //create a copy so that it isnt a pointer and can be freely manipulated
+    _newitem.count = 1               //example of that manipulation, count = 1 because it is a newly acquired item and you only have one
+    array_push(_itemarray, _newitem) //add the new item to the list of items
+}
+
+#define remove_item(ITEM)
+var _itemarray = global.PlayerItems;
+
+with _itemarray
+{
+	if self.key == ITEM.key
+	{
+		self.count--
+		if self.count <= 0
+		{
+			for (var i = 0,  j = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM.key {j = i;}}
+			global.PlayerItems = array_delete(_itemarray, j)
+		}
+	}
 }
 
 #define item_get_count(ITEM)
@@ -1816,21 +1798,18 @@ switch TAG
 #define reorder()
 var amount_common   = 0,
 		amount_uncommon = 0,
-		amount_rare     = 0,
-		amount_unique   = 0;
-cursed_array [0,0] = -4
+		amount_rare     = 0;
+inherited_items[0,0] = -4
 for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 0{amount_common   += global.PlayerItems[i].count}};
 for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 1{amount_uncommon += global.PlayerItems[i].count}};
 for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 2{amount_rare     += global.PlayerItems[i].count}};
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 4{amount_unique   += global.PlayerItems[i].count}};
-for (var i = 0, j = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 3{cursed_array[j,0] = global.PlayerItems[i];cursed_array[j,1] = global.PlayerItems[i].count; j++}};
-global.PlayerItems =  []
+for (var i = 0, j = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier > 2{inherited_items[j,0] = global.PlayerItems[i];inherited_items[j,1] = global.PlayerItems[i].count; j++}};
+global.PlayerItems = []
 global.PlayerItems[0] = item[? "none"]
 if amount_common   > 0 {global.PlayerItems[1] = global.CommonItems[random_range(0, array_length(global.CommonItems))]     ;global.PlayerItems[1].count = amount_common  }
 if amount_uncommon > 0 {global.PlayerItems[2] = global.UncommonItems[random_range(0, array_length(global.UncommonItems))] ;global.PlayerItems[2].count = amount_uncommon}
 if amount_rare     > 0 {global.PlayerItems[3] = global.RareItems[random_range(0, array_length(global.RareItems))]         ;global.PlayerItems[3].count = amount_rare    }
-if amount_unique   > 0 {global.PlayerItems[4] = global.UniqueItems[random_range(0, array_length(global.UniqueItems))]     ;global.PlayerItems[4].count = amount_unique  }
-for (var i = 0, iLen = array_length_1d(cursed_array); i < iLen; i++){global.PlayerItems[5 + i] = cursed_array[i,0]; repeat(cursed_array[i,1])add_item(cursed_array[i,0])}
+for (var i = 0, iLen = array_length_1d(inherited_items); i < iLen; i++){global.PlayerItems[4 + i] = inherited_items[i,0]; repeat(inherited_items[i,1])add_item(inherited_items[i,0])}
 
 #define roll(VALUE)
 var _chance = irandom_range(1,100),
@@ -1937,3 +1916,10 @@ var _tx = x,
     x = _tx;
     y = _ty;
 return r;
+
+#define array_delete(_array, _index)
+var  i = _index,
+  _new = array_slice(_array, 0, i);
+
+array_copy(_new, array_length(_new), _array, i + 1, array_length(_array) - (i + 1))
+return _new;

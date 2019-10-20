@@ -19,7 +19,7 @@ item_none = {
 	description_small : "THIS SHOULDNT APPEAR", // item description for the popup
 	description_large : "THIS SHOUDLN'T APPEAR#IF IT DOES#PLEASE CONTACT GOBLET ABOUT IT", // more detailed description for the pause menu
 	spr_index         : 0,  // index of the frame of the sprite for items
-	tier              : -1,  // -1 = untiered, 0 = common, 1 = uncommon, 2 = rare, 3 = cursed, 4 = unique
+	tier              : -1,  // -1 = untiered, 0 = common, 1 = uncommon, 2 = rare, 3 = cursed, 4 = unique, 5 = garbage
   key               : "none"
 
 };
@@ -171,7 +171,7 @@ item_golden_shot = {
 #macro item_sabotage_tools item[? "tools"]
 item_sabotage_tools = {
   name              : "Sabotage Tools",
-	description_small : "@wEnemy @sbullets sometimes get @wjammed",
+	description_small : "@wEnemy bullets @ssometimes get @wjammed",
 	description_large : "-",
 	spr_index         : 14,
 	tier              : 2
@@ -479,7 +479,7 @@ item_celesteel = {
 // ITEM 42: SCRAP MISSILE
 #macro item_scrap_missile item[? "missile"]
 item_scrap_missile = {
-  name              : "Scrap Missile",
+  name              : "SCRAP MISSILE",
 	description_small : "@s+@w8 @yArmor@s, scale @wdamage @swith @yarmor",
 	description_large : "-",
 	spr_index         : 42,
@@ -490,7 +490,7 @@ item_scrap_missile = {
 // ITEM 43: MERC'S CANTEEN
 #macro item_mercenary_canteen item[? "canteen"]
 item_mercenary_canteen = {
-  name              : "Mercenary's Canteen",
+  name              : "MERC'S CANTEEN",
 	description_small : "@wEnemies @sdrop @yarmor",
 	description_large : "-",
 	spr_index         : 43,
@@ -501,42 +501,34 @@ item_mercenary_canteen = {
 // ITEM 44: INJURY
 #macro item_injury item[? "injury"]
 item_injury = {
-  name              : "Injury",
-	description_small : "@r-20% Max HP",
+  name              : "INJURY",
+	description_small : "@s-20% @rMax HP",
 	description_large : "-",
 	spr_index         : 44,
 	tier              : 4
 
 };
 
-// ITEM 45: BLOOD GOD'S SHIELD
-#macro item_blood item[? "blood"]
-item_blood = {
-  name              : "Blood God's Armor",
-	description_small : "@sUpon @pdeath@s revive with @yinvincibility",
+// ITEM 45: BACKUP HEART
+#macro item_backup_heart item[? "heart"]
+item_backup_heart = {
+  name              : "BACKUP HEART",
+	description_small : "@sPrevent @wdeath @sonce",
 	description_large : "-",
 	spr_index         : 45,
 	tier              : 2
 };
-// ITEM 46: RUINED PAPER
-#macro item_paper item[? "paper"]
-item_paper= {
-  name              : "@sPrinter Paper",
-	description_small : "@dWorthless",
-	description_large : "-",
-	spr_index         : 46,
-	tier              : 4
-};
 
 // ITEM 46: Shattered Heart
-#macro item_paper item[? "heart"]
-item_paper= {
-  name              : "@sShattered Heart",
-	description_small : "@dWas used to revive you",
+#macro item_backup_heart_spent item[? "spent heart"]
+item_backup_heart_spent = {
+  name              : "SPENT HEART",
+	description_small : "@sIt's all used up",
 	description_large : "-",
-	spr_index         : 47,
-	tier              : 4
+	spr_index         : 46,
+	tier              : 5
 };
+
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),
