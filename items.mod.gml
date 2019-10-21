@@ -44,6 +44,7 @@ with(instances_matching(chestprop, "name", "ItemChest")) {instance_delete(self)}
 if instance_exists(Player) Player.invincibility = 0;
 global.PlayerItems = [item[? "none"]]
 global.GemCoeff = choose(-1, 1)
+global.BossBarMaxHP = 0
 global.frame = 0;
 global.RadiGumdropTimer = 0;
 global.RadiatedSnackCounter = 0;
@@ -626,18 +627,19 @@ else
 add_item(ITEM)
 
 #define step
-Player.my_health = round(Player.my_health)
 //Invincibility
-with (Player) {
-if invincibility > 0 {
-invincibility--
-if my_health < lsthealth {
-	my_health = lsthealth
+with (Player)
+{
+if invincibility > 0
+	{
+		invincibility--
+		if my_health < lsthealth
+		{
+			my_health = lsthealth
+		}
+		if ((invincibility % 2) == 1) with instance_create(x + random_range(-20, 20), y + random_range(-20, 20), FrogHeal) {image_blend = c_red}
+	}
 }
-if ((invincibility % 2) == 1) with instance_create(x + random_range(-20, 20), y + random_range(-20, 20), FrogHeal) {
-	image_blend = c_red;
-}
-}}
 //Destroy shrine of challenge during teleporter
 if mod_variable_get("mod", "main", "teleporter") == true {
 	with (CustomObject) {
@@ -844,7 +846,7 @@ if(button_pressed(index, "horn")) {
 		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "item"
-			item_index = item[? "golden"]
+			item_index = item[? "incendiary"]
 			chest_setup(tag)
 		}
 	}
@@ -911,7 +913,7 @@ if amount >= 1
        		if(instance_exists(near))
 					{
 	 					var _s = speed
-   					motion_add(point_direction(x, y, near.x, near.y), speed / clamp(8 - amount / 3, 2, 8));
+   					motion_add(point_direction(x, y, near.x, near.y), speed * amount / 6);
    					speed = _s;
    					image_angle = direction;
 					}
@@ -1012,37 +1014,48 @@ if amount >= 1
 var amount = item_get_count("incendiary");
 if amount >= 1
 {
-	with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFire = 3 + amount}}
-
-  with instances_matching_ge(enemy, "OnFire", 1)
+	with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFire = (3 + amount * 2) * (GameCont.area = 101 ? 0 : 1)}}}
+with instances_matching_ge(enemy, "OnFire", 1)
+{
+  image_blend = merge_color(c_orange, c_white, 0.3)
+	if (current_frame + id) mod 7 <= 1 && self != BigMaggotBurrow && self != RavenFly && self != LilHunterFly
 	{
-    image_blend = merge_color(c_orange, c_white, 0.3)
-		if (current_frame + id) mod 5 = 0
+		with instance_create(x, y, Flame)
 		{
-			with instance_create(x, y, Flame)
-			{
-				team = -100
-				damage = 1 + amount * .25
-				image_speed = 3
-				force = 0
-				direction = random(360)
-			}
-			instance_create(x + random_range(-4, 4), y + random_range(-4, 4), Smoke)
-			OnFire--
-			if OnFire = 0{image_blend = merge_color(c_orange, c_white, 1)}
-			if my_health = 0 instance_create(x, y, GroundFlame)
+			team = -100
+			damage = 1 + amount * .35
+			image_speed = 3
+			force = 0
+			direction = random(360)
+		}
+		instance_create(x + random_range(-4, 4), y + random_range(-4, 4), Smoke)
+		OnFire--
+		if OnFire = 0{image_blend = merge_color(c_orange, c_white, 1)}
+		if my_health = 0 instance_create(x, y, GroundFlame)
+	}
+
+	//fx
+	if irandom(4) = 0
+	{
+		with instance_create(x + random_range(-8, 8), y + random_range(-8, 8), BulletHit)
+		{
+			motion_set(90, 2)
+			image_speed = 1
+			image_xscale = .5
+			image_yscale = .5
+			depth = other.depth - 1
+			sprite_index = sprGroundFlame
 		}
 	}
-	with (projectile)
+	if irandom(4) = 0
 	{
-	  with (creator) if "OnFire" == true
+		with instance_create(x + random_range(-8, 8), y + random_range(-8, 8), Smoke)
 		{
-	    if "FlameBoost" not in self
-			{
-	      speed *= 10
-	      FlameBoost = true;
-	    }
-	  }
+			motion_set(90, 2)
+			image_xscale = .4
+			image_yscale = .4
+			depth = other.depth - choose(0, 1, 1)
+		}
 	}
 }
 //Incendiary Rounds
@@ -1456,42 +1469,54 @@ if global.bossBars == true
 	var Boss = [BanditBoss, HyperCrystal, FrogQueen, OasisBoss, LilHunter, Nothing2, Nothing, ScrapBoss, TechnoMancer, Turtle, SuperFireBaller],
 	    _mxh = 0,
 			_myh = 0,
+			_amo = 0,
 			_nam = "";
 	for(var i = 0; i < array_length_1d(Boss); i += 1)
-	if instance_exists(Boss[i]) && instance_exists(Player)
 	{
-		_myh += Boss[i].my_health;
-		_mxh += Boss[i].maxhealth;
-		switch Boss[i]
+		if instance_exists(Boss[i]) && instance_exists(Player)
 		{
-			case BanditBoss     : _nam = "BIG BANDIT"   ; break;
-			case HyperCrystal   : _nam = "HYPER CRYSTAL"; break;
-			case FrogQueen      : _nam = "MOM"          ; break;
-			case OasisBoss      : _nam = "BIG FISH"     ; break;
-			case LilHunter      : _nam = "LIL HUNTER"   ; break;
-			case Nothing        : _nam = "THRONE"       ; break;
-			case Nothing2       : _nam = "THRONE II"    ; break;
-			case ScrapBoss      : _nam = "BIG DOG"      ; break;
-			case TechnoMancer   : _nam = "TECHNOMANCER" ; break;
-			case Turtle         : _nam = "SEWER TURTLE" ; break;
-			case SuperFireBaller: _nam = "MANSION GANG" ; break;
-			default: _nam = "BOSS"; break;
+			with Boss[i] if "tag" in self && tag = "boss"
+			{
+				_myh += my_health;
+				_mxh += maxhealth;
+				_amo++;
+			}
+			switch Boss[i]
+			{
+				case BanditBoss     : _nam = "BIG BANDIT"   ; break;
+				case HyperCrystal   : _nam = "HYPER CRYSTAL"; break;
+				case FrogQueen      : _nam = "MOM"          ; break;
+				case OasisBoss      : _nam = "BIG FISH"     ; break;
+				case LilHunter      : _nam = "LIL HUNTER"   ; break;
+				case Nothing        : _nam = "THRONE"       ; break;
+				case Nothing2       : _nam = "THRONE II"    ; break;
+				case ScrapBoss      : _nam = "BIG DOG"      ; break;
+				case TechnoMancer   : _nam = "TECHNOMANCER" ; break;
+				case Turtle         : _nam = "SEWER TURTLE" ; break;
+				case SuperFireBaller: _nam = "MANSION GANG" ; break;
+				default: _nam = "BOSS"; break;
+			}
+		}
+		if _myh != 0
+		{
+			draw_set_color(c_white)
+			draw_set_alpha(1);
+			draw_X = -154 + game_width / 2
+			draw_Y = 220
+			draw_set_color(c_black);draw_rectangle(-1 + draw_X, 13 + draw_Y    , 308 + draw_X, 0 + draw_Y    , false)
+			draw_set_color(c_white);draw_rectangle( 0 + draw_X, 11 + draw_Y    , 307 + draw_X, 1 + draw_Y    , false)
+			draw_set_color(c_black);draw_rectangle( 1 + draw_X,  8 + draw_Y + 2, 306 + draw_X, 0 + draw_Y + 2, false)
+			global.BarLength = max(0, (_myh/ (global.BossBarMaxHP > _mxh ? global.BossBarMaxHP : _mxh) * 306)) //health * length / maxhealth
+			draw_set_color(c_red);draw_rectangle(1 + draw_X, 10 + draw_Y, (global.BarLength) + draw_X, 3 + draw_Y, false)
+			draw_set_font(fntSmall)
+			if _amo > 1 draw_text_nt(game_width / 2 - 152, 224, "+" + string(_amo - 1))
+			draw_set_halign(1)
+			draw_set_font(fntM)
+			draw_text_nt(game_width / 2, 210, _nam)
+			draw_set_halign(0)
 		}
 	}
-	if _myh != 0
-	{
-		draw_set_color(c_white)
-		draw_set_alpha(1);
-		draw_X = -154 + game_width / 2
-		draw_Y = 220
-		draw_set_color(c_black);draw_rectangle(-1 + draw_X, 13 + draw_Y    , 308 + draw_X, 0 + draw_Y    , false)
-		draw_set_color(c_white);draw_rectangle( 0 + draw_X, 11 + draw_Y    , 307 + draw_X, 1 + draw_Y    , false)
-		draw_set_color(c_black);draw_rectangle( 1 + draw_X,  8 + draw_Y + 2, 306 + draw_X, 0 + draw_Y + 2, false)
-		global.BarLength = (Boss[i].my_health * 306) / Boss[i].maxhealth //health * length / maxhealth
-		draw_set_color(c_red);draw_rectangle(1 + draw_X, 10 + draw_Y, (global.BarLength) + draw_X, 3 + draw_Y, false)
-		draw_text_nt(game_width / 2, 210, _nam)
-		draw_set_halign(1)
-	}
+	if _mxh > global.BossBarMaxHP || _mxh = 0 {global.BossBarMaxHP = _mxh};
 }
 
 draw_set_halign(fa_left)
@@ -1722,7 +1747,6 @@ with _itemarray
 }
 
 #define item_get_count(ITEM)
-if instance_exists(Player) {
 var amount
 for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM {amount = global.PlayerItems[i].count; break}}
 return amount
@@ -1750,7 +1774,7 @@ draw_sprite_stretched(global.sprBackdropFill, 0, STARTX + _HBorderWidth, STARTY 
 draw_sprite_stretched(global.sprBackdropVBorderTop, 0, STARTX + _TopCornerWidth, STARTY, _TitleHMargin, _VBorderTopHeight)
 draw_sprite_stretched(global.sprBackdropVBorderTop, 0, STARTX + _TopCornerWidth + _TitleHMargin + _TitleWidth, STARTY, ENDX - STARTX - _TitleHMargin - _TitleWidth, _VBorderTopHeight)
 draw_text_nt(STARTX + _TopCornerWidth + _TitleHMargin, STARTY - _TitleVMargin, TITLE)
-}
+
 #define itemchest_open
 sound_play(sndAmmoChest);
 
