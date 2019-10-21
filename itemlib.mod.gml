@@ -28,7 +28,7 @@ item_none = {
 #macro item_ancient_armor_plate item[? "plate"]
 item_ancient_armor_plate = {
   name              : "Ancient Armor Plate",
-	description_small : "@sReduced @wdamage @sfrom touching @wenemies. @s+2 @yArmor",
+	description_small : "@s+2 @yArmor, @sless @wcontact damage @staken",
 	description_large : "@sTake @w50% @d(+50 per stack) from @wtouch damage",
 	spr_index         : 1,
 	tier              : 1
@@ -502,7 +502,7 @@ item_mercenary_canteen = {
 #macro item_injury item[? "injury"]
 item_injury = {
   name              : "INJURY",
-	description_small : "@s-20% @rMax HP",
+	description_small : "@s-1 @rMax HP",
 	description_large : "-",
 	spr_index         : 44,
 	tier              : 4
