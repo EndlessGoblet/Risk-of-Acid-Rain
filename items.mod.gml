@@ -61,7 +61,7 @@ global.popoChance = 0;
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]] //To-Do: Fern
-global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"]] // Todo: dice
+global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"], item[? "explo"], item[? "clay"]] // Todo: dice
 global.UniqueItems   = [item[? "energy"]    , item[? "times"],  item[? "injury"], item[? "paper"], item[? "heart"]]
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
@@ -173,7 +173,7 @@ if (skill_get(28) == 1) _roll = round(random_range(2, 6))
 if (GameCont.area = 100) var _roll = 0;
 for(i = 0; i < _roll; i++) {
 var my_floor = floors[irandom(array_length(floors) - 1)];
-with(my_floor){ obj_create(x - sprite_xoffset + sprite_width / 2, y - sprite_yoffset + sprite_height / 2, "ItemChest" ); }
+with(my_floor){ obj_create(x - sprite_xoffset + sprite_width / 2, y - sprite_yoffset + sprite_height / 2, "ItemChest" );}
 }
 if global.doubleShrines != true {
 var _roll = round(random_range(0, 2)) //SHRINE AMOUNTS-------------
@@ -217,10 +217,18 @@ if distance_to_object(Wall) <= 5 && "boom" not in self {
     boom = true;
 }
 }
-
-
+if item_get_count("clay") > 0 {
+with(instances_matching(chestprop, "name", "ItemChest")) {
+if distance_to_object(Wall) <= 10 && "boom" not in self {
+    with instance_create(x, y, GreenExplosion) { damage = 0; }
+    boom = true;
+}
+}}
 
 }
+	
+
+
 #define draw
 //HEALTH BARS
 if global.hpBars == true {
@@ -606,6 +614,8 @@ if ITEM = item[? "plate"]
 {
 	Player.armor += 2;
 }
+
+
 //fx
 
 var _pitch = random_range(.8, 1.2)
@@ -625,7 +635,7 @@ else
 add_item(ITEM)
 
 #define step
-Player.my_health = round(Player.my_health)
+if instance_exists(Player) Player.my_health = round(Player.my_health)
 //Invincibility
 with (Player) {
 if invincibility > 0 {
@@ -810,7 +820,7 @@ with (Player) {
 if(button_pressed(index, "horn")) {
 	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too // yeah because you set Player.debug to true is my guess //My brain is smol
 	{
-		/*with obj_create(mouse_x, mouse_y, "ItemChest")
+		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "none"
 			chest_setup(tag)
@@ -839,11 +849,11 @@ if(button_pressed(index, "horn")) {
 		with obj_create(mouse_x, mouse_y, "CustomPickup")
 		{
 			tag = "fern"
-		}*/
+		}
 		with obj_create(mouse_x, mouse_y, "ItemChest")
 		{
 			tag = "item"
-			item_index = item[? "golden"]
+			item_index = item[? "clay"]
 			chest_setup(tag)
 		}
 	}
@@ -1329,7 +1339,7 @@ if amount >= 1
 		var Near = instance_nearest(x, y, enemy)
 		if distance_to_object(Near) <= (16 + amount)
 		{
-      if current_frame mod max(room_speed * 3 - amount * 3, 1) = 0 with instance_create(x, y, Shank)
+      if current_frame mod max(room_speed / 2.5 - amount * 3, 1) = 0 with instance_create(x, y, Shank)
 			{
 	        motion_add(point_direction(x, y, Near.x, Near.y) + random_range(-5, 5), 4 + skill_get(mut_long_arms) * 2);
 	        image_angle = direction
@@ -1404,6 +1414,29 @@ if amount >= 1 && instance_exists(Player)
 	}
 }
 //backup heart
+
+//Explosive Rounds
+var amount = item_get_count("explo");
+if amount >= 1 && instance_exists(Player)
+{
+with (Effect) {
+	if object_index == BulletHit || object_index == LightningHit || object_index == DiscDisappear || object_index == DiscBounce {
+		repeat(amount) instance_create(x, y, SmallExplosion)
+		instance_destroy();
+	}
+	
+}
+}
+//Explosive Rounds
+
+//Molding Clay
+var amount = item_get_count("clay");
+if amount >= 1 && instance_exists(Player)
+{
+_roll = round(random_range(1, (amount + 1)))
+}
+//Molding Clay
+
 
 //Scale health with level
 if (GameCont.level >= 2)   { extra_health += 3;} // 4
@@ -1709,8 +1742,9 @@ if instance_exists(Player) {
 var amount
 for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM {amount = global.PlayerItems[i].count; break}}
 return amount
-
+}
 #define draw_backdrop(STARTX, STARTY, ENDX, ENDY, TITLE)
+
 var _TopCornerHeight     = sprite_get_height(global.sprBackdropCornerTop),
     _TopCornerWidth      = sprite_get_width(global.sprBackdropCornerTop),
     _BottomCornerHeight  = sprite_get_height(global.sprBackdropCornerBottom) - 1,
@@ -1733,7 +1767,7 @@ draw_sprite_stretched(global.sprBackdropFill, 0, STARTX + _HBorderWidth, STARTY 
 draw_sprite_stretched(global.sprBackdropVBorderTop, 0, STARTX + _TopCornerWidth, STARTY, _TitleHMargin, _VBorderTopHeight)
 draw_sprite_stretched(global.sprBackdropVBorderTop, 0, STARTX + _TopCornerWidth + _TitleHMargin + _TitleWidth, STARTY, ENDX - STARTX - _TitleHMargin - _TitleWidth, _VBorderTopHeight)
 draw_text_nt(STARTX + _TopCornerWidth + _TitleHMargin, STARTY - _TitleVMargin, TITLE)
-}
+
 #define itemchest_open
 sound_play(sndAmmoChest);
 
@@ -1764,8 +1798,33 @@ if "tag" in self
 									  break;
 	}
 	if tag = "item" with instance_create(x, y, CustomObject){on_step = antifx_step}
+
+	//Molding Clay duplication
+	if tag != "item" && item_get_count("clay") > 0 {
+		_roll = round(random_range(1, (item_get_count("clay") + 1)))
+		trace(_roll)
+		var _ang = random(360),
+    _i   = 0;
+	repeat(item_get_count("clay")) if (_roll == 1) {
+with obj_create(Player.x + lengthdir_x(26, _ang + _i * 180), Player.y + lengthdir_y(26, _ang + _i * 180), "ItemChest")
+	{
+		tag = "item"
+		item_index = tem
+		chest_setup(tag)
+	}
+	//with instance_create(Player.x + lengthdir_x(26, _ang + _i * 180), Player.y + lengthdir_y(26, _ang + _i * 180), GreenExplosion) damage = 0;
+	}
+	if (_roll == 1) with instance_create(Player.x, Player.y, PopupText) {
+		text = "@yX" + string(item_get_count("clay") + 1) + " ITEMS"
+	}
+	if (_roll != 1) with instance_create(Player.x, Player.y, PopupText) {
+		text = "@sNO ITEMS"
+	}
 }
-get_item(tem)
+
+}
+if (item_get_count("clay") == 0) || (tag = "item") get_item(tem)
+if (item_get_count("clay") >= 1) && (_roll == 1) get_item(tem)
 
 
 #define chest_setup(TAG)

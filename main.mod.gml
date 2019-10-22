@@ -3,7 +3,7 @@
 #define init
 if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
 //DEBUG
-global.debug = false;
+global.debug = true;
 //Create important initial variables
 global.AnomalyGet  = 0;
 global.HardmodeGet = 0;
@@ -134,8 +134,10 @@ var mansion = [FireBaller, SuperFireBaller, Jock, Molefish, Molesarge]
 var cursed = [InvLaserCrystal, InvSpider]
 var everything = [Bandit, Scorpion, BigMaggot, Maggot, Rat, Ratking, Gator, BuffGator, Raven, MeleeBandit, Sniper, Salamander, LaserCrystal, LightningCrystal, Spider, Bandit, SnowTank, SnowBot, Wolf, Turret, Freak, ExploFreak, Necromancer, RhinoFreak, ExploGuardian, Guardian, DogGuardian, Turtle, BoneFish, Crab, FireBaller, SuperFireBaller, Jock, Molefish, Molesarge, InvLaserCrystal, InvSpider]
 var jungle = [JungleAssassinHide, JungleBandit, JungleFly]
+var night = [Bandit, Bandit]
 var place
 if (GameCont.area == 1) place = desert; if (GameCont.area == 2) place = sewers; if (GameCont.area == 3) place = scrapyard; if (GameCont.area == 4) place = caves; if (GameCont.area == 5) place = ice; if (GameCont.area == 6) place = labs; if (GameCont.area == 7) place = palace;
+if (GameCont.area == 0) place = night;
 if (GameCont.area == 105) place = jungle;
 if (GameCont.area == 104) place = cursed;
 if (GameCont.area == 103) place = mansion;
@@ -349,6 +351,7 @@ Close = "true"
 var AMOUNT = 0;
 with (enemy) if (Close == "true") && (object_index != Maggot) && instance_exists(self) AMOUNT++
 var scale = 3 + (round(GameCont.hard / 4) + (5 * GameCont.loops))
+if (GameCont.area == 103) var scale = 25;
 var amountNum = 3
 if (global.teleporter == true) amountNum = 8 * (GameCont.loops + 1)
 with (Player) if ("s_Combat" in self) if AMOUNT <= scale || Player.s_Combat > 0 {
@@ -464,7 +467,6 @@ if (_roll == 10) instance_create(x, y, AmmoPickup)
 }
 	 global.charge = clamp(global.charge, 0, 100)
 if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get_count("energy") * 10) && global.BossesLeft <= 0{
-    instance_create(Gen.x, Gen.y, Portal)
     GameCont.hard += 2
     if (GameCont.area = 1) GameCont.subarea = 3;
     //Area choose
@@ -475,30 +477,30 @@ if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get
     if (GameCont.area = 106) GameCont.area = 7;
     if (GameCont.area = 106) GameCont.subarea = 1;
 
-    if (GameCont.area = 105) && (_roll = 1) GameCont.area = 106
+    if (GameCont.area = 105) && (_roll = 1) { GameCont.area = 106; GameCont.subarea = 0; }
     if (GameCont.area = 105) && (_roll != 1) {
     GameCont.area = 5
     GameCont.subarea = 3
     }
 
-    if (GameCont.area = 104) && (_roll = 1) GameCont.area = 105
+    if (GameCont.area = 104) && (_roll = 1) { GameCont.area = 105; GameCont.subarea = 0; }
     if (GameCont.area = 104) && (_roll != 1) {
     GameCont.area = 4
     GameCont.subarea = 1
     }
 
-    if (GameCont.area = 103) && (_roll = 1) GameCont.area = 104
+    if (GameCont.area = 103) && (_roll = 1) { GameCont.area = 104; GameCont.subarea = 0; }
     if (GameCont.area = 103) && (_roll != 1) {
     GameCont.area = 3
     GameCont.subarea = 3
     }
-    if (GameCont.area = 102) && (_roll = 1) GameCont.area = 103
+    if (GameCont.area = 102) && (_roll = 1) { GameCont.area = 103; GameCont.subarea = 0; }
     if (GameCont.area = 102) && (_roll != 1) {
     GameCont.area = 2
     GameCont.subarea = 1
     }
 
-    if (GameCont.area = 101) && (_roll = 1) GameCont.area = 102
+    if (GameCont.area = 101) && (_roll = 1) { GameCont.area = 102; GameCont.subarea = 0; }
     if (GameCont.area = 101) && (_roll != 1) {
     GameCont.area = 1
     GameCont.subarea = 3
@@ -514,7 +516,10 @@ if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get
     global.charge = 0;
     global.teleporter = false;
     global.teleDone = true;
-    with(SmallGenerator) instance_destroy();
+    x_ = Gen.x
+    y_ = Gen.y
+    with(SmallGenerator) instance_delete(self);
+    instance_create(x_, y_, Portal)
 }
 
 

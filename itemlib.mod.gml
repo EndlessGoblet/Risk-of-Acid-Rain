@@ -529,6 +529,25 @@ item_backup_heart_spent = {
 	tier              : 5
 };
 
+// ITEM 47: Explosive Rounds
+#macro item_explo item[? "explo"]
+item_explo = {
+  name              : "Explosive Rounds",
+	description_small : "@sBullets @yEXPLODE",
+	description_large : "-",
+	spr_index         : 47,
+	tier              : 3
+};
+
+// ITEM 48: Molding Clay
+#macro item_clay item[? "clay"]
+item_clay = {
+  name              : "Molding Clay",
+	description_small : "@sChests contain @wdouble @sor@w nothing",
+	description_large : "-",
+	spr_index         : 48,
+	tier              : 3
+};
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),
