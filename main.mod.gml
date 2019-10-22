@@ -7,17 +7,21 @@ global.debug = false;
 //Create important initial variables
 global.AnomalyGet  = 0;
 global.HardmodeGet = 0;
-global.teleDone = false;
-
 global.difficulty = 0;
+
 global.time = 0;
 global.frame = 0;
 global.seconds = 0;
 global.minutes = 0;
 global.hours = 0;
+
 global.teleporter = false;
+
+global.CircleSurf = -1;
 //Garbo Variables
 global.radi = 0;
+global.maxradi = 150
+
 global.speed = 15;
 global.charge = 0;
 global.chargeF = 0;
@@ -37,7 +41,11 @@ global.menu = false;
 global.sprSplash  = sprite_add("sprites/other/splash.png", 1, 320, 240);
 global.sprVersion = sprite_add("sprites/other/sprVersion.png", 1, 93, 20);
 global.sprOutline = sprite_add("sprites/other/sprOutline.png", 1, 93, 20);
-global.sprMode = sprite_add("sprites/other/sprMode.png", 1, 19, 13);
+
+global.sprTeleporterIdle = sprite_add("sprites/teleporter/sprTeleporterIdle.png", 1, 25, 20);
+global.mskTeleporter     = sprite_add("sprites/teleporter/mskTeleporter.png"    , 1, 25, 20);
+
+global.sprMode  = sprite_add("sprites/other/sprMode.png", 1, 19, 13);
 global.sprModes = sprite_add("sprites/other/sprModes.png", 2, 41, 41);
 if (instance_exists(CharSelect)) global.menu = true;
 //set new level function
@@ -55,7 +63,13 @@ while(true){
 }
 
 #define level_start
-global.teleDone = false;
+with instance_create(0, 0, CustomObject)
+{
+	name = "RoRSurfaceHandler"
+	depth = -1.9
+	on_draw = circlesurface_draw
+}
+
 global.crownVault = false;
 //Reset vars
 global.BossesLeft = 0 // 0 at level start, after teleport activation = amount of boss enemies, at 0 spawns an item
@@ -83,32 +97,43 @@ with (WeaponChest) {
     }
 }}
 //SPAWN OBJECTS ON LEVEL START
-var floors = instances_matching(Floor, mod_current, undefined);
-var my_floor = floors[irandom(array_length(floors) - 1)];
-with(my_floor){ instance_create(x - sprite_xoffset + sprite_width / 2, y - sprite_yoffset + sprite_height / 2, SmallGenerator ); }
+with Player
+{
+	with instance_create(instance_furthest(x, y, Floor).x - sprite_xoffset + sprite_width / 2, instance_furthest(x, y, Floor).y - sprite_yoffset + sprite_height / 2, CustomProp)
+	{
+		name     = "Teleporter"
+		teledone = false
+		radifac  = random_range(.9, 1.1)
 
-var my_floor = floors[irandom(array_length(floors) - 1)];
-with(my_floor){ instance_create(x - sprite_xoffset + sprite_width / 2, y - sprite_yoffset + sprite_height / 2, SmallGenerator ); }
+		spr_idle = global.sprTeleporterIdle
+		spr_hurt = global.sprTeleporterIdle
+		spr_dead = global.sprTeleporterIdle
+		mask_index   = global.mskTeleporter
+		image_speed  = .5
+		maxhealth    = 999999999999999999999999 // yeah
+		my_health    = maxhealth
 
-var my_floor = floors[irandom(array_length(floors) - 1)];
-with(my_floor){ instance_create(x - sprite_xoffset + sprite_width / 2, y - sprite_yoffset + sprite_height / 2, SmallGenerator ); }
+		var _i = 0;
+		do
+		{
+			with instance_nearest(x, y, Wall) if distance_to_object(other) <= 64
+			{
+				instance_create(x, y, FloorExplo);
+				instance_destroy();
+			}
+			_i++;
+		}until(_i = 64)
+		with Debris instance_delete(self);
 
-repeat(2) with instance_nearest(Player.x, Player.y, SmallGenerator) {
-    instance_delete(self)
+		on_step  = teleporter_step
+	}
 }
-if instance_number(SmallGenerator) > 1 {
-    with instance_nearest(Player.x, Player.y, SmallGenerator) {
- instance_delete(self)
-    }
-}
-;
-if (GameCont.area == 100) with (SmallGenerator) instance_delete(self)
+
 global.radi = 0;
 global.speed = 15;
 global.charge = 0;
 global.chargeF = 0;
 global.teleporter = false;
-
 
 #define enemySpawn
 if instance_exists(Player) {
@@ -191,14 +216,139 @@ var SpawnY = Player.y + y_
 
 }
 }
+
+#define teleporter_step
+//TELEPORTER EVENT
+
+if my_health < maxhealth my_health = maxhealth
+
+var _tele = self;
+with (Player)
+{
+	if !instance_exists(Spiral) && instance_exists(Player) && global.teleporter = true && point_in_circle(Player.x, Player.y, _tele.x - 4, _tele.y, global.radi)
+	{
+		global.chargeF++
+		if global.chargeF == round(room_speed / 1.5)
+		{
+			global.chargeF = 0;
+			global.charge += 1 + (global.BossesLeft = 0 ? 3 : 0) //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
+			if (GameCont.area = 101) global.charge += 4 //Charge faster in oasis
+			with instances_matching_le(enemy,"my_health",0)
+			{
+				if size > 0
+				{
+					if (irandom(9) = 0) instance_create(x, y, AmmoPickup)
+				}
+			}
+		}
+		global.charge = clamp(global.charge, 0, max(100 - item_get_count("energy") * 10, 1))
+		if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get_count("energy") * 10) && global.BossesLeft <= 0 && other.teledone = false // fully charged
+		{
+			other.teledone = true
+			view_shake_max_at(x, y, 64)
+			sleep(200)
+			instance_create(_tele.x, _tele.y, Portal)
+		  GameCont.hard += 2
+
+			//Area choose
+		  var _roll = round(random_range(1, 3))
+		  global.areaChoice = GameCont.lastarea + 1
+		  global.subareaChoice = 1
+
+			switch GameCont.area
+			{
+				case 106: GameCont.area    = 7;
+				          GameCont.subarea = 1;
+									break;
+				case 105: if _roll = 0
+									{
+										GameCont.area    = 106;
+										GameCont.subarea = 5;
+									}
+									else
+									{
+										GameCont.area    = 5;
+										GameCont.subarea = 3;
+									}
+									break;
+				case 104: if _roll = 0
+									{
+										GameCont.area    = 105;
+										GameCont.subarea = 1;
+									}
+									else
+									{
+										GameCont.area    = 3;
+										GameCont.subarea = 3;
+									}
+									break;
+				case 103: if _roll = 0
+									{
+										GameCont.area    = 104;
+										GameCont.subarea = 1;
+									}
+									else
+									{
+										GameCont.area    = 3;
+										GameCont.subarea = 3;
+									}
+									break;
+				case 102: if _roll = 0
+									{
+										GameCont.area    = 103;
+										GameCont.subarea = 1;
+									}
+									else
+									{
+										GameCont.area    = 2;
+										GameCont.subarea = 1;
+									}
+									break;
+			  case 101: if _roll = 0
+									{
+										GameCont.area    = 102;
+										GameCont.subarea = 1;
+									}
+									else
+									{
+										GameCont.area    = 1;
+										GameCont.subarea = 3;
+									}
+									break;
+				case   1: if _roll = 0
+									{
+										GameCont.area = 102
+									}
+									break;
+				case   2: if _roll = 0
+									{
+										GameCont.area = 103
+									}
+									break;
+				case   3: if _roll = 0
+					 				{
+					 					GameCont.area = 104
+					 				}
+									break;
+			  case   4: if _roll = 0
+									{
+										GameCont.area = 105
+									}
+									break;
+			  case   5: if _roll = 0
+									{
+										GameCont.area = 106
+									}
+									break;
+			}
+		    global.charge = 0;
+		    global.teleporter = false;
+		}
+	}
+}
+
 #define step
-//No teleporter fix
-/*
-if (GameCont.area != 100) && global.teleDone != true && !instance_exists(SmallGenerator) {
-var my_floor = floors[irandom(array_length(floors) - 1)];
-with(my_floor){ instance_create(x - sprite_xoffset + sprite_width / 2, y - sprite_yoffset + sprite_height / 2, SmallGenerator );
-}}
-*/
+
 //Crown Vault Fix
 if instance_exists(CrownPed) global.crownVault = true;
 if instance_exists(Portal) && global.crownVault == true {
@@ -230,12 +380,14 @@ if (global.mode == 1) var minutes_ = 5
 global.timeControl = (minutes_ * 2) * (60 * 60)
 
 //Hard Mode
-if (global.mode == 1) {
+{
 with (enemy) {
 for(i = 0; i < 5; i++){
-
+			var _speed_hardmode = global.mode = 1 ? .7 : 0,
+			    _speed_times    = .2 + .1 * item_get_count("times"),
+					_speed_boss     = "boss_buff" in self ? .7 : 0;
 			if(alarm_get(i) > 2){
-				alarm_set(i, (alarm_get(i) - (.4 + .1 * item_get_count("times"))));
+				alarm_set(i, alarm_get(i) - (_speed_hardmode + _speed_times + _speed_boss));
 			}
 		}
 
@@ -316,10 +468,6 @@ global.debug = CharSelect.debugSet
 CharSelect.debugSet = false;
 }
 
-with (SmallGenerator) { //You can no longer hit generators <:
-    mask_index = mskNone;
-}
-
 }
 if instance_exists(Player) {
     Player.debug = global.debug;
@@ -351,8 +499,9 @@ with (enemy) if (Close == "true") && (object_index != Maggot) && instance_exists
 var scale = 3 + (round(GameCont.hard / 4) + (5 * GameCont.loops))
 var amountNum = 3
 if (global.teleporter == true) amountNum = 8 * (GameCont.loops + 1)
-with (Player) if ("s_Combat" in self) if AMOUNT <= scale || Player.s_Combat > 0 {
-if ( !instance_exists(Spiral) && global.crownVault != true ) enemySpawn();
+with (Player) if ("s_Combat" in self) if AMOUNT <= scale || Player.s_Combat > 0
+{
+if instance_exists(Spiral) && global.crownVault != true enemySpawn();
 }
 
 with (Player) if "s_Combat" in self && (s_Combat > 0) {
@@ -398,24 +547,12 @@ with (projectile) {  //Boost non-boosted projectiles based on difficulty
 //CHEAT VARIABLES
 speed = (0) + (room_speed / 30)
 
-
-//MAKE TELEPORTER INVINCIBLE
-with (SmallGenerator) {
-    my_health = 999999999;
-    mask_index = mskNone;
-
-}
 //INCREASE GLOBAL.RADI
-if global.radi < 150 && global.teleporter == true{
+if global.radi < global.maxradi && global.teleporter == true{
     global.radi += (1 * (global.speed));
     global.speed *= 0.9;
 }
 
-/*
-if global.radi < 50 && global.teleporter == true{
-    global.radi++
-}
-*/
 //TIME SYSTEM
 if instance_exists(Player) && !instance_exists(GenCont) global.frame += speed * current_time_scale
 if global.frame == room_speed {
@@ -432,94 +569,17 @@ if global.minutes == 60 {
 }
 //TIME SYSTEM END
 
-
 //DIFFICULTY INCREASING TIMER
-if !instance_exists(GenCont) && instance_exists(Player) global.time += speed *  (1 + item_get_count("times") * 1.2)
+if !instance_exists(GenCont) && instance_exists(Player) global.time += speed * 3 * (1 + item_get_count("times") * 1.4)
 if global.time >= global.timeControl && global.difficulty != 8 { //increases every 3 minutes //11520
 global.time = 0;
 global.difficulty++ //difficulty increase
 sound_play_pitch(sndDragonStop,1)
 }
 
-if global.difficulty == 8 {
-    global.time = global.timeControl
-}
+if global.difficulty == 8 {global.time = global.timeControl}
 //DIFFICULTY INCREASING TIMER END
 
-//TELEPORTER EVENT
-with (Player) {
-    var Gen = instance_nearest(x, y, SmallGenerator)
-if !instance_exists(Spiral) && global.teleporter == true && point_in_circle(x, y, Gen.x - 4, Gen.y, global.radi) && global.teleporter == true {
-global.chargeF++
-if global.chargeF == round(room_speed / 1.5){
-global.chargeF = 0;
-global.charge += 1 + (global.BossesLeft = 0 ? .2 : 0) //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
-if (GameCont.area = 101) global.charge += 4 //Charge faster in oasis
-with instances_matching_le(enemy,"my_health",0){
-		if object_index != Maggot {
-var _roll = round(random_range(1, 10))
-if (_roll == 10) instance_create(x, y, AmmoPickup)
-        }
-}
-}
-	 global.charge = clamp(global.charge, 0, 100)
-if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get_count("energy") * 10) && global.BossesLeft <= 0{
-    instance_create(Gen.x, Gen.y, Portal)
-    GameCont.hard += 2
-    if (GameCont.area = 1) GameCont.subarea = 3;
-    //Area choose
-    var _roll = round(random_range(1, 3))
-    global.areaChoice = GameCont.lastarea + 1
-    global.subareaChoice = 1
-
-    if (GameCont.area = 106) GameCont.area = 7;
-    if (GameCont.area = 106) GameCont.subarea = 1;
-
-    if (GameCont.area = 105) && (_roll = 1) GameCont.area = 106
-    if (GameCont.area = 105) && (_roll != 1) {
-    GameCont.area = 5
-    GameCont.subarea = 3
-    }
-
-    if (GameCont.area = 104) && (_roll = 1) GameCont.area = 105
-    if (GameCont.area = 104) && (_roll != 1) {
-    GameCont.area = 4
-    GameCont.subarea = 1
-    }
-
-    if (GameCont.area = 103) && (_roll = 1) GameCont.area = 104
-    if (GameCont.area = 103) && (_roll != 1) {
-    GameCont.area = 3
-    GameCont.subarea = 3
-    }
-    if (GameCont.area = 102) && (_roll = 1) GameCont.area = 103
-    if (GameCont.area = 102) && (_roll != 1) {
-    GameCont.area = 2
-    GameCont.subarea = 1
-    }
-
-    if (GameCont.area = 101) && (_roll = 1) GameCont.area = 102
-    if (GameCont.area = 101) && (_roll != 1) {
-    GameCont.area = 1
-    GameCont.subarea = 3
-
-    }
-
-    if (GameCont.area = 1) && (_roll = 1) GameCont.area = 102
-    if (GameCont.area = 2) && (_roll = 1) GameCont.area = 103
-    if (GameCont.area = 3) && (_roll = 1) GameCont.area = 104
-    if (GameCont.area = 4) && (_roll = 1) GameCont.area = 105
-    if (GameCont.area = 5) && (_roll = 1) GameCont.area = 106
-
-    global.charge = 0;
-    global.teleporter = false;
-    global.teleDone = true;
-    with(SmallGenerator) instance_destroy();
-}
-
-
-}
-}
 //Make cursed crytal caves have cursed music
 if GameCont.area = 104 && global.teleporter = true {
 var rando = [musBoss1, musBoss2, musBoss3, musBoss4B, musBoss5, musBoss6, musBoss7, musBoss8, mus104]
@@ -808,93 +868,185 @@ current_time_scale=1
 }
 
 #define draw
-
-
-
 draw_set_halign(fa_center)
-with(SmallGenerator)
+with instances_matching(CustomProp, "name", "Teleporter")
 {
-
-//DRAW TELEPORTER CIRCLE
-if global.teleporter == true && instance_exists(Player) {
-
-//DRAW TELEPORTER PERCENT
-draw_x = 5; draw_y = 20; draw_set_alpha(0.5); draw_set_color(c_black);
-draw_rectangle(draw_x+x + 15 , draw_y+y - 9 , x+draw_x-23 ,y+draw_y , false)
-draw_set_alpha(1)
-if point_in_circle(Player.x, Player.y, x - 4, y, global.radi) && global.teleporter == true {
-       // draw_text_nt(x, y + 12, string(global.charge) + "%");
-            draw_set_color(c_red); draw_set_alpha(0.15)
-            if (global.DarkCircle = true) draw_set_alpha(3)
-            draw_circle(x -4, y, global.radi, false);
-            draw_set_alpha(1);draw_set_color(c_white);
-            draw_text_nt(x + draw_x - 2, y + 12, string(global.charge) + "%");
-} else {
-   if (global.frame % 10 == 1) {
-   draw_set_alpha(0.6)
-      } else {
-       draw_set_alpha(0.3)
-   }
-    draw_set_color(c_red);
-    draw_circle(x -4, y, global.radi, false);
-    draw_set_alpha(1)
-    draw_text_nt(x + draw_x - 2, y + 12, string(global.charge) + "%");
-    draw_text_nt(x + draw_x - 2, y + 12, (floor(current_frame/4)*30 % 20 ? "@r" + string(global.charge) + "%" : "@w" + string(global.charge) + "%" ));
-}
-}
-
-if (distance_to_object(Player) <= 8) && (global.teleporter == false)
+	if (distance_to_object(Player) <= 8) && (global.teleporter == false)
 	{
-with Player
-{  if(button_pressed(index, "pick")) && global.teleporter == false
-{   sound_play(sndLevelUltra) //What to do when the activate teleporter
-            global.teleporter = true;
-            global.radi += 1;
-            repeat(40) with instance_create(x, y, GreenExplosion) damage = 0;
-sound_play_music(musBoss8)
-negative_ASK = round(random_range(0, 1))
-negative = 1;
-if (negative_ASK == 0) negative = -1; if (negative_ASK == 1) negative = 1;
-var SpawnX = Player.x - (random_range(85, 105) * negative)
-var SpawnY = Player.y - (random_range(85, 105) * negative)
-if (GameCont.area == 2) var SpawnX = Player.x - (random_range(105, 115) * negative)
-if (GameCont.area == 2) var SpawnY = Player.y - (random_range(105, 115) * negative)
-//with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Explosion) {
+		with Player
+		{
+			if(button_pressed(index, "pick")) && global.teleporter == false //What to do when the activate teleporter
+			{
+				sound_play(sndLevelUltra)
+        global.teleporter = true;
+        global.radi += 1;
+				var i = 0
+				do
+				{
+					with instance_nearest(x, y, Wall) if distance_to_object(other)<= global.maxradi
+					{
+						instance_create(x, y, FloorExplo)
+						instance_destroy()
+						sleep(2)
+					}
+					i++;
+				}until(i = 1000)
+				repeat(40) with instance_create(x, y, GreenExplosion) {damage = 0; image_speed = random_range(.7, 1)};
+				sound_play_music(musBoss8)
+				negative_ASK = round(random_range(0, 1))
+				negative = 1;
+				if (negative_ASK == 0) negative = -1; if (negative_ASK == 1) negative = 1;
+				var SpawnX = Player.x - (random_range(85, 105) * negative),
+				    SpawnY = Player.y - (random_range(85, 105) * negative);
+				if (GameCont.area == 2) var SpawnX = Player.x - (random_range(105, 115) * negative)
+				if (GameCont.area == 2) var SpawnY = Player.y - (random_range(105, 115) * negative)
 
- //Make Room via Explosion
- var repeatNumber = Player.s_Challenge + 1
-            repeat(repeatNumber) if (GameCont.area == 1) { sound_play_music( musBoss1); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, BanditBoss)  {global.BossesLeft++; tag = "boss"}}
-            repeat(repeatNumber) if (GameCont.area == 2) { sound_play_music( musBoss5); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, FrogQueen)   {global.BossesLeft++; tag = "boss"}}
-            repeat(repeatNumber) if (GameCont.area == 3) { sound_play_music( musBoss2); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, ScrapBoss)   {global.BossesLeft++; tag = "boss"}GameCont.subarea = 3}
-            repeat(repeatNumber) if (GameCont.area == 4) { sound_play_music( musBoss6); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, HyperCrystal){global.BossesLeft++; tag = "boss"}}
-            repeat(repeatNumber) if (GameCont.area == 5) { sound_play_music( musBoss3); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, LilHunter)   {global.BossesLeft++; tag = "boss"}GameCont.subarea = 3}
-            repeat(repeatNumber) if (GameCont.area == 6) { sound_play_music( musBoss7); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, TechnoMancer){global.BossesLeft++; tag = "boss"}}
-            repeat(repeatNumber) if (GameCont.area == 7) { sound_play_music(musBoss4B); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Nothing2)    {global.BossesLeft++; tag = "boss"}GameCont.subarea = 3}
-            repeat(repeatNumber) if (GameCont.area == 0) { sound_play_music( musBoss8); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Nothing2)    {global.BossesLeft++; tag = "boss"}}
+ 				var _boss_amount = 1,
+				    _boss        = CrownGuardianOld;
+			  other._enemy = Guardian;
+				switch GameCont.area
+				{
+					case   1: _boss  = BanditBoss;
+										other._enemy = Bandit;
+								  	sound_play_music( musBoss1);
+								  	break;
+					case   2: _boss  = FrogQueen;
+										other._enemy = FastRat;
+								  	sound_play_music( musBoss5);
+								  	break;
+					case   3: _boss  = ScrapBoss;
+										other._enemy = Raven;
+								  	sound_play_music( musBoss2);
+								  	break;
+					case   4: _boss  = HyperCrystal;
+										other._enemy = Spider;
+										sound_play_music( musBoss6);
+										break;
+					case 	 5: _boss  = LilHunter;
+										other._enemy = Grunt;
+										sound_play_music( musBoss3);
+										break;
+					case 	 6: _boss  = TechnoMancer;
+										other._enemy = Freak;
+										sound_play_music( musBoss7);
+										break;
+					case	 7: _boss  = Nothing2;
+										other._enemy = Wind;
+										sound_play_music(musBoss4B);
+										break;
+					case   0: _boss  = Nothing2;
+										other._enemy = WindNight;
+					 			  	sound_play_music( musBoss8);
+								  	break;
+					case 101: _boss  = OasisBoss;
+										other._enemy = Bubble;
+										sound_play_music(musBoss3);
+										break;
+					case 102: _boss  = Turtle;
+										other._enemy = Rat;
+					 					sound_play_music(musBoss3);
+										_boss_amount += 3;
+										break;
+					case 103: _boss  = SuperFireBaller;
+										other._enemy = Molefish;
+										sound_play_music(mus104);
+					    			_boss_amount += 4;
+										break;
+				}
+				_boss_amount *= Player.s_Challenge + 1
 
-            repeat(repeatNumber)if (GameCont.area == 101) { sound_play_music(musBoss3); with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, OasisBoss){global.BossesLeft++; tag = "boss"}}
-            if (GameCont.area == 102) { sound_play_music(musBoss3);
-            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_orange, c_white, 0.3); my_health *= 2; maxhealth *= 2; global.BossesLeft++; tag = "boss"}
-            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_red, c_white, 0.3)   ; my_health *= 2; maxhealth *= 2; global.BossesLeft++; tag = "boss"}
-            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_blue, c_white, 0.3)  ; my_health *= 2; maxhealth *= 2; global.BossesLeft++; tag = "boss"}
-            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, Turtle) { image_blend = merge_color(c_purple, c_white, 0.3); my_health *= 2; maxhealth *= 2; global.BossesLeft++; tag = "boss"}
-            }
+        repeat(_boss_amount) {with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, _boss)  {global.BossesLeft++; tag = "boss"}}
+    	}
+		}
 
-            if (GameCont.area == 103) { sound_play_music(mus104);
-            repeat(repeatNumber) with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, SuperFireBaller){global.BossesLeft++; tag = "boss"};
-            }
 
-    }
+		//DRAW ACTIVATE TEXT
+    draw_x = 1; draw_y = -17; draw_set_alpha(0.5); draw_set_color(c_black);
+    draw_rectangle(draw_x+x + 40 , draw_y+y - 9 , x+draw_x-43 ,y+draw_y , false)
+    draw_set_color(c_white); draw_set_alpha(1)
+    draw_text_nt(x, y - 25, "@1(keysmall:pick) ACTIVATE");
+	}
+	var _ang = random(360)
+	if global.teleporter = true && global.BossesLeft > 0 && (current_frame mod (room_speed * 5)) = 0 {repeat(irandom(2) + 1) instance_create(x + lengthdir_x(global.radi * radifac * random_range(.3, .8), _ang), y + lengthdir_y(global.radi * radifac * random_range(.3, .8), _ang), _enemy)}
+}
+with instances_matching(enemy, "tag", "boss") // make bosses more powerful
+{
+	if "boss_buff" not in self
+	{
+		boss_buff = (self != OasisBoss ? 2 : 1) + item_get_count("times") * .25
+		maxhealth *= boss_buff
+		my_health = maxhealth
+	}
+}
+with TopCont
+{
+	with instances_matching(CustomProp, "name", "Teleporter") var _tele = self
+	if global.teleporter == true && instance_exists(Player)
+	{
+		draw_x = 5
+		draw_y = 20
+		var _strTele      = string(global.charge) + "%",
+				_strTeleBlink = point_distance(_tele.x, _tele.y, Player.x, Player.y) <= global.radi ? "@w" : (current_frame mod 5 <= 2 ? "@w" : "@r"),
+				_x            = clamp(_tele.x + draw_x - 2, view_xview + string_width(_strTele)/2, view_xview + game_screen_get_width_nonsync() - string_width(_strTele)/2 + 2),
+				_y            = clamp(_tele.y + 12, view_yview, view_yview + game_screen_get_height_nonsync() - string_height(_strTele));
+		draw_set_halign(1)
+		draw_text_nt(_x, _y, _strTeleBlink + _strTele);
+		draw_text_nt(_x, _y, _strTeleBlink + _strTele);
+	}
 }
 
-        //DRAW ACTIVATE TEXT
-        draw_x = 1; draw_y = -17; draw_set_alpha(0.5); draw_set_color(c_black);
-        draw_rectangle(draw_x+x + 40 , draw_y+y - 9 , x+draw_x-43 ,y+draw_y , false)
-        draw_set_color(c_white); draw_set_alpha(1)
-        draw_text_nt(x, y - 25, "@1(keysmall:pick) ACTIVATE");
+#define circlesurface_draw
+if !surface_exists((global.CircleSurf)){global.CircleSurf = surface_create(game_screen_get_width_nonsync(), game_screen_get_height_nonsync())}
+with instances_matching(CustomProp, "name", "Teleporter")
+{
+	//DRAW TELEPORTER CIRCLE
+	if global.teleporter == true && instance_exists(Player)
+	{
+		//DRAW TELEPORTER PERCENT
+		draw_x = 5
+		draw_y = 20
+		draw_set_alpha(0.5)
+		draw_set_color(c_black);
+		draw_rectangle(draw_x+x + 15 , draw_y+y - 9 , x+draw_x-23 ,y+draw_y , false)
+		draw_set_alpha(1)
+		var _x = x - view_xview,
+		    _y = y - view_yview;
 
-
+		surface_set_target(global.CircleSurf)
+		draw_circle_colour(_x -4, _y, global.radi, c_red, c_red, false);
+		surface_reset_target();
 	}
+}
+with instances_matching(CustomProp, "name", "Teleporter")
+{
+	//DRAW TELEPORTER CIRCLE
+	if global.teleporter == true && instance_exists(Player)
+	{
+		//DRAW TELEPORTER PERCENT
+		draw_x = 5
+		draw_y = 20
+		draw_set_alpha(0.5)
+		draw_set_color(c_black);
+		draw_rectangle(draw_x+x + 15 , draw_y+y - 9 , x+draw_x-23 ,y+draw_y , false)
+		draw_set_alpha(1)
+		var _x = x - view_xview,
+		    _y = y - view_yview;
+
+		surface_set_target(global.CircleSurf)
+		draw_set_blend_mode(bm_subtract)
+		draw_circle_colour(_x -4, _y, global.radi - 2, c_white, c_white, false);
+		draw_set_blend_mode(bm_normal)
+		surface_reset_target();
+
+		draw_set_alpha(.15)
+		draw_circle_colour(x -4, y, global.radi, c_red, c_red, false)
+		draw_set_alpha(1)
+	}
+}
+if surface_exists(global.CircleSurf) = true
+{
+	draw_surface_ext(global.CircleSurf, view_xview, view_yview, 1, 1, 0, c_white, .8)
+	surface_free(global.CircleSurf)
 }
 
 #define chest_setup(TAG)																 return mod_script_call("mod", "items","chest_setup"   , TAG)
