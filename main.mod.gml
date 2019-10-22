@@ -456,7 +456,7 @@ if !instance_exists(Spiral) && global.teleporter == true && point_in_circle(x, y
 global.chargeF++
 if global.chargeF == round(room_speed / 1.5){
 global.chargeF = 0;
-global.charge += 1 //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
+global.charge += 1 + (global.BossesLeft = 0 ? .2 : 0) //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
 if (GameCont.area = 101) global.charge += 4 //Charge faster in oasis
 with instances_matching_le(enemy,"my_health",0){
 		if object_index != Maggot {
