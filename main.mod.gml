@@ -36,14 +36,18 @@ global.mode = 0;
 global.crownVault = false;
 if (instance_exists(CharSelect)) CharSelect.closeSettings = true;
 if (instance_exists(Player)) Player.debug = false;
+
+global.shrineIcons = sprite_add("sprites/shrines/shrineIcons.png", 16, 13, 13)
+
 //Main Menu (Splash screen?)
 global.menu = false;
 global.sprSplash  = sprite_add("sprites/other/splash.png", 1, 320, 240);
 global.sprVersion = sprite_add("sprites/other/sprVersion.png", 1, 93, 20);
 global.sprOutline = sprite_add("sprites/other/sprOutline.png", 1, 93, 20);
 
-global.sprTeleporterIdle = sprite_add("sprites/teleporter/sprTeleporterIdle.png", 1, 25, 20);
-global.mskTeleporter     = sprite_add("sprites/teleporter/mskTeleporter.png"    , 1, 25, 20);
+global.sprTeleporterIdle   = sprite_add("sprites/teleporter/sprTeleporterIdle.png"  , 1, 24, 20);
+global.sprTeleporterSiphon = sprite_add("sprites/teleporter/sprTeleporterSiphon.png", 2, 24, 20);
+global.mskTeleporter       = sprite_add("sprites/teleporter/mskTeleporter.png"      , 1, 24, 20);
 
 global.sprMode  = sprite_add("sprites/other/sprMode.png", 1, 19, 13);
 global.sprModes = sprite_add("sprites/other/sprModes.png", 2, 41, 41);
@@ -99,11 +103,12 @@ with (WeaponChest) {
 //SPAWN OBJECTS ON LEVEL START
 with Player
 {
-	with instance_create(instance_furthest(x, y, Floor).x - sprite_xoffset + sprite_width / 2, instance_furthest(x, y, Floor).y - sprite_yoffset + sprite_height / 2, CustomProp)
+	if GameCont.area != 100 with instance_create(instance_furthest(x, y, Floor).x - sprite_xoffset + sprite_width / 2, instance_furthest(x, y, Floor).y - sprite_yoffset + sprite_height / 2, CustomProp)
 	{
 		name     = "Teleporter"
 		teledone = false
 		radifac  = random_range(.9, 1.1)
+		portal   = "regular"
 
 		spr_idle = global.sprTeleporterIdle
 		spr_hurt = global.sprTeleporterIdle
@@ -126,6 +131,7 @@ with Player
 		with Debris instance_delete(self);
 
 		on_step  = teleporter_step
+		on_draw  = teleporter_draw
 	}
 }
 
@@ -217,6 +223,13 @@ var SpawnY = Player.y + y_
 }
 }
 
+#define teleporter_draw
+draw_self()
+if item_get_count("siphon") > 0
+{
+	draw_sprite(global.sprTeleporterSiphon, portal = "vault" ? 1 : 0, x, y)
+}
+
 #define teleporter_step
 //TELEPORTER EVENT
 
@@ -247,7 +260,6 @@ with (Player)
 			other.teledone = true
 			view_shake_max_at(x, y, 64)
 			sleep(200)
-			instance_create(_tele.x, _tele.y, Portal)
 		  GameCont.hard += 2
 
 			//Area choose
@@ -341,8 +353,9 @@ with (Player)
 									}
 									break;
 			}
-		    global.charge = 0;
-		    global.teleporter = false;
+			with instance_create(_tele.x, _tele.y, Portal){if _tele.portal = "vault" {GameCont.area = 100; type = 2}else{type = 1}}
+		  global.charge = 0;
+		  global.teleporter = false;
 		}
 	}
 }
@@ -357,7 +370,7 @@ if instance_exists(Portal) && global.crownVault == true {
 }
 
 //bosses item spawn code
-with instances_matching(hitme, "tag", "boss")
+ if instance_exists(Player) with instances_matching(hitme, "tag", "boss")
 {
 	if my_health <= 0
 	{
@@ -391,57 +404,57 @@ for(i = 0; i < 5; i++){
 			}
 		}
 
-if "convert" not in self {
-    _roll = round(max(random_range(1, 5.25 - .25 * item_get_count("times")), 1))
-    if (_roll == 1) {
-if (object_index == Scorpion) {
-instance_create(x, y, GoldScorpion);
-instance_delete(self);
-break;
-}
-if (object_index == Gator) {
-instance_create(x, y, BuffGator);
-instance_delete(self);
-break;
-}
-if (object_index == Exploder) {
-instance_create(x, y, SuperFrog);
-instance_delete(self);
-break;
-}
-if (object_index == FireBaller) {
-instance_create(x, y, SuperFireBaller);
-instance_delete(self);
-break;
-}
-if (object_index == Grunt) {
-instance_create(x, y, EliteGrunt);
-instance_delete(self);
-break;
-}
-if (object_index == Inspector) {
-instance_create(x, y, EliteInspector);
-instance_delete(self);
-break;
-}
-if (object_index == Shielder) {
-instance_create(x, y, EliteShielder);
-instance_delete(self);
-break;
-}
-if (object_index == SnowTank) {
-instance_create(x, y, GoldSnowTank);
-instance_delete(self);
-break;
-}
-if (object_index == LaserCrystal) {
-instance_create(x, y, LightningCrystal);
-instance_delete(self);
-break;
-}
-}
-convert = true;
-}
+if "convert" not in self && global.mode = 1 {
+	    _roll = round(max(random_range(1, 5.25 - .25 * item_get_count("times")), 1))
+	    if (_roll == 1) {
+	if (object_index == Scorpion) {
+	instance_create(x, y, GoldScorpion);
+	instance_delete(self);
+	break;
+	}
+	if (object_index == Gator) {
+	instance_create(x, y, BuffGator);
+	instance_delete(self);
+	break;
+	}
+	if (object_index == Exploder) {
+	instance_create(x, y, SuperFrog);
+	instance_delete(self);
+	break;
+	}
+	if (object_index == FireBaller) {
+	instance_create(x, y, SuperFireBaller);
+	instance_delete(self);
+	break;
+	}
+	if (object_index == Grunt) {
+	instance_create(x, y, EliteGrunt);
+	instance_delete(self);
+	break;
+	}
+	if (object_index == Inspector) {
+	instance_create(x, y, EliteInspector);
+	instance_delete(self);
+	break;
+	}
+	if (object_index == Shielder) {
+	instance_create(x, y, EliteShielder);
+	instance_delete(self);
+	break;
+	}
+	if (object_index == SnowTank) {
+	instance_create(x, y, GoldSnowTank);
+	instance_delete(self);
+	break;
+	}
+	if (object_index == LaserCrystal) {
+	instance_create(x, y, LightningCrystal);
+	instance_delete(self);
+	break;
+	}
+	}
+	convert = true;
+	}
 }
 
 
@@ -893,11 +906,6 @@ with instances_matching(CustomProp, "name", "Teleporter")
 				}until(i = 1000)
 				repeat(40) with instance_create(x, y, GreenExplosion) {damage = 0; image_speed = random_range(.7, 1)};
 				sound_play_music(musBoss8)
-				negative_ASK = round(random_range(0, 1))
-				negative = 1;
-				if (negative_ASK == 0) negative = -1; if (negative_ASK == 1) negative = 1;
-				var SpawnX = Player.x - (random_range(85, 105) * negative),
-				    SpawnY = Player.y - (random_range(85, 105) * negative);
 				if (GameCont.area == 2) var SpawnX = Player.x - (random_range(105, 115) * negative)
 				if (GameCont.area == 2) var SpawnY = Player.y - (random_range(105, 115) * negative)
 
@@ -953,9 +961,25 @@ with instances_matching(CustomProp, "name", "Teleporter")
 					    			_boss_amount += 4;
 										break;
 				}
+				if other.portal = "vault" other._enemy = Guardian;
 				_boss_amount *= Player.s_Challenge + 1
 
-        repeat(_boss_amount) {with instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16, instance_nearest(SpawnX, SpawnY, Floor).y + 16, _boss)  {global.BossesLeft++; tag = "boss"}}
+        repeat(_boss_amount)
+				{
+					with instance_create(other.x, other.y, _boss)
+					{
+						global.BossesLeft++
+						tag = "boss"
+						if instance_exists(Player) && distance_to_object(Player) <= 64
+						{
+							var _i = 0;
+							do
+							{
+								move_contact_solid(point_direction(Player.x, Player.y, x, y), 1)
+							}until(_i = 100 or distance_to_object(Player) > 64)
+						}
+					}
+				}
     	}
 		}
 
@@ -967,7 +991,21 @@ with instances_matching(CustomProp, "name", "Teleporter")
     draw_text_nt(x, y - 25, "@1(keysmall:pick) ACTIVATE");
 	}
 	var _ang = random(360)
-	if global.teleporter = true && global.BossesLeft > 0 && (current_frame mod (room_speed * 5)) = 0 {repeat(irandom(2) + 1) instance_create(x + lengthdir_x(global.radi * radifac * random_range(.3, .8), _ang), y + lengthdir_y(global.radi * radifac * random_range(.3, .8), _ang), _enemy)}
+	if global.teleporter = true && global.BossesLeft > 0 && (current_frame mod (room_speed * 5)) = 0 && instance_number(_enemy) < 8
+	{
+		repeat(irandom(2) + 1) with instance_create(x + lengthdir_x(global.radi * radifac * random_range(.3, .8), _ang), y + lengthdir_y(global.radi * radifac * random_range(.3, .8), _ang), _enemy)
+		{
+			repeat(6) with instance_create(x, y, Smoke){sprite_index = sprDust; depth = other.depth - choose(0, 1, 1)}
+			if instance_exists(Player) && distance_to_object(Player) <= 32
+			{
+				var _i = 0;
+				do
+				{
+					move_contact_solid(point_direction(Player.x, Player.y, x, y), 1)
+				}until(_i = 100 or distance_to_object(Player) > 32)
+			}
+		}
+	}
 }
 with instances_matching(enemy, "tag", "boss") // make bosses more powerful
 {
@@ -981,17 +1019,38 @@ with instances_matching(enemy, "tag", "boss") // make bosses more powerful
 with TopCont
 {
 	with instances_matching(CustomProp, "name", "Teleporter") var _tele = self
-	if global.teleporter == true && instance_exists(Player)
+	if instance_exists(Player)
 	{
-		draw_x = 5
-		draw_y = 20
-		var _strTele      = string(global.charge) + "%",
-				_strTeleBlink = point_distance(_tele.x, _tele.y, Player.x, Player.y) <= global.radi ? "@w" : (current_frame mod 5 <= 2 ? "@w" : "@r"),
-				_x            = clamp(_tele.x + draw_x - 2, view_xview + string_width(_strTele)/2, view_xview + game_screen_get_width_nonsync() - string_width(_strTele)/2 + 2),
-				_y            = clamp(_tele.y + 12, view_yview, view_yview + game_screen_get_height_nonsync() - string_height(_strTele));
-		draw_set_halign(1)
-		draw_text_nt(_x, _y, _strTeleBlink + _strTele);
-		draw_text_nt(_x, _y, _strTeleBlink + _strTele);
+		if global.teleporter == true
+		{
+			draw_x = 5
+			draw_y = 20
+			var _strTele      = string(global.charge) + "%",
+					_strTeleBlink = point_distance(_tele.x, _tele.y, Player.x, Player.y) <= global.radi ? "@w" : (current_frame mod 5 <= 2 ? "@w" : "@r"),
+					_x            = clamp(_tele.x + draw_x - 2, view_xview + string_width(_strTele)/2, view_xview + game_screen_get_width_nonsync() - string_width(_strTele)/2 + 2),
+					_y            = clamp(_tele.y + 12, view_yview, view_yview + game_screen_get_height_nonsync() - string_height(_strTele)),
+					_portal       = _tele.portal = "vault" ? sprProtoPortal : sprPortal
+			draw_set_halign(1)
+			draw_text_nt(_x, _y, _strTeleBlink + _strTele);
+			draw_text_nt(_x, _y, _strTeleBlink + _strTele);
+			draw_sprite_ext(_portal, (current_frame * .5) mod 4, _tele.x, _tele.y, .4 * (Player.x < _tele.x ? -1 : 1), .4, 0, c_white, 1)
+		}
+		else
+		{
+			if Player.s_Challenge > 0
+			{
+				var _i = 1;
+				repeat(Player.s_Challenge)
+				{
+					draw_sprite_ext(global.shrineIcons, 3, _tele.x + 4, _tele.y -10 - (sprite_get_height(global.shrineIcons) + 1) * _i, 1, 1, 0, c_black, .5)
+					draw_sprite_ext(global.shrineIcons, 3, _tele.x + 6, _tele.y -10 - (sprite_get_height(global.shrineIcons) + 1) * _i, 1, 1, 0, c_black, .5)
+					draw_sprite_ext(global.shrineIcons, 3, _tele.x + 5, _tele.y -11 - (sprite_get_height(global.shrineIcons) + 1) * _i, 1, 1, 0, c_black, .5)
+					draw_sprite_ext(global.shrineIcons, 3, _tele.x + 5, _tele.y  -9 - (sprite_get_height(global.shrineIcons) + 1) * _i, 1, 1, 0, c_black, .5)
+					draw_sprite(global.shrineIcons, 3, _tele.x + 5, _tele.y -10 - (sprite_get_height(global.shrineIcons) + 1) * _i)
+					_i++
+				}
+			}
+		}
 	}
 }
 
