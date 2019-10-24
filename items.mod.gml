@@ -152,8 +152,9 @@ var  _area_amount = 0,
 
 switch GameCont.area // area specific extra chests
 {
-	case 101: _area_amount = 2; break;
-	default : _area_amount = 0; break;
+	case 100: _area_amount = -_chest_amount; break; // = repeat(0) will execute code once
+	case 101: _area_amount =              2; break;
+	default : _area_amount =              0; break;
 }
 _chest_amount += _area_amount;
 
@@ -162,8 +163,8 @@ _chest_amount *= (global.doubleChests + 1); // double chest options
 with Floor // get a list of all "unoccupied" Floors
 {
 	var _d = 0;
-	with Player _d = distance_to_object(instance_furthest(x, y, Floor)) * .7;
-	if ((styleb = true && instance_exists(Player) && distance_to_object(Player) > _d) || (styleb = false && instance_exists(Player) && distance_to_object(Player) > 350) || (distance_to_object(TopPot) < 64) || (styleb = true && distance_to_object(Detail) < 64 && distance_to_object(Detail) > 32) || distance_to_object(Detail) < 64) && !place_meeting(x, y, Wall) && !place_meeting(x, y, prop) && self != FloorExplo && id mod 2 = 0
+	with Player _d = distance_to_object(instance_furthest(x, y, Floor)) * .4;
+	if ((styleb = true && instance_exists(Player) && distance_to_object(Player) > _d) || (styleb = false && instance_exists(Player) && distance_to_object(Player) > 350) || (distance_to_object(TopPot) < 64) || distance_to_object(Detail) < 64) && !place_meeting(x, y, prop) && !place_meeting(x, y, hitme) && self != FloorExplo
 	{
 		_floorq[| _i] = self; // add eligible floor tiles to the list
 		_i++;
@@ -173,6 +174,14 @@ ds_list_shuffle(_floorq)
 
 repeat(_chest_amount + _prize_amount)
 {
+	if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
+	{
+		with other
+		{
+			instance_create(x, y, FloorExplo)
+			instance_destroy()
+		}
+	}
 	with obj_create(_floorq[| 0].x + 16, _floorq[| 0].y + 16, "ItemChest") {with instance_place(x, y, Wall){instance_delete(self)}}
 	ds_list_delete(_floorq, 0)
 	ds_list_shuffle(_floorq)
@@ -181,7 +190,17 @@ if _prize_amount > 0 // 1/2 of perfect prize's effect. repeat(0) executes the th
 {
 	repeat(_prize_amount)
 	{
+		if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
+		{
+			with other
+			{
+				instance_create(x, y, FloorExplo)
+				instance_destroy()
+			}
+		}
 		with obj_create(_floorq[| 0].x + 16, _floorq[| 0].y + 16, "ItemChest") {tag = "gold"; chest_setup(tag); with instance_place(x, y, Wall){instance_delete(self)}}
+		ds_list_delete(_floorq, 0)
+		ds_list_shuffle(_floorq)
 	}
 }
 
@@ -416,9 +435,7 @@ if (type == "Balance") { //BALANCE SHRINE---------------------
 }
 
 if (type == "Crowns") {
-    instance_create(Player.x, Player.y, Portal)
-    GameCont.area = 100;
-    with instance_create(x,y,GreenExplosion) { damage = 0; mask_index = mskNone; }
+    with instances_matching(CustomProp, "name", "Teleporter"){portal = "vault"}
     wait(1);
     instance_destroy()
     global.popoChance = 99
@@ -834,7 +851,7 @@ with (Player)
 	{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too // yeah because you set Player.debug to true is my guess //My brain is smol
 		{
-			/*with obj_create(mouse_x, mouse_y, "ItemChest")
+			with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
 				tag = "none"
 				chest_setup(tag)
@@ -865,11 +882,11 @@ with (Player)
 				tag = "infammo"
 				sprite_index = global.sprInfammoPickup
 				num = 1
-			}*/
+			}
 			with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
 				tag = "item"
-				item_index = item[? "missile"]
+				item_index = item[? "siphon"]
 				chest_setup(tag)
 			}
 		}
@@ -927,16 +944,16 @@ if amount >= 1
 			{
        	if "slowed" not in self
 			 	{
-          speed /= 1.5;
+          speed /= (1 + .5 / amount);
           slowed = 1;
         }
-        if distance_to_object(enemy) <= (16 + (4 * amount))
+        if distance_to_object(enemy) <= (32 / speed)
 				{
         	near = instance_nearest(x, y, enemy);
        		if(instance_exists(near))
 					{
 	 					var _s = speed
-   					motion_add(point_direction(x, y, near.x, near.y), speed * amount / 6);
+   					motion_add(point_direction(x, y, near.x, near.y), speed * .85);
    					speed = _s;
    					image_angle = direction;
 					}
@@ -976,7 +993,7 @@ if distance_to_object(Player) <= 8 {
 Touched = true;
 with (Player) global.RadiatedSnackCounter += maxhealth / (250 / amount)
 if floor(global.RadiatedSnackCounter) >= 1 {
-   with (Player) if (my_health < maxhealth) my_health += round(global.RadiatedSnackCounter)
+   with (Player) if (my_health < maxhealth) {sound_play_pitch(sndHealthChest, 1.5); instance_create(x, y, HorrorTB); my_health += round(global.RadiatedSnackCounter)}
 with (Player) if (my_health > maxhealth) my_health = maxhealth
 global.RadiatedSnackCounter = 0;
 sound_play_pitch(sndHPPickup, 1.3)
@@ -1247,8 +1264,9 @@ if amount >= 1 {
 	{
 		if "grease" not in self
 		{
-			friction /= (1 + (.4 * amount))
+			friction /= (1 + (.3 * amount))
 			grease = true
+			speed *= 1.15
 		}
 	}
 }
@@ -1347,13 +1365,15 @@ team = 2;
 Player.firewoodCharge = 0;
 }
 }
-if (Player.firewoodKills) >= 10 {
-    with instance_create(Player.x, Player.y, PopupText) {
-    text = "@(sprGroundFlame)" + "@y " + string(Player.firewoodCharge)
-    time = 5
-}
-    Player.firewoodKills = 0;
-}
+	if (Player.firewoodKills) >= 10
+	{
+	  with instance_create(Player.x, Player.y, PopupText)
+		{
+		   text = "@(sprGroundFlame)" + "@y " + string(Player.firewoodCharge)
+		   time = 5
+		}
+	  Player.firewoodKills = 0;
+	}
 }
 //Firewood
 
@@ -1368,6 +1388,7 @@ if amount >= 1
 		{
 			tag = "infammo"
 			sprite_index = global.sprInfammoPickup
+			lifetime /= 2
 		}
 	}
 }

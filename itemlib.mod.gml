@@ -215,7 +215,7 @@ item_rubber_rounds = {
 #macro item_liquid_nitrogen item[? "nitrogen"]
 item_liquid_nitrogen = {
   name              : "Liquid Nitrogen",
-	description_small : "Gain an @waura @sthat @wslows @senemy @wbullets",
+	description_small : "@sGain an @waura @sthat @wslows @senemy @wbullets",
 	description_large : "-",
 	spr_index         : 18,
 	tier              : 1
@@ -336,7 +336,7 @@ item_bullet_grease = {
 #macro item_ammo_extractor item[? "extractor"]
 item_ammo_extractor = {
   name              : "Ammo Extractor",
-	description_small : "@sGain @winfinite ammo @son @wkill",
+	description_small : "@wEnemies @sdrop @yinfinite ammo",
 	description_large : "-",
 	spr_index         : 29,
 	tier              : 2
