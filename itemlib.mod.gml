@@ -548,6 +548,36 @@ item_clay = {
 	spr_index         : 48,
 	tier              : 3
 };
+
+// ITEM 49: Collider
+#macro item_collider item[? "collider"]
+item_collider = {
+  name              : "Collider",
+	description_small : "@sIncreased @wdamage, @sdon't @rhit yourself",
+	description_large : "-",
+	spr_index         : 49,
+	tier              : 3
+};
+
+// ITEM 50: Diamond Bullets
+#macro item_diamond item[? "diamond"]
+item_diamond = {
+  name              : "Diamond Bullets",
+	description_small : "@wSharper, Faster, @bpricier @sbullets",
+	description_large : "-",
+	spr_index         : 50,
+	tier              : 3
+};
+
+// ITEM 51: Sythe
+#macro item_scythe item[? "scythe"]
+item_scythe = {
+  name              : "Death's Scythe",
+	description_small : "@pDegernate HP, @skilling heals you",
+	description_large : "-",
+	spr_index         : 51,
+	tier              : 3
+};
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),

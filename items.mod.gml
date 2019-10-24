@@ -65,7 +65,7 @@ global.popoChance = 0;
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]] //To-Do: Fern
-global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"], item[? "explo"], item[? "clay"]] // Todo: dice
+global.CursedItems   = [item[? "dice"]      , item[? "heater"] , item[? "gem"], item[? "explo"], item[? "clay"], item[? "collider"], item[? "diamond"], item[? "scythe"]] // Todo: dice
 global.UniqueItems   = [item[? "energy"]    , item[? "times"],  item[? "injury"]]
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
@@ -103,7 +103,7 @@ Player.firewoodCharge = 0;
 Player.firewoodKills  = 0;
 Player.armor          = 0;
 Player.perma_armor    = 0;
-
+Player.deathCounter = 0; 
 //Shrine
 Player.s_Combat    = 0;
 Player.s_Challenge = 0;
@@ -630,6 +630,17 @@ if ITEM = item[? "plate"]
 	Player.armor += 2;
 }
 
+if ITEM = item[? "diamond"]
+{
+	with (Player) {
+typ_ammo[1] = round(typ_ammo[1] / 1.5);	// +8 Bullets
+typ_ammo[2] = round(typ_ammo[2] / 1.5)
+typ_ammo[3] = round(typ_ammo[3] / 1.5)
+typ_ammo[4] = round(typ_ammo[4] / 1.5)
+typ_ammo[5] = round(typ_ammo[5] / 1.5)
+}
+
+}
 
 //fx
 
@@ -879,7 +890,7 @@ with (Player)
 			with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
 				tag = "item"
-				item_index = item[? "missile"]
+				item_index = item[? "scythe"]
 				chest_setup(tag)
 			}
 		}
@@ -1482,17 +1493,60 @@ with (Effect) {
 //Explosive Rounds
 
 //Molding Clay
-var amount = item_get_count("clay");
-if amount >= 1 && instance_exists(Player)
-{
-_roll = round(random_range(1, (amount + 1)))
-}
+//Check opening chest script *
 //Molding Clay
+
+
 
 //injury  Always keep this item last
 var amount = item_get_count("injury");
 if amount >= 1 && instance_exists(Player){Player.extra_health--}
 //injury  Always keep this item last
+
+//Collider
+var amount = item_get_count("collider");
+if amount >= 1 && instance_exists(Player)
+{
+with (projectile) {
+if (team = 2) {
+team = 3;
+damage *= (1 + (amount * .5))
+}}}
+//Collider
+
+//Diamond Bullets
+var amount = item_get_count("diamond");
+if amount >= 1 && instance_exists(Player)
+{
+Player.reloadspeed += (0.5 * amount)
+with (projectile) {
+	if team == 2 && "diamond" not in self {
+		diamond = true;
+		damage *= (1.5 * amount)
+		speed *= (1.2 + (amount * .1))
+	}
+}
+}
+//Diamond Bullets
+
+//Death's Scythe   /!\ NOT FINISHED /!\
+var amount = item_get_count("scythe");
+if amount >= 1 && instance_exists(Player)
+{
+Player.deathCounter += (1 * amount)
+if (Player.deathCounter) >= (30 * (room_speed / 30)) / amount {
+var HURT = (round(Player.maxhealth / 8)) 
+if (HURT < 0) HURT = 1
+Player.my_health -= HURT
+Player.deathCounter = 0;
+}
+with instances_matching_le(enemy,"my_health",0){
+var HEAL = round(Player.maxhealth / 16) if HEAL < 1 { HEAL = 1}
+Player.my_health += HEAL * amount
+}
+}
+
+//Death's Scythe /!\ NOT FINISHED /!\
 
 //Scale health with level
 if (GameCont.level >= 2)   { extra_health += 3;} // 4
@@ -1819,7 +1873,7 @@ with _itemarray
 var amount
 for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM {amount = global.PlayerItems[i].count; break}}
 return amount
-}
+
 #define draw_backdrop(STARTX, STARTY, ENDX, ENDY, TITLE)
 
 var _TopCornerHeight     = sprite_get_height(global.sprBackdropCornerTop),

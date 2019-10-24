@@ -159,10 +159,8 @@ var mansion = [FireBaller, SuperFireBaller, Jock, Molefish, Molesarge]
 var cursed = [InvLaserCrystal, InvSpider]
 var everything = [Bandit, Scorpion, BigMaggot, Maggot, Rat, Ratking, Gator, BuffGator, Raven, MeleeBandit, Sniper, Salamander, LaserCrystal, LightningCrystal, Spider, Bandit, SnowTank, SnowBot, Wolf, Turret, Freak, ExploFreak, Necromancer, RhinoFreak, ExploGuardian, Guardian, DogGuardian, Turtle, BoneFish, Crab, FireBaller, SuperFireBaller, Jock, Molefish, Molesarge, InvLaserCrystal, InvSpider]
 var jungle = [JungleAssassinHide, JungleBandit, JungleFly]
-var night = [Bandit, Bandit]
 var place
 if (GameCont.area == 1) place = desert; if (GameCont.area == 2) place = sewers; if (GameCont.area == 3) place = scrapyard; if (GameCont.area == 4) place = caves; if (GameCont.area == 5) place = ice; if (GameCont.area == 6) place = labs; if (GameCont.area == 7) place = palace;
-if (GameCont.area == 0) place = night;
 if (GameCont.area == 105) place = jungle;
 if (GameCont.area == 104) place = cursed;
 if (GameCont.area == 103) place = mansion;
@@ -499,12 +497,11 @@ Close = "true"
 var AMOUNT = 0;
 with (enemy) if (Close == "true") && (object_index != Maggot) && instance_exists(self) AMOUNT++
 var scale = 3 + (round(GameCont.hard / 4) + (5 * GameCont.loops))
-if (GameCont.area == 103) var scale = 25;
 var amountNum = 3
 if (global.teleporter == true) amountNum = 8 * (GameCont.loops + 1)
 with (Player) if ("s_Combat" in self) if AMOUNT <= scale || Player.s_Combat > 0
 {
-if instance_exists(Spiral) && global.crownVault != true enemySpawn();
+if !instance_exists(Spiral) && global.crownVault != true enemySpawn();
 }
 
 with (Player) if "s_Combat" in self && (s_Combat > 0) {
