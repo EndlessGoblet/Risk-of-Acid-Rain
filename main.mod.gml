@@ -512,7 +512,6 @@ with (enemy)
 /*var AMOUNT = 0;
 with (enemy) if (Close == "true") && instance_exists(self) AMOUNT++
 var scale = 3 + (round(GameCont.hard / 4) + (5 * GameCont.loops))
-if (GameCont.area == 103) var scale = 25;
 var amountNum = 3
 if (global.teleporter == true) amountNum = 8 * (GameCont.loops + 1)
 with (Player) if ("s_Combat" in self) if AMOUNT <= scale || Player.s_Combat > 0

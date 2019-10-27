@@ -105,7 +105,7 @@ Player.firewoodCharge = 0;
 Player.firewoodKills  = 0;
 Player.armor          = 0;
 Player.perma_armor    = 0;
-
+Player.deathCounter = 0; 
 //Shrine
 Player.s_Combat    = 0;
 Player.s_Challenge = 0;
@@ -696,6 +696,36 @@ if ITEM = item[? "plate"] && global.ItemGetAmount > 0
 }
 
 add_item(ITEM, global.ItemGetAmount)
+
+if ITEM = item[? "diamond"]
+{
+	with (Player) {
+typ_ammo[1] = round(typ_ammo[1] / 1.5);	// +8 Bullets
+typ_ammo[2] = round(typ_ammo[2] / 1.5)
+typ_ammo[3] = round(typ_ammo[3] / 1.5)
+typ_ammo[4] = round(typ_ammo[4] / 1.5)
+typ_ammo[5] = round(typ_ammo[5] / 1.5)
+}
+
+}
+
+//fx
+
+var _pitch = random_range(.8, 1.2)
+if ITEM.tier = 3 _pitch  *= .7
+sound_play_pitchvol(sndTVOn, 1.1 * _pitch, .4)
+if ITEM.tier >= 1{sound_play_pitchvol(sndMutHover, _pitch, 1)}
+if ITEM.tier != 4
+{
+	if ITEM.tier >= 2{sleep(3);sound_play_pitchvol(sndBasicUltra, 1.5 * _pitch, 1)}
+	if ITEM.tier  = 2{sound_play_pitchvol(sndGoldPickup, 1.11* _pitch, .2)}
+	if ITEM.tier  = 3{sleep(7);sound_play_pitchvol(sndCursedChest,1.2 * _pitch, .3); sound_play_pitchvol(sndCursedPickup, _pitch, .8)}
+}
+else
+{
+	// unique item pickup sound goes here
+}
+add_item(ITEM)
 
 #define step
 //Invincibility
@@ -1652,6 +1682,55 @@ with (Effect) {
 }
 }
 //Explosive Rounds
+
+//Molding Clay
+//Check opening chest script *
+//Molding Clay
+
+//Collider
+var amount = item_get_count("collider");
+if amount >= 1 && instance_exists(Player)
+{
+with (projectile) {
+if (team = 2) {
+team = 3;
+damage *= (1 + (amount * .5))
+}}}
+//Collider
+
+//Diamond Bullets
+var amount = item_get_count("diamond");
+if amount >= 1 && instance_exists(Player)
+{
+Player.reloadspeed += (0.5 * amount)
+with (projectile) {
+	if team == 2 && "diamond" not in self {
+		diamond = true;
+		damage *= (1.5 * amount)
+		speed *= (1.2 + (amount * .1))
+	}
+}
+}
+//Diamond Bullets
+
+//Death's Scythe   /!\ NOT FINISHED /!\
+var amount = item_get_count("scythe");
+if amount >= 1 && instance_exists(Player)
+{
+Player.deathCounter += (1 * amount)
+if (Player.deathCounter) >= (30 * (room_speed / 30)) / amount {
+var HURT = (round(Player.maxhealth / 8)) 
+if (HURT < 0) HURT = 1
+Player.my_health -= HURT
+Player.deathCounter = 0;
+}
+with instances_matching_le(enemy,"my_health",0){
+var HEAL = round(Player.maxhealth / 16) if HEAL < 1 { HEAL = 1}
+Player.my_health += HEAL * amount
+}
+}
+
+//Death's Scythe /!\ NOT FINISHED /!\
 
 //Scale health with level
 if (GameCont.level >= 2) { extra_health += 3} // 4
