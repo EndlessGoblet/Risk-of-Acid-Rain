@@ -388,9 +388,9 @@ item_anomal_energy = {
 };
 
 // ITEM 34: CHAOTIC DICE
-#macro item_chaotic_dice item[? "dice"]
-item_chaotic_dice = {
-  name              : "Chaotic Dice",
+#macro item_chaotic_brooch item[? "brooch"]
+item_chaotic_brooch = {
+  name              : "Chaotic Brooch",
 	description_small : "@w+2 @gUncommon @wItems@s, @wreorder @severy @warea",
 	description_large : "-",
 	spr_index         : 34,
@@ -519,7 +519,7 @@ item_backup_heart = {
 	tier              : 2
 };
 
-// ITEM 46: Shattered Heart
+// ITEM 46: USED BACKUP HEART
 #macro item_backup_heart_spent item[? "spent heart"]
 item_backup_heart_spent = {
   name              : "SPENT HEART",
@@ -529,25 +529,46 @@ item_backup_heart_spent = {
 	tier              : 5
 };
 
-// ITEM 47: Explosive Rounds
-#macro item_explo item[? "explo"]
-item_explo = {
-  name              : "Explosive Rounds",
-	description_small : "@sBullets @yEXPLODE",
+// ITEM 47: FEL ROUNDS
+#macro item_fel_rounds item[? "fel"]
+item_fel_rounds = {
+  name              : "Fel Rounds",
+	description_small : "@sBullets @smake @wenemies explde @sinto @bfel fire",
 	description_large : "-",
 	spr_index         : 47,
 	tier              : 3
 };
 
-// ITEM 48: Molding Clay
-#macro item_clay item[? "clay"]
-item_clay = {
+// ITEM 48: MOLDING CLAY
+#macro item_molding_clay item[? "clay"]
+item_molding_clay = {
   name              : "Molding Clay",
-	description_small : "@sChests contain @wdouble @sor@w nothing",
+	description_small : "@wChests @scontain @wdouble @sor@w nothing",
 	description_large : "-",
 	spr_index         : 48,
 	tier              : 3
 };
+
+// ITEM 49: NOTHING
+#macro item_nothing item[? "nothing"]
+item_nothing = {
+  name              : "Nothing",
+	description_small : "@sIt's nothing",
+	description_large : "-",
+	spr_index         : 49,
+	tier              : 5
+};
+
+// ITEM 50: METAFILLINGS
+#macro item_metafillings item[? "fillings"]
+item_metafillings = {
+  name              : "Metafillings",
+	description_small : "@yPickups @sare @wworth @smore",
+	description_large : "-",
+	spr_index         : 50,
+	tier              : 2
+};
+
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),

@@ -1,4 +1,4 @@
-#macro item mod_variable_get("mod", "itemlib", "ItemDirectory")
+#macro item mod_variable_get("mod", "itemlib", "ItemDirectory");
 
 #define init
 if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
@@ -21,6 +21,22 @@ global.CircleSurf = -1;
 //Garbo Variables
 global.radi = 0;
 global.maxradi = 150
+
+//spawn arrays
+global.spwDesert     = [Bandit, Bandit, Bandit, Scorpion, BigMaggot, BigMaggot, Maggot, Maggot]
+global.spwSewers     = [Rat, Rat, Rat, Ratking, Gator, Gator, BuffGator, Bandit, Bandit]
+global.spwScrapyard  = [Bandit, Bandit, Raven, Raven, MeleeBandit, Sniper, Salamander]
+global.spwCaves      = [LaserCrystal, LightningCrystal, Spider, Gator]
+global.spwIce        = [Bandit, SnowTank, SnowBot, Wolf]
+global.spwLabs       = [Freak, Turret, Freak, ExploFreak, Necromancer, RhinoFreak]
+global.spwPalace     = [ExploGuardian, DogGuardian, Guardian, Guardian, ExploGuardian]
+global.spwPizza      = [Turtle, Rat]
+global.spwOasis      = [BoneFish, Crab, BoneFish, BoneFish, BoneFish, Bandit, Bandit]
+global.spwMansion    = [FireBaller, SuperFireBaller, Jock, Molefish, Molesarge]
+global.spwCursed     = [InvLaserCrystal, InvSpider]
+global.spwEverything = [Bandit, Scorpion, BigMaggot, Maggot, Rat, Ratking, Gator, BuffGator, Raven, MeleeBandit, Sniper, Salamander, LaserCrystal, LightningCrystal, Spider, Bandit, SnowTank, SnowBot, Wolf, Turret, Freak, ExploFreak, Necromancer, RhinoFreak, ExploGuardian, Guardian, DogGuardian, Turtle, BoneFish, Crab, FireBaller, SuperFireBaller, Jock, Molefish, Molesarge, InvLaserCrystal, InvSpider]
+global.spwJungle     = [JungleAssassinHide, JungleBandit, JungleFly]
+global.spwNight      = [Bandit, Bandit]
 
 global.speed = 15;
 global.charge = 0;
@@ -66,6 +82,8 @@ while(true){
 	wait 1;
 }
 
+#macro c_fel $FF271C;
+
 #define level_start
 with instance_create(0, 0, CustomObject)
 {
@@ -79,6 +97,8 @@ global.crownVault = false;
 global.BossesLeft = 0 // 0 at level start, after teleport activation = amount of boss enemies, at 0 spawns an item
 global.subareaChoice = 0
 global.areaChoice = 0
+
+global.respawn = irandom_range(6, 12) * (crown_current = 7 ? 2 : 1) // double enemies with cob
 //Spawn invincible anti-portal maggot
 if (GameCont.area != 100) with instance_create(Player.x-500, Player.y-500, Maggot) {
     visible = false;
@@ -110,9 +130,10 @@ with Player
 		radifac  = random_range(.9, 1.1)
 		portal   = "regular"
 
-		spr_idle = global.sprTeleporterIdle
-		spr_hurt = global.sprTeleporterIdle
-		spr_dead = global.sprTeleporterIdle
+		spr_idle   = global.sprTeleporterIdle
+		spr_hurt   = global.sprTeleporterIdle
+		spr_dead   = global.sprTeleporterIdle
+		spr_shadow = mskNone
 		mask_index   = global.mskTeleporter
 		image_speed  = .5
 		maxhealth    = 999999999999999999999999 // yeah
@@ -142,87 +163,63 @@ global.chargeF = 0;
 global.teleporter = false;
 
 #define enemySpawn
-if instance_exists(Player) {
+if instance_exists(Player)
+{
+	var _place = -4
+	switch GameCont.area
+	{
+		case   1: _place = global.spwDesert;    break;
+		case   2: _place = global.spwSewers;    break;
+		case   3: _place = global.spwScrapyard; break;
+		case   4: _place = global.spwCaves;     break;
+		case   5: _place = global.spwIce;       break;
+		case   6: _place = global.spwLabs;      break;
+		case   7: _place = global.spwPalace;    break;
+		case   0: _place = global.spwNight;     break;
+		case 100: _place = global.spwPalace;    break;
+		case 101: _place = global.spwOasis;     break;
+		case 102: _place = global.spwPizza;     break;
+		case 103: _place = global.spwMansion;   break;
+		case 104: if global.teleporter = true
+							{
+								_place = global.spwEverything;
+								break;
+							}
+							else
+							{
+								_place = global.spwCursed;
+								break;
+							}
+		case 105: _place = global.spwJungle; break;
+		default:  _place =  global.spwNight; break;
+	}
 
-var negative_ASK = round(random_range(0, 1))
-var negative = 1;
-if (negative_ASK == 0) negative = -1; if (negative_ASK == 1) negative = 1;
-if instance_exists(Player) {
-var SpawnX = Player.x + (random_range(75, 200) * negative)
-var SpawnY = Player.y + (random_range(75, 200) * negative)
+	// CHESTS:
+	var  _floorq = ds_list_create(), // put all available floor tiles into a list
+		   _i = 0;
 
-if (global.teleporter == true) { SpawnX = Player.x - (random_range(50, 150) * negative); SpawnY = Player.y - (random_range(50, 150) * negative); }
-var desert = [Bandit, Bandit, Scorpion, BigMaggot, Maggot]
-var sewers = [Rat, Rat, Rat, Ratking, Gator, Gator, BuffGator, Bandit, Bandit]
-var scrapyard = [Bandit, Bandit, Raven, Raven, MeleeBandit, Sniper, Salamander]
-var caves = [LaserCrystal, LightningCrystal, Spider, Gator]
-var ice = [Bandit, SnowTank, SnowBot, Wolf]
-var labs = [Freak, Turret, Freak, ExploFreak, Necromancer, RhinoFreak]
-var palace = [ExploGuardian, DogGuardian, Guardian, Guardian, ExploGuardian]
-var pizza = [Turtle, Rat]
-var oasis = [BoneFish, Crab, BoneFish, BoneFish, BoneFish, Bandit]
-var mansion = [FireBaller, SuperFireBaller, Jock, Molefish, Molesarge]
-var cursed = [InvLaserCrystal, InvSpider]
-var everything = [Bandit, Scorpion, BigMaggot, Maggot, Rat, Ratking, Gator, BuffGator, Raven, MeleeBandit, Sniper, Salamander, LaserCrystal, LightningCrystal, Spider, Bandit, SnowTank, SnowBot, Wolf, Turret, Freak, ExploFreak, Necromancer, RhinoFreak, ExploGuardian, Guardian, DogGuardian, Turtle, BoneFish, Crab, FireBaller, SuperFireBaller, Jock, Molefish, Molesarge, InvLaserCrystal, InvSpider]
-var jungle = [JungleAssassinHide, JungleBandit, JungleFly]
-var night = [Bandit, Bandit]
-var place
-if (GameCont.area == 1) place = desert; if (GameCont.area == 2) place = sewers; if (GameCont.area == 3) place = scrapyard; if (GameCont.area == 4) place = caves; if (GameCont.area == 5) place = ice; if (GameCont.area == 6) place = labs; if (GameCont.area == 7) place = palace;
-if (GameCont.area == 0) place = night;
-if (GameCont.area == 105) place = jungle;
-if (GameCont.area == 104) place = cursed;
-if (GameCont.area == 103) place = mansion;
-if (GameCont.area == 102) place = pizza;
-if (GameCont.area == 101) place = oasis;
-if (GameCont.area == 100) place = palace;
-if (GameCont.area == 104) && (global.teleporter = true) place = everything
-with (Player) debug1 = place
-
-    //var roll = round(random_range(1, 500)) //HOW MUCH ENEMIES SPAWN (NATURALLY)
-    var roll = round(random_range(1, 25))
-    if (GameCont.area == 100) var roll = round(random_range(1, 500))
-    if (global.teleporter == true) roll = round(random_range(1, 10))
-    if (global.teleporter == true && GameCont.area = 103) roll = round(random_range(1, 5)) //More enemies during teleporter mansion
-    if (global.teleporter == true && GameCont.area = 101) roll = round(random_range(1, 20)) //More tame teleporter enemy increase during oasis
-    var negative_ASK = round(random_range(0, 1))
-var negative = 1;
-if (negative_ASK == 0) negative = -1; if (negative_ASK == 1) negative = 1;
-var x_ = (random_range(50, 200) * negative)
-var y_ = (random_range(50, 200) * negative)
-var SpawnX = Player.x + x_
-var SpawnY = Player.y + y_
+	with Floor // get a list of all "unoccupied" Floors
+	{
+		var _d = 0;
+		if instance_exists(Player) && distance_to_object(Player) > 92 && !place_meeting(x, y, hitme) && self != FloorExplo &&  distance_to_object(instance_nearest(x, y, Wall)) > 16
+		{
+			_floorq[| _i] = self; // add eligible floor tiles to the list
+			_i++;
+		}
+	}
+	ds_list_shuffle(_floorq)
 
 
-    if roll == 1 || global.respawn > 0{
-        var enemyChoice = place[round(random_range(0, array_length_1d(place) - 1))]
+  var enemyChoice = _place[round(random_range(0, array_length(_place) - 1))]
 
-        with instance_create(SpawnX + 16, SpawnY + 16, enemyChoice) {
-            New = true;
-            if distance_to_object(Floor) >= 8 && distance_to_object(FloorExplo) >= 8 && distance_to_object(FloorMiddle) >= 8 {
-                instance_delete(self);
-                //enemySpawn();
-               // global.respawn += 1;
-                break;
-            }
-        }
-        with instances_matching(enemy, "New", true) {
-          //  if instance_exists(object_index) {
-            if distance_to_object(Wall) == 0 {
-        if ("tag" not in self) {
-        instance_delete(self);
-        //enemySpawn();
-               // global.respawn += 1;
-                break;
-        }
-        } else {
-            New = false;
-        if !instance_exists(Spiral) repeat(15) instance_create(instance_nearest(SpawnX, SpawnY, Floor).x + 16 + random_range(1, 16), instance_nearest(SpawnX, SpawnY, Floor).y + 16 + random_range(1, 16), Dust)
-        }
-       // }
-
-    }}
-
-}
+	with instance_create(_floorq[| 0].x, _floorq[| 0].y, enemyChoice)
+	{
+		if place_meeting(x, y, Wall) || place_meeting(x, y, FloorExplo) || !place_meeting(x, y, Floor) || distance_to_object(Player) <= 32
+		{
+			instance_delete(self)
+			exit
+		}
+	}
 }
 
 #define teleporter_draw
@@ -363,6 +360,7 @@ with (Player)
 }
 
 #define step
+if irandom(instance_number(enemy) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
 
 //Crown Vault Fix
 if instance_exists(CrownPed) global.crownVault = true;
@@ -395,19 +393,19 @@ if (global.mode == 1) var minutes_ = 5
 global.timeControl = (minutes_ * 2) * (60 * 60)
 
 //Hard Mode
-{
+
 with (enemy) {
 for(i = 0; i < 5; i++){
-			var _speed_hardmode = global.mode = 1 ? .7 : 0,
-			    _speed_times    = .2 + .1 * item_get_count("times"),
-					_speed_boss     = "boss_buff" in self ? .7 : 0;
+			var _speed_hardmode = global.mode = 1 ? 1 : 0,
+			    _speed_times    = .2 * item_get_count("times"),
+					_speed_boss     = "boss_buff" in self ? 1 : 0;
 			if(alarm_get(i) > 2){
 				alarm_set(i, alarm_get(i) - (_speed_hardmode + _speed_times + _speed_boss));
 			}
 		}
 
 if "convert" not in self && global.mode = 1 {
-	    _roll = round(max(random_range(1, 5.25 - .25 * item_get_count("times")), 1))
+	    var _roll = round(max(random_range(1, 5.25 - .25 * item_get_count("times")), 1))
 	    if (_roll == 1) {
 	if (object_index == Scorpion) {
 	instance_create(x, y, GoldScorpion);
@@ -459,21 +457,19 @@ if "convert" not in self && global.mode = 1 {
 	}
 }
 
-
-}
-
 if global.AnomalyGet = false && instance_exists(Player) && Player.race = "horror"
 {
 	if ultra_get("horror", 2) = true
 	{
 		global.AnomalyGet = true
-		repeat(2) get_item(item[? "energy"])
+		get_item(item[? "energy"], 2)
 	}
 }
+
 if global.HardmodeGet = false && global.mode = 1 && instance_exists(Player) && !instance_exists(SpiralCont)
 {
 	global.HardmodeGet = true
-	get_item(item[? "times"])
+	get_item(item[? "times"], 1)
 }
 
 if instance_exists(CharSelect) {
@@ -500,48 +496,52 @@ if instance_exists(CharSelect) && (CharSelect.closeInfo == true) {
     CharSelect.closeInfo = false;
 }
 //enemy Spawner
-with (enemy) {
-    if distance_to_object(Player) <= 450 {
-Close = "true"
-    } else {
-        Close = "false"
-    }
-//if an enemy is close to wall, break it
-
+with (enemy)
+{
+	if distance_to_object(Player) <= 450
+	{
+		Close = "true"
+  }
+	else
+	{
+    Close = "false"
+  }
+	if place_meeting(x, y, Wall) || !place_meeting(x, y, Floor) Close = "true"
 }
-var AMOUNT = 0;
-with (enemy) if (Close == "true") && (object_index != Maggot) && instance_exists(self) AMOUNT++
+
+/*var AMOUNT = 0;
+with (enemy) if (Close == "true") && instance_exists(self) AMOUNT++
 var scale = 3 + (round(GameCont.hard / 4) + (5 * GameCont.loops))
 if (GameCont.area == 103) var scale = 25;
 var amountNum = 3
 if (global.teleporter == true) amountNum = 8 * (GameCont.loops + 1)
 with (Player) if ("s_Combat" in self) if AMOUNT <= scale || Player.s_Combat > 0
 {
-if instance_exists(Spiral) && global.crownVault != true enemySpawn();
+if !instance_exists(SpiralCont) && global.crownVault != true enemySpawn();
 }
 
 with (Player) if "s_Combat" in self && (s_Combat > 0) {
-Player.s_Combat--
-global.respawn += 1;
-enemySpawn();
-}
+	Player.s_Combat--
+	global.respawn += 1;
+	enemySpawn();
+}*/
 
 with(FloorMaker) if GameCont.area != 0 && GameCont.area != 2 && GameCont.area != 4 && GameCont.area != 6 && GameCont.area != 100//Make areas larger
-		{
-		goal = 220
-        if (GameCont.area == 3) goal = 110
-		}
+{
+	goal = 220
+  if (GameCont.area == 3) goal = 110
+}
 
 //Difficulty Changes
 with (enemy) {
     if ("boost") not in self { //Boost non-boosted enemies based on difficulty
 if (global.difficulty == 1) {maxhealth *= 1.3; my_health *= 1.3;if (meleedamage >= 1) meleedamage = round(meleedamage * 1.5); boost = true; }
-if (global.difficulty == 2) {maxhealth *= 1.6; my_health *= 1.6;if (meleedamage >= 1) meleedamage *= 2; boost = true; }
-if (global.difficulty == 3) {maxhealth *= 1.9; my_health *= 1.9;if (meleedamage >= 1) meleedamage *= 3; boost = true; }
-if (global.difficulty == 4) {maxhealth *= 2.2; my_health *= 2.2;if (meleedamage >= 1) meleedamage *= 4; boost = true; }
-if (global.difficulty == 5) {maxhealth *= 2.5; my_health *= 2.5;if (meleedamage >= 1) meleedamage *= 5; boost = true; }
+if (global.difficulty == 2) {maxhealth *= 1.6; my_health *= 1.6;if (meleedamage >= 1) meleedamage *=  2; boost = true; }
+if (global.difficulty == 3) {maxhealth *= 1.9; my_health *= 1.9;if (meleedamage >= 1) meleedamage *=  3; boost = true; }
+if (global.difficulty == 4) {maxhealth *= 2.2; my_health *= 2.2;if (meleedamage >= 1) meleedamage *=  4; boost = true; }
+if (global.difficulty == 5) {maxhealth *= 2.5; my_health *= 2.5;if (meleedamage >= 1) meleedamage *=  5; boost = true; }
 if (global.difficulty == 6) {maxhealth *= 2.8; my_health *= 2.8;if (meleedamage >= 1) meleedamage = round(meleedamage * 6.5); boost = true; }
-if (global.difficulty == 7) {maxhealth *= 3.1; my_health *= 3.1;if (meleedamage >= 1) meleedamage *= 8; boost = true; }
+if (global.difficulty == 7) {maxhealth *= 3.1; my_health *= 3.1;if (meleedamage >= 1) meleedamage *=  8; boost = true; }
 if (global.difficulty == 8) {maxhealth *= 3.4; my_health *= 3.4;if (meleedamage >= 1) meleedamage *= 10; boost = true; }
     }
 }
@@ -564,7 +564,8 @@ with (projectile) {  //Boost non-boosted projectiles based on difficulty
 speed = (0) + (room_speed / 30)
 
 //INCREASE GLOBAL.RADI
-if global.radi < global.maxradi && global.teleporter == true{
+if global.radi < global.maxradi && global.teleporter == true
+{
     global.radi += (1 * (global.speed));
     global.speed *= 0.9;
 }
@@ -907,10 +908,8 @@ with instances_matching(CustomProp, "name", "Teleporter")
 					}
 					i++;
 				}until(i = 1000)
-				repeat(40) with instance_create(x, y, GreenExplosion) {damage = 0; image_speed = random_range(.7, 1)};
+
 				sound_play_music(musBoss8)
-				if (GameCont.area == 2) var SpawnX = Player.x - (random_range(105, 115) * negative)
-				if (GameCont.area == 2) var SpawnY = Player.y - (random_range(105, 115) * negative)
 
  				var _boss_amount = 1,
 				    _boss        = CrownGuardianOld;
@@ -994,7 +993,7 @@ with instances_matching(CustomProp, "name", "Teleporter")
     draw_text_nt(x, y - 25, "@1(keysmall:pick) ACTIVATE");
 	}
 	var _ang = random(360)
-	if global.teleporter = true && global.BossesLeft > 0 && (current_frame mod (room_speed * 5)) = 0 && instance_number(_enemy) < 8
+	if global.teleporter = true && (current_frame mod (room_speed * 5)) = 0 && instance_number(_enemy) < 12
 	{
 		repeat(irandom(2) + 1) with instance_create(x + lengthdir_x(global.radi * radifac * random_range(.3, .8), _ang), y + lengthdir_y(global.radi * radifac * random_range(.3, .8), _ang), _enemy)
 		{
@@ -1040,7 +1039,7 @@ with TopCont
 		}
 		else
 		{
-			if Player.s_Challenge > 0
+			if Player.s_Challenge > 0 && global.charge <= 0 && global.teleporter = false
 			{
 				var _i = 1;
 				repeat(Player.s_Challenge)
@@ -1079,6 +1078,16 @@ with instances_matching(CustomProp, "name", "Teleporter")
 		surface_reset_target();
 	}
 }
+with instances_matching(CustomSlash, "name", "Inv Area")
+{
+	var _x = x - view_xview,
+			_y = y - view_yview;
+
+	surface_set_target(global.CircleSurf)
+	draw_circle_colour(_x, _y, image_xscale, c_fel, c_fel, false);
+	surface_reset_target();
+}
+
 with instances_matching(CustomProp, "name", "Teleporter")
 {
 	//DRAW TELEPORTER CIRCLE
@@ -1105,15 +1114,39 @@ with instances_matching(CustomProp, "name", "Teleporter")
 		draw_set_alpha(1)
 	}
 }
+with instances_matching(CustomSlash, "name", "Inv Area")
+{
+	var _x = x - view_xview,
+			_y = y - view_yview;
+
+	surface_set_target(global.CircleSurf)
+	draw_set_blend_mode(bm_subtract)
+	draw_circle_colour(_x, _y, image_xscale - 2, c_white, c_white, false);
+	draw_set_blend_mode(bm_normal)
+	surface_reset_target();
+
+	draw_set_alpha(.25)
+	draw_circle_colour(x, y, global.radi, c_fel, c_fel, false)
+	draw_set_alpha(1)
+}
+
 if surface_exists(global.CircleSurf) = true
 {
 	draw_surface_ext(global.CircleSurf, view_xview, view_yview, 1, 1, 0, c_white, .8)
 	surface_free(global.CircleSurf)
 }
 
+#define point_in_teleporter(OBJECT)
+with instances_matching(CustomProp, "name", "Teleporter")
+{
+	if distance_to_object(OBJECT) <= global.radi * radifac && global.charge > 0 {return true}else{return false}
+}
+return false;
+
+
 #define chest_setup(TAG)																 return mod_script_call("mod", "items","chest_setup"   , TAG)
 #define obj_create(X, Y, OBJ_NAME)											 return mod_script_call("mod", "items","obj_create"    , X, Y, OBJ_NAME)
 #define add_item(ITEM)																	 return mod_script_call("mod", "items","add_item"      , ITEM)
-#define get_item(ITEM)     			                         return mod_script_call("mod", "items","get_item"      , ITEM)
+#define get_item(ITEM, AMOUNT)     			                 return mod_script_call("mod", "items","get_item"      , ITEM. AMOUNT)
 #define item_get_count(ITEM)                             return mod_script_call("mod", "items","item_get_count", ITEM)
 #define draw_backdrop(XSTART, YSTART, XEND, YEND, TITLE) return mod_script_call("mod", "items", "draw_backdrop", XSTART, YSTART, XEND, YEND, TITLE)
