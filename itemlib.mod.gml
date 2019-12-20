@@ -570,33 +570,33 @@ item_metafillings = {
 };
 
 
-// ITEM 49: Collider
+// ITEM 51: COLLIDER
 #macro item_collider item[? "collider"]
 item_collider = {
   name              : "Collider",
 	description_small : "@sIncreased @wdamage, @sdon't @rhit yourself",
 	description_large : "-",
-	spr_index         : 49,
+	spr_index         : 51,
 	tier              : 3
 };
 
-// ITEM 50: Diamond Bullets
-#macro item_diamond item[? "diamond"]
-item_diamond = {
-  name              : "Diamond Bullets",
+// ITEM 52: DIAMOND ROUNDS
+#macro item_diamond_rounds item[? "diamond"]
+item_diamond_rounds = {
+  name              : "Diamond Rounds",
 	description_small : "@wSharper, Faster, @bpricier @sbullets",
 	description_large : "-",
-	spr_index         : 50,
+	spr_index         : 52,
 	tier              : 3
 };
 
-// ITEM 51: Sythe
-#macro item_scythe item[? "scythe"]
-item_scythe = {
+// ITEM 53: SCYTHE
+#macro item_death_scythe item[? "scythe"]
+item_death_scythe = {
   name              : "Death's Scythe",
-	description_small : "@pDegernate HP, @skilling heals you",
+	description_small : "@sDegernate @rHP, @skilling @gheals you",
 	description_large : "-",
-	spr_index         : 51,
+	spr_index         : 53,
 	tier              : 3
 };
 #define items_finalize()

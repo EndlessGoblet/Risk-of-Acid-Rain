@@ -65,7 +65,8 @@ global.sprTeleporterIdle   = sprite_add("sprites/teleporter/sprTeleporterIdle.pn
 global.sprTeleporterSiphon = sprite_add("sprites/teleporter/sprTeleporterSiphon.png", 2, 24, 20);
 global.mskTeleporter       = sprite_add("sprites/teleporter/mskTeleporter.png"      , 1, 24, 20);
 
-global.sprMode  = sprite_add("sprites/other/sprMode.png", 1, 19, 13);
+global.sprButtons  		 = sprite_add("sprites/other/sprButtons.png", 3, 12, 12);
+global.sprButtonsSplat = sprite_add("sprites/other/sprButtonsSplat.png", 1, 14, 14);
 global.sprModes = sprite_add("sprites/other/sprModes.png", 2, 41, 41);
 if (instance_exists(CharSelect)) global.menu = true;
 //set new level function
@@ -650,33 +651,62 @@ global.info = false;
 
 #define draw_gui
 //TO-DO
-if instance_exists(CharSelect)  {
+
+if instance_exists(CharSelect)
+{
     draw_set_halign(fa_center)
-    if (global.mode == 1) {
-    draw_set_alpha(0.7)
-    draw_text_nt(game_width / 2 + random_range(-2, 2), 20 + random_range(-2, 2), "@rHARD MODE")
-    draw_set_alpha(1)
-    draw_text_nt(game_width / 2, 20, "@rHARD MODE")
+    if (global.mode == 1)
+		{
+	    draw_set_alpha(0.7)
+	    draw_text_nt(game_width / 2 + random_range(-2, 2), 20 + random_range(-2, 2), "@rHARD MODE")
+	    draw_set_alpha(1)
+	    draw_text_nt(game_width / 2, 20, "@rHARD MODE")
     }
-    if (global.mode == 0) {
-        draw_set_alpha(1)
-draw_text_nt(game_width / 2, 20, "@wNORMAL MODE")
+    if (global.mode == 0)
+		{
+				draw_text_nt(game_width / 2, 20, "@wNORMAL MODE")
     }
-        draw_set_halign(fa_left)
-    var draw_x = -19
-    var draw_y = 42
-    draw_set_alpha(1)
-    for(var i = 0; i < 0.5; i += 1) {
-    if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x+15, draw_y-6, draw_x+4*10+2, draw_y+10) {
-        draw_sprite(global.sprMode, 1, 20, 50)
-        if button_pressed(i, "fire") {
+    draw_set_halign(fa_left)
+    var _draw_x = 10,
+    	  _draw_y = 45,
+				_button_w = sprite_get_width(global.sprButtons),
+				_button_h = sprite_get_height(global.sprButtons),
+				_string_h = string_height("M") / 2,
+				_active = false;
 
-        if (global.modesMenu == false) { global.modesMenu = true; global.info = false; sound_play(sndClick) } else { global.modesMenu = false; sound_play(sndClick)}
-
-         }
-    } else {
-        draw_sprite(global.sprMode, 1, 20, 51)
+    for(var i = 0; i < 0.5; i += 1)
+		{
+			draw_sprite(global.sprButtonsSplat, 1, _draw_x + 2, _draw_y);
+			if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i], _draw_x - _button_w/2,  _draw_y - _button_h/2, _draw_x + _button_w/2, _draw_y + _button_h/2)
+			{
+				_active = true;
+        if button_pressed(i, "fire")
+				{
+        		if (global.modesMenu == false)
+						{
+							global.modesMenu = true
+							global.info = false;
+						}
+						else
+						{
+							global.modesMenu = false;
+						}
+						sound_play(sndClick);
+				}
     }
+
+		if global.modesMenu = true  || _active = true
+		{
+			_active = true;
+			draw_text_nt(_button_w, _draw_y - _string_h, "MODES");
+		}
+    draw_sprite_ext(global.sprButtons, 0, _draw_x, _draw_y + _active, 1, 1, 0, _active = true ? c_white : c_ltgray, 1);
+
+		_draw_y += _button_h
+		draw_sprite(global.sprButtonsSplat, 1, _draw_x + 2, _draw_y);
+
+		_draw_y += _button_h
+		draw_sprite(global.sprButtonsSplat, 1, _draw_x + 2, _draw_y);
 
     var draw_x = game_width - 47; var draw_y = 44; draw_set_alpha(0); draw_rectangle(0+draw_x-52, draw_y-6, draw_x+4*10+2, draw_y+10, 0); draw_set_alpha(1) draw_set_color(c_white)
     if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-6, draw_x+4*10+2, draw_y+10) {

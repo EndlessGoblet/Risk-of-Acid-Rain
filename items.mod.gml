@@ -105,7 +105,7 @@ Player.firewoodCharge = 0;
 Player.firewoodKills  = 0;
 Player.armor          = 0;
 Player.perma_armor    = 0;
-Player.deathCounter = 0; 
+Player.deathCounter = 0;
 //Shrine
 Player.s_Combat    = 0;
 Player.s_Challenge = 0;
@@ -695,8 +695,6 @@ if ITEM = item[? "plate"] && global.ItemGetAmount > 0
 	Player.armor += 2 * global.ItemGetAmount
 }
 
-add_item(ITEM, global.ItemGetAmount)
-
 if ITEM = item[? "diamond"]
 {
 	with (Player) {
@@ -710,7 +708,6 @@ typ_ammo[5] = round(typ_ammo[5] / 1.5)
 }
 
 //fx
-
 var _pitch = random_range(.8, 1.2)
 if ITEM.tier = 3 _pitch  *= .7
 sound_play_pitchvol(sndTVOn, 1.1 * _pitch, .4)
@@ -725,7 +722,7 @@ else
 {
 	// unique item pickup sound goes here
 }
-add_item(ITEM)
+add_item(ITEM, global.ItemGetAmount)
 
 #define step
 //Invincibility
@@ -1719,7 +1716,7 @@ if amount >= 1 && instance_exists(Player)
 {
 Player.deathCounter += (1 * amount)
 if (Player.deathCounter) >= (30 * (room_speed / 30)) / amount {
-var HURT = (round(Player.maxhealth / 8)) 
+var HURT = (round(Player.maxhealth / 8))
 if (HURT < 0) HURT = 1
 Player.my_health -= HURT
 Player.deathCounter = 0;
@@ -1936,7 +1933,7 @@ if (global.descriptionTimer > 0)
   var draw_x = -120
 	draw_set_alpha(_alpha)
 	draw_sprite(sprBossNameSplat, 3, game_width / 2 + draw_x + x_offset + 36, 210)
-	draw_sprite(sprScoreSplat, 2, game_width / 2 + draw_x + x_offset + 146, 216)
+	draw_sprite(sprScoreSplat   , 2, game_width / 2 + draw_x + x_offset + 146, 216)
 	switch _item.tier
 	{
 		case 0 : draw_set_color(c_white); break;
