@@ -3,7 +3,7 @@
 #define init
 if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
 //DEBUG
-global.debug = true;
+global.debug = false;
 //Create important initial variables
 global.AnomalyGet  = 0;
 global.HardmodeGet = 0;
@@ -46,11 +46,17 @@ global.subareaChoice = 0
 global.BarLength = 0;
 global.DarkCircle = false;
 global.respawn = 0;
-global.info = false;
-global.modesMenu = false;
-global.mode = 0;
+global.MenuIndex			 = -1;    // -1 = no menu, 0 = modes, 1 = info, 2 = options
+global.Gamemode  			 = 0;     // 0 = normal mode, 1 = hardmode
+
+global.preformanceMode = false; // Turn on to avoid lag (recommended)
+global.hpBars 				 = true;
+global.bossBars 			 = true;
+global.doubleChests    = false;
+global.doubleShrines   = false;
+global.forceSupport    = false;
+
 global.crownVault = false;
-if (instance_exists(CharSelect)) CharSelect.closeSettings = true;
 if (instance_exists(Player)) Player.debug = false;
 
 global.shrineIcons = sprite_add("sprites/shrines/shrineIcons.png", 16, 13, 13)
@@ -58,8 +64,6 @@ global.shrineIcons = sprite_add("sprites/shrines/shrineIcons.png", 16, 13, 13)
 //Main Menu (Splash screen?)
 global.menu = false;
 global.sprSplash  = sprite_add("sprites/other/splash.png", 1, 320, 240);
-global.sprVersion = sprite_add("sprites/other/sprVersion.png", 1, 93, 20);
-global.sprOutline = sprite_add("sprites/other/sprOutline.png", 1, 93, 20);
 
 global.sprTeleporterIdle   = sprite_add("sprites/teleporter/sprTeleporterIdle.png"  , 1, 24, 20);
 global.sprTeleporterSiphon = sprite_add("sprites/teleporter/sprTeleporterSiphon.png", 2, 24, 20);
@@ -68,6 +72,7 @@ global.mskTeleporter       = sprite_add("sprites/teleporter/mskTeleporter.png"  
 global.sprButtons  		 = sprite_add("sprites/other/sprButtons.png", 3, 12, 12);
 global.sprButtonsSplat = sprite_add("sprites/other/sprButtonsSplat.png", 1, 14, 14);
 global.sprModes = sprite_add("sprites/other/sprModes.png", 2, 41, 41);
+
 if (instance_exists(CharSelect)) global.menu = true;
 //set new level function
 global.newLevel = instance_exists(GenCont);
@@ -111,9 +116,9 @@ if (GameCont.area != 100) with instance_create(Player.x-500, Player.y-500, Maggo
     my_health = 999999999;
     tag = "god"
 }
-if (global.mode == 1) {
+if (global.Gamemode = 1) {
 with (WeaponChest) {
-    if (GameCont.area == 1 || GameCont.area == 101) {
+    if (GameCont.area = 1 || GameCont.area == 101) {
         wait(2)
         if instance_exists(WeaponChest) {
         instance_create(x, y, BigWeaponChest)
@@ -121,9 +126,11 @@ with (WeaponChest) {
         }
     }
 }}
+
 //SPAWN OBJECTS ON LEVEL START
 with Player
 {
+	// Teleporter
 	if GameCont.area != 100 with instance_create(instance_furthest(x, y, Floor).x - sprite_xoffset + sprite_width / 2, instance_furthest(x, y, Floor).y - sprite_yoffset + sprite_height / 2, CustomProp)
 	{
 		name     = "Teleporter"
@@ -195,14 +202,14 @@ if instance_exists(Player)
 		default:  _place =  global.spwNight; break;
 	}
 
-	// CHESTS:
+	// Chests
 	var  _floorq = ds_list_create(), // put all available floor tiles into a list
 		   _i = 0;
 
 	with Floor // get a list of all "unoccupied" Floors
 	{
 		var _d = 0;
-		if instance_exists(Player) && distance_to_object(Player) > 92 && !place_meeting(x, y, hitme) && self != FloorExplo &&  distance_to_object(instance_nearest(x, y, Wall)) > 16
+		if instance_exists(Player) && distance_to_object(Player) > 92 && !place_meeting(x, y, hitme) && !instance_is(self, FloorExplo) &&  distance_to_object(instance_nearest(x, y, Wall)) > 16
 		{
 			_floorq[| _i] = self; // add eligible floor tiles to the list
 			_i++;
@@ -389,7 +396,7 @@ if instance_exists(Portal) && global.crownVault == true {
 }
 
 var minutes_ = 3 //How many minutes for difficulty to go up
-if (global.mode == 1) var minutes_ = 5
+if (global.Gamemode == 1) var minutes_ = 5
 //global.timeControl = 60 * 60 * (21600) //Time Control
 global.timeControl = (minutes_ * 2) * (60 * 60)
 
@@ -397,7 +404,7 @@ global.timeControl = (minutes_ * 2) * (60 * 60)
 
 with (enemy) {
 for(i = 0; i < 5; i++){
-			var _speed_hardmode = global.mode = 1 ? 1 : 0,
+			var _speed_hardmode = global.Gamemode = 1 ? 1 : 0,
 			    _speed_times    = .2 * item_get_count("times"),
 					_speed_boss     = "boss_buff" in self ? 1 : 0;
 			if(alarm_get(i) > 2){
@@ -405,7 +412,7 @@ for(i = 0; i < 5; i++){
 			}
 		}
 
-if "convert" not in self && global.mode = 1 {
+if "convert" not in self && global.Gamemode = 1 {
 	    var _roll = round(max(random_range(1, 5.25 - .25 * item_get_count("times")), 1))
 	    if (_roll == 1) {
 	if (object_index == Scorpion) {
@@ -467,7 +474,7 @@ if global.AnomalyGet = false && instance_exists(Player) && Player.race = "horror
 	}
 }
 
-if global.HardmodeGet = false && global.mode = 1 && instance_exists(Player) && !instance_exists(SpiralCont)
+if global.HardmodeGet = false && global.Gamemode = 1 && instance_exists(Player) && !instance_exists(SpiralCont)
 {
 	global.HardmodeGet = true
 	get_item(item[? "times"], 1)
@@ -486,16 +493,7 @@ if instance_exists(Player) {
 } else if instance_exists(CharSelect) {
     CharSelect.debug = global.debug
 }
-if instance_exists(CharSelect) && "closeSettings" not in self {
-    CharSelect.closeSettings = false;
-}
-if instance_exists(CharSelect) && "closeInfo" not in self {
-    CharSelect.closeInfo = false;
-}
-if instance_exists(CharSelect) && (CharSelect.closeInfo == true) {
-    global.info = false;
-    CharSelect.closeInfo = false;
-}
+
 //enemy Spawner
 with (enemy)
 {
@@ -528,7 +526,7 @@ with (Player) if "s_Combat" in self && (s_Combat > 0) {
 
 with(FloorMaker) if GameCont.area != 0 && GameCont.area != 2 && GameCont.area != 4 && GameCont.area != 6 && GameCont.area != 100//Make areas larger
 {
-	goal = 220
+	goal = 160
   if (GameCont.area == 3) goal = 110
 }
 
@@ -627,14 +625,17 @@ with (enemy) {
 global.AnomalyGet  = false;
 global.HardmodeGet = false;
 Player.debug1 = 0;
-var roll = round(random_range(1, 3))
-if (roll = 1) {
-GameCont.area = 101;
-global.areaChoice = 101;
-global.subareaChoice = 1
-} else {
-global.areaChoice = 1
-global.subareaChoice = 1
+
+if irandom_range(1, 3) = 1
+{
+	GameCont.area        = 101;
+	global.areaChoice    = 101;
+	global.subareaChoice = 1;
+}
+else
+{
+	global.areaChoice    = 1;
+	global.subareaChoice = 1;
 }
 //reset variables on run start
 global.difficulty = 0;
@@ -644,29 +645,39 @@ global.seconds = 0;
 global.minutes = 0;
 global.hours = 0;
 global.teleporter = false;
-global.modesMenu = false;
-global.info = false;
-
-
+global.MenuIndex = -1;
+global.Gamemode  = 0;
 
 #define draw_gui
-//TO-DO
+// Black backdrop
+if global.MenuIndex > -1 // If any menu is open
+{
+	draw_set_alpha(.75);
+	draw_rectangle_colour(0, 36, game_width, game_height - 35, c_black, c_black, c_black, c_black, false);
+	draw_set_alpha(1);
+}
+else
+{
+
+}
 
 if instance_exists(CharSelect)
 {
+		/// GAMEMODES
     draw_set_halign(fa_center)
-    if (global.mode == 1)
+    if global.Gamemode = 1 // Hardmode Header
 		{
 	    draw_set_alpha(0.7)
 	    draw_text_nt(game_width / 2 + random_range(-2, 2), 20 + random_range(-2, 2), "@rHARD MODE")
 	    draw_set_alpha(1)
 	    draw_text_nt(game_width / 2, 20, "@rHARD MODE")
     }
-    if (global.mode == 0)
+    if global.Gamemode = 0 // Normal mode Header
 		{
 				draw_text_nt(game_width / 2, 20, "@wNORMAL MODE")
     }
-    draw_set_halign(fa_left)
+
+    draw_set_halign(fa_left);
     var _draw_x = 10,
     	  _draw_y = 45,
 				_button_w = sprite_get_width(global.sprButtons),
@@ -674,91 +685,112 @@ if instance_exists(CharSelect)
 				_string_h = string_height("M") / 2,
 				_active = false;
 
+		// Button backdrop
+		var _i = 0;
+		repeat(3)
+		{
+			draw_sprite(global.sprButtonsSplat, 1, _draw_x - 3, _draw_y + _button_h * _i);
+			_i++;
+		}
+
     for(var i = 0; i < 0.5; i += 1)
 		{
-			draw_sprite(global.sprButtonsSplat, 1, _draw_x + 2, _draw_y);
 			if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i], _draw_x - _button_w/2,  _draw_y - _button_h/2, _draw_x + _button_w/2, _draw_y + _button_h/2)
 			{
 				_active = true;
         if button_pressed(i, "fire")
 				{
-        		if (global.modesMenu == false)
+        		if global.MenuIndex != 0
 						{
-							global.modesMenu = true
-							global.info = false;
+							global.MenuIndex = 0;
+
 						}
 						else
 						{
-							global.modesMenu = false;
+							global.MenuIndex = -1;
 						}
 						sound_play(sndClick);
 				}
     }
 
-		if global.modesMenu = true  || _active = true
+		if global.MenuIndex = 0  || _active = true
 		{
 			_active = true;
 			draw_text_nt(_button_w, _draw_y - _string_h, "MODES");
 		}
     draw_sprite_ext(global.sprButtons, 0, _draw_x, _draw_y + _active, 1, 1, 0, _active = true ? c_white : c_ltgray, 1);
 
-		_draw_y += _button_h
-		draw_sprite(global.sprButtonsSplat, 1, _draw_x + 2, _draw_y);
+				/// INFO
+				_active = false;
+				_draw_y += _button_h + 1;
 
-		_draw_y += _button_h
-		draw_sprite(global.sprButtonsSplat, 1, _draw_x + 2, _draw_y);
+				if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i], _draw_x - _button_w/2,  _draw_y - _button_h/2, _draw_x + _button_w/2, _draw_y + _button_h/2)
+				{
+					_active = true;
+			    if button_pressed(i, "fire")
+					{
+				    if (global.MenuIndex) != 1
+						{
+								global.MenuIndex = 1;
+				    }
+						else
+						{
+				        global.MenuIndex = -1;
+				    }
+						sound_play_pitch(sndClick, 1)
+			    }
+		    }
 
-    var draw_x = game_width - 47; var draw_y = 44; draw_set_alpha(0); draw_rectangle(0+draw_x-52, draw_y-6, draw_x+4*10+2, draw_y+10, 0); draw_set_alpha(1) draw_set_color(c_white)
-    if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-6, draw_x+4*10+2, draw_y+10) {
-    draw_sprite_ext(global.sprOutline, 1, game_width - 5, 55, 1, 1, 0, c_white, 1 );
-    draw_sprite_ext(global.sprVersion, 1, game_width - 5, 55, 1, 1, 0, c_white, 1 );
-    if button_pressed(i, "fire") {
-    if (global.info) == false {
-        global.info = true;
-        global.modesMenu = false;
-        CharSelect.closeSettings = true;
-        sound_play_pitch(sndClick, 0.8)
-        wait(2)
-        sound_play_pitch(sndClick, 0.9)
-        wait(2)
-        sound_play_pitch(sndClick, 1)
-    } else {
-        global.info = false;
-        sound_play_pitch(sndClick, 1)
-        wait(2)
-        sound_play_pitch(sndClick, 0.9)
-        wait(2)
-        sound_play_pitch(sndClick, 0.8)
-    }
-    }
-    } else {
-    draw_sprite(global.sprVersion, 1, game_width - 5, 55)
-    }
-    if (global.modesMenu==true) || (global.info ==true) { draw_x = game_width / 2 + 35; draw_y = 20; draw_set_alpha(0.85); draw_set_color(c_black); draw_rectangle(120+draw_x, 20+draw_y, -190+draw_x, 180+draw_y, 0) }
-    if global.info == true { //Draw menues here--------------
-        //draw_x = game_width / 2 + 35; draw_y = 20; draw_set_alpha(0.85); draw_set_color(c_black); draw_rectangle(120+draw_x, 20+draw_y, -190+draw_x, 180+draw_y, 0)
-        draw_set_alpha(1)
-        //draw_text_nt(game_width / 2 - 152, 42, "@pVERSION 1.5")
-         draw_text_nt(game_width / 2 - 152, 42, (floor(current_frame/8)*30 % 20 ? "@wVERSION 1.6" : "@gVERSION 1.6"));
-        draw_text_nt(game_width / 2 - 152, 52, "@s10/20/19")
-        draw_text_nt(game_width / 2 - 152, 42, "@s            [ITEMS AND ARMOR GALORE]")
-        var draw_y = -5
-        draw_text_nt(game_width / 2 - 152, 66 + draw_y, "@s-PATCH NOTES-")
-        draw_set_font(fntChat)
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "@w-More balanced items")
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "#@w-Added @yArmor @wand @gLuck")
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "##@w-Added @rHARDMODE @dVia controller on the top-right")
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "###@y-8 New Items")
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "####@w-I'm 99% sure you can't get stuck in the crown vault anymore")
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "#####@w-Added shrine of @rcarnage")
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "######@w-Tons of bug fixes")
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "#######@w-Added @gbig chests@w that give better items")
-        draw_text_nt(game_width / 2 - 152, 72 + draw_y, "########@w-Reverted back to @rteleporter @wnot being able to be hit")
-        draw_text_nt(game_width / 2 - 152, 182 + draw_y, "ITEMS: 38")
-        draw_text_nt(game_width / 2 - 152, 191 + draw_y, "SHRINES: 9")
+				if global.MenuIndex = 1 || _active = true
+				{
+					_active = true;
+					draw_text_nt(_button_w, _draw_y - _string_h, "UPDATE INFO");
+				}
+		    draw_sprite_ext(global.sprButtons, 1, _draw_x, _draw_y + _active, 1, 1, 0, _active = true ? c_white : c_ltgray, 1);
 
-    }
-    if global.modesMenu == true {
+				/// SETTINGS
+				_active = false;
+				_draw_y += _button_h + 1;
+				if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i], _draw_x - _button_w/2,  _draw_y - _button_h/2, _draw_x + _button_w/2, _draw_y + _button_h/2)
+				{
+					_active = true;
+					if button_pressed(i, "fire")
+					{
+						if (global.MenuIndex) != 2
+						{
+							global.MenuIndex = 2;
+						}
+						else
+						{
+						  global.MenuIndex = -1;
+						}
+						sound_play_pitch(sndClick, 1)
+					}
+				}
+
+				if global.MenuIndex = 2 || _active = true
+				{
+					_active = true;
+					draw_text_nt(_button_w, _draw_y - _string_h, "SETTINGS");
+				}
+				draw_sprite_ext(global.sprButtons, 2, _draw_x, _draw_y + _active, 1, 1, 0, _active = true ? c_white : c_ltgray, 1);
+
+    		if global.MenuIndex = 1
+				{
+	        draw_text_nt(game_width / 2 - 152, 42, (floor(current_frame/8)*30 % 20 ? "@wVERSION 1.6" : "@gVERSION 1.6"));
+	        draw_text_nt(game_width / 2 - 152, 52, "@s10/20/19")
+	        draw_text_nt(game_width / 2 - 152, 42, "@s            [ITEMS AND ARMOR GALORE]")
+	        var draw_y = -5
+	        draw_text_nt(game_width / 2 - 152, 66 + draw_y, "@s-PATCH NOTES-")
+	        draw_set_font(fntChat)
+	        draw_text_nt(game_width / 2 - 152, 182 + draw_y, "ITEMS: 38")
+					draw_text_nt(game_width / 2 - 152, 72 + draw_y, "@rGOBLET STOP ADDING TEXT DRAW FUNCTIONS #INSTEAD OF STARTING NEW LINES #AND START CHAINING LINES WITH THE HASH SYMBOL PLEASE")
+	        draw_text_nt(game_width / 2 - 152, 191 + draw_y, "SHRINES: 9")
+    		}
+
+			// Draw the gamemode menu
+	    if global.MenuIndex = 0
+			{
 				draw_x = 141
 				draw_y = 79
 				x_offset = 70
@@ -768,7 +800,7 @@ if instance_exists(CharSelect)
         draw_sprite(global.sprModes, 1, draw_x + 1 + x_offset, draw_y + y_offset + 1)
         draw_set_alpha(1)
         draw_set_color(c_white)
-        draw_rectangle(draw_x - 42 + global.mode * x_offset, draw_y - 27 , draw_x + global.mode * x_offset, draw_y + 15, 0)
+        draw_rectangle(draw_x - 42 + global.Gamemode * x_offset, draw_y - 27 , draw_x + global.Gamemode * x_offset, draw_y + 15, 0)
 
         draw_sprite(global.sprModes, 0, draw_x           , draw_y + y_offset)
         draw_sprite(global.sprModes, 1, draw_x + x_offset, draw_y + y_offset)
@@ -785,7 +817,7 @@ if instance_exists(CharSelect)
 	        draw_text_nt(_textx + 3, _texty, _strModeNormal)
 	        if button_pressed(i, "fire")
 					{
-		        global.mode = 0;
+		        global.Gamemode = 0;
 		        sound_play_pitch(sndClick, 1.2)
 	        }
         }
@@ -796,16 +828,95 @@ if instance_exists(CharSelect)
 	        draw_text_nt(_textx + 3, _texty - string_height(_strModeNormal) * 4 / 3 - 2, _strModeHard)
 	        if button_pressed(i, "fire")
 					{
-		        global.mode = 1;
+		        global.Gamemode = 1;
 		        sound_play_pitch(sndClick, 1)
 		        sound_play_pitch(sndMeatExplo, 1)
 	        }
         }
     }
+		// OPTIONS
+		if global.MenuIndex = 2
+		{
+			var draw_x = game_width - 31; var draw_y = 20; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+2, draw_y+10, 1); draw_set_alpha(1) draw_set_color(c_white)
+			if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+2, draw_y+10) {
+			var draw_x = game_width - 31; var draw_y = 20; draw_set_alpha(0.25); draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+2, draw_y+10, 0); draw_set_alpha(1) draw_set_color(c_white)
+			}
+			if button_pressed(i, "fire") && point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+2, draw_y+10)
+			 {
+			sound_play_pitch(sndClick, random_range(0.8, 1.2))
+			}
+
+			draw_x = game_width / 2 + 35; draw_y = 20; draw_set_alpha(0.85); draw_set_color(c_black); draw_rectangle(120+draw_x, 20+draw_y, -190+draw_x, 180+draw_y, 0) //Draw Box
+
+			//Preformance Mode Toggle
+			draw_set_alpha(1) draw_set_color(c_white); draw_text_nt(game_width / 2 - 150, 50, "PREFORMANCE MODE") //Draw Label
+			if (global.preformanceMode == true) { draw_text_nt(game_width / 2 - 15, 50, "ON") } else { draw_text_nt(game_width / 2 - 15, 50, "OFF") } //Draw ON/OFF
+			var draw_x = game_width / 2 - 101; var draw_y = 50; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
+			if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) {
+			draw_text_nt(game_width / 2 - 151, 180, "DOES MANY DIFFERENT THINGS TO INCREASE")
+			draw_text_nt(game_width / 2 - 151, 190, "PERFORMANCE @dSLIGHTY LOWERS QUALITY")
+			if button_pressed(i, "fire") { //Check if they clicked
+			if global.preformanceMode == true {global.preformanceMode = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.preformanceMode = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+			//Preformance Mode Toggle
+			//Enemy HP Bars
+			draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 65; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
+			draw_text_nt(game_width / 2 - 150, draw_y, "ENEMY HP BARS") //Draw Label
+			if (global.hpBars == true) { draw_text_nt(game_width / 2 - 15, draw_y, "ON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
+			if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
+			draw_text_nt(game_width / 2 - 151, 190, "SMALL HEALTH BARS UNDER ENEMIES")
+			if button_pressed(i, "fire") { //Check if they clicked
+			if global.hpBars == true {global.hpBars = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.hpBars = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+			//Enemy HP Bars
+			//Boss HP Bars
+			draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 80; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
+			draw_text_nt(game_width / 2 - 150, draw_y, "BOSS HP BARS") //Draw Label
+			if (global.bossBars == true) { draw_text_nt(game_width / 2 - 15, draw_y, "ON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
+			if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
+			draw_text_nt(game_width / 2 - 151, 190, "BIG ON SCREEN HEALTH BARS FOR BOSSES")
+			if button_pressed(i, "fire") { //Check if they clicked
+			if global.bossBars == true {global.bossBars = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.bossBars = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+			//Boss HP Bars
+			//Double Chests
+			draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 95; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
+			draw_text_nt(game_width / 2 - 150, draw_y, "DOUBLE ITEMS") //Draw Label
+			if (global.doubleChests == true) { draw_text_nt(game_width / 2 - 15, draw_y, "@rON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
+			if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
+			draw_text_nt(game_width / 2 - 151, 190,"DOUBLES THE AMOUNT OF ITEM CHESTS")
+			if button_pressed(i, "fire") { //Check if they clicked
+			if global.doubleChests == true {global.doubleChests = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.doubleChests = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+			//Double Chests
+			//Double Shrines
+			draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 110; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
+			draw_text_nt(game_width / 2 - 150, draw_y, "DOUBLE SHRINES") //Draw Label
+			if (global.doubleShrines == true) { draw_text_nt(game_width / 2 - 15, draw_y, "@rON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
+			if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
+			draw_text_nt(game_width / 2 - 151, 190,"DOUBLES THE AMOUNT OF SHRINES")
+			if button_pressed(i, "fire") { //Check if they clicked
+			if global.doubleShrines == true {global.doubleShrines = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.doubleShrines = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+			//Double Shrines
+			//Debug Mode
+			draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 125; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
+			draw_text_nt(game_width / 2 - 150, draw_y, "FORCE SUPPORT") //Draw Label
+			if (global.forceSupport == true) { draw_text_nt(game_width / 2 - 15, draw_y, "ON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
+			if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
+			draw_set_font(fntChat);
+			draw_text_nt(game_width / 2 - 151, 180,"@wNORMALLY, CUSTOM PROJECTILES ARE UNAFFECTED BY THINGS SUCH AS")
+			draw_text_nt(game_width / 2 - 151, 190,"HOMING, AND BOUNCING, ENABLING THIS MAKES THEM EFFECTED")
+			draw_set_font(fntM0)
+			if button_pressed(i, "fire") { //Check if they clicked
+			if global.forceSupport == true {global.forceSupport = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.forceSupport = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+			//Debug Mode
+			//Cheats Warning
+			if global.doubleChests == true || global.doubleShrines == true {
+			draw_text_nt(game_width / 2 + 40, 44, "@rCHEATS ENABLED")
+			}
+		}
 }
 }
-//DEBUG
-if global.debug == true && instance_exists(Player) {
+
+///DEBUG
+if global.debug = true && instance_exists(Player)
+{
     draw_set_halign(fa_right)
     draw_set_font(fntChat)
     draw_set_alpha(1)
@@ -835,7 +946,6 @@ veryhard   = make_colour_rgb(141, 70, 60);  //very hard
 insane     = make_colour_rgb(140, 67, 72);  //insane
 impossible = make_colour_rgb(110, 83, 104); //impossible
 Iseeyou    = make_colour_rgb(69, 58, 80);   //I see you
-
 
 if (global.difficulty == 0) draw_set_color(easy)
 if (global.difficulty == 1) draw_set_color(medium)
@@ -1087,6 +1197,12 @@ with TopCont
 
 #define circlesurface_draw
 if !surface_exists((global.CircleSurf)){global.CircleSurf = surface_create(game_screen_get_width_nonsync(), game_screen_get_height_nonsync())}
+
+// Safety clear
+surface_set_target(global.CircleSurf);
+draw_clear_alpha(c_white,0);
+surface_reset_target();
+
 with instances_matching(CustomProp, "name", "Teleporter")
 {
 	//DRAW TELEPORTER CIRCLE
@@ -1159,7 +1275,7 @@ with instances_matching(CustomSlash, "name", "Inv Area")
 	draw_set_alpha(1)
 }
 
-if surface_exists(global.CircleSurf) = true
+if surface_exists(global.CircleSurf)
 {
 	draw_surface_ext(global.CircleSurf, view_xview, view_yview, 1, 1, 0, c_white, .8)
 	surface_free(global.CircleSurf)
