@@ -1,8 +1,7 @@
 #macro item 					 mod_variable_get("mod", "itemlib", "ItemDirectory");
 
 #define init
-#macro savefile "RoAR_Settings.txt" //Remembering settings
-global.fancy = false;
+global.fancy = true;
 global.preformanceMode = false //Turn on to avoid lag (recommended)
 global.hpBars = true;
 global.bossBars = true;
@@ -87,7 +86,6 @@ global.doubleShrines = false;
 //ITEMS
 global.newLevel = instance_exists(GenCont);
 global.hasGenCont = false;
-load_save()	
 while(true){
 	if(instance_exists(GenCont)) global.newLevel = 1;
 	else if(global.newLevel){
@@ -1801,94 +1799,7 @@ draw_set_font(fntM0)
  if instance_exists(CharSelect) {
 
 
-for(var i = 0; i < 0.5; i += 1) {
 
-                if global.settings == true {
-
-                draw_x = game_width / 2 + 35; draw_y = 20; draw_set_alpha(0.85); draw_set_color(c_black); draw_rectangle(120+draw_x, 20+draw_y, -190+draw_x, 180+draw_y, 0) //Draw Box
-
-                //Preformance Mode Toggle
-                draw_set_alpha(1) draw_set_color(c_white); draw_text_nt(game_width / 2 - 150, 50, "PREFORMANCE MODE") //Draw Label
-                if (global.preformanceMode == true) { draw_text_nt(game_width / 2 - 15, 50, "ON") } else { draw_text_nt(game_width / 2 - 15, 50, "OFF") } //Draw ON/OFF
-                var draw_x = game_width / 2 - 101; var draw_y = 50; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
-                if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) {
-                draw_text_nt(game_width / 2 - 151, 180, "DOES MANY DIFFERENT THINGS TO INCREASE")
-                draw_text_nt(game_width / 2 - 151, 190, "PERFORMANCE @dSLIGHTY LOWERS QUALITY")
-                if button_pressed(i, "fire") { //Check if they clicked
-                if global.preformanceMode == true {global.preformanceMode = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.preformanceMode = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
-				save_save()}} //On/Off Toggle
-                //Preformance Mode Toggle
-                //Enemy HP Bars
-                draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 65; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
-                draw_text_nt(game_width / 2 - 150, draw_y, "ENEMY HP BARS") //Draw Label
-                if (global.hpBars == true) { draw_text_nt(game_width / 2 - 15, draw_y, "ON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
-                if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
-                draw_text_nt(game_width / 2 - 151, 190, "SMALL HEALTH BARS UNDER ENEMIES")
-                if button_pressed(i, "fire") { //Check if they clicked
-                if global.hpBars == true {global.hpBars = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.hpBars = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
-				save_save()}} //On/Off Toggle
-                //Enemy HP Bars
-                //Boss HP Bars
-                draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 80; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
-                draw_text_nt(game_width / 2 - 150, draw_y, "BOSS HP BARS") //Draw Label
-                if (global.bossBars == true) { draw_text_nt(game_width / 2 - 15, draw_y, "ON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
-                if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
-                draw_text_nt(game_width / 2 - 151, 190, "BIG ON SCREEN HEALTH BARS FOR BOSSES")
-                if button_pressed(i, "fire") { //Check if they clicked
-                if global.bossBars == true {global.bossBars = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.bossBars = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
-				save_save()}} //On/Off Toggle
-                //Boss HP Bars
-                //Double Chests
-                draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 95; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
-                draw_text_nt(game_width / 2 - 150, draw_y, "DOUBLE ITEMS") //Draw Label
-                if (global.doubleChests == true) { draw_text_nt(game_width / 2 - 15, draw_y, "@rON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
-                if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
-                draw_text_nt(game_width / 2 - 151, 190,"DOUBLES THE AMOUNT OF ITEM CHESTS")
-                if button_pressed(i, "fire") { //Check if they clicked
-                if global.doubleChests == true {global.doubleChests = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.doubleChests = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
-				save_save()}} //On/Off Toggle
-                //Double Chests
-                //Double Shrines
-                draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 110; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
-                draw_text_nt(game_width / 2 - 150, draw_y, "DOUBLE SHRINES") //Draw Label
-                if (global.doubleShrines == true) { draw_text_nt(game_width / 2 - 15, draw_y, "@rON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
-                if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
-                draw_text_nt(game_width / 2 - 151, 190,"DOUBLES THE AMOUNT OF SHRINES")
-                if button_pressed(i, "fire") { //Check if they clicked
-                if global.doubleShrines == true {global.doubleShrines = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.doubleShrines = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
-				save_save()}} //On/Off Toggle
-                //Double Shrines
-				//Fancy Teleporter
-                draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 140; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
-                draw_text_nt(game_width / 2 - 150, draw_y, "FANCY TELEPORTER") //Draw Label
-                if (global.fancy == true) { draw_text_nt(game_width / 2 - 15, draw_y, "ON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
-                if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
-				draw_set_font(fntChat);
-                draw_text_nt(game_width / 2 - 151, 175,"Adds fancier and cooler looking graphics to the teleporter#@rMay cause graphical issues on some devices")
-				draw_set_font(fntM0)
-                if button_pressed(i, "fire") { //Check if they clicked
-                if global.fancy == true {global.fancy = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.fancy = true sound_play_pitch(sndGoldCrossbow, 1.2)}
-				save_save()}} //On/Off Toggle
-                //Fancy Teleporter
-                //Debug Mode
-                draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 125; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
-                draw_text_nt(game_width / 2 - 150, draw_y, "FORCE SUPPORT") //Draw Label
-                if (global.forceSupport == true) { draw_text_nt(game_width / 2 - 15, draw_y, "ON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
-                if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
-                draw_set_font(fntChat);
-                draw_text_nt(game_width / 2 - 151, 180,"@wNORMALLY, CUSTOM PROJECTILES ARE UNAFFECTED BY THINGS SUCH AS")
-                draw_text_nt(game_width / 2 - 151, 190,"HOMING, AND BOUNCING, ENABLING THIS MAKES THEM EFFECTED")
-                draw_set_font(fntM0)
-                if button_pressed(i, "fire") { //Check if they clicked
-                if global.forceSupport == true {global.forceSupport = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.forceSupport = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
-				save_save()}} //On/Off Toggle
-                //Debug Mode
-                //Cheats Warning
-                if global.doubleChests == true || global.doubleShrines == true {
-                draw_text_nt(game_width / 2 + 40, 44, "@rCHEATS ENABLED")
-                }
-                }
-}
 
 
 
@@ -2309,27 +2220,3 @@ if projectile_canhit(other) with other
 
 
 
-#define load_save
-//trace("Attempted Load")
-wait file_load(savefile);
-if file_exists(savefile){
-		var _settings = string_load(savefile);
-		_settings = string_split(_settings,"|");
-		global.preformanceMode = real(_settings[0]);
-		//trace("Settings Loaded: " + string(global.preformanceMode));
-		global.hpBars = real(_settings[1]);
-		global.bossBars = real(_settings[2]);
-		global.forceSupport = real(_settings[3]);
-		file_unload(savefile);
-	}
-
-#define save_save
-/*
-trace_color("Preformance Mode: " + string(global.preformanceMode), c_red)
-trace_color("Enemy HP Bars: " + string(global.hpBars), c_lime)
-trace_color("Boss HP Bars: " + string(global.bossBars), c_orange)
-trace_color("Force Support: " + string(global.forceSupport), c_blue)
-*/
-var _str = "" + string(global.preformanceMode) + "|" + string(global.hpBars) + "|" + string(global.bossBars)+ "|" + string(global.forceSupport);
-string_save(_str,savefile);
-//trace("Settings Saved");
