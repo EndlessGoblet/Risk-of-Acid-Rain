@@ -56,6 +56,7 @@ global.bossBars 			 = true;
 global.doubleChests    = false;
 global.doubleShrines   = false;
 global.forceSupport    = false;
+global.sixtyFPS = false;
 
 global.crownVault = false;
 if (instance_exists(Player)) Player.debug = false;
@@ -373,6 +374,14 @@ with (Player)
 }
 
 #define step
+if global.sixtyFPS == true {
+room_speed = 60
+current_time_scale = 0.5
+} else {
+room_speed = 30
+current_time_scale = 1
+}
+
 if irandom(instance_number(enemy) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
 
 //Crown Vault Fix
@@ -746,7 +755,7 @@ if instance_exists(CharSelect)
 			    }
 		    }
 
-				if global.MenuIndex = 1 || _active = true
+				if _active = true
 				{
 					_active = true;
 					draw_text_nt(_button_w, _draw_y - _string_h, "UPDATE INFO");
@@ -782,14 +791,14 @@ if instance_exists(CharSelect)
 
     		if global.MenuIndex = 1
 				{
-	        draw_text_nt(game_width / 2 - 152, 42, (floor(current_frame/8)*30 % 20 ? "@wVERSION 1.6" : "@gVERSION 1.6"));
-	        draw_text_nt(game_width / 2 - 152, 52, "@s10/20/19")
-	        draw_text_nt(game_width / 2 - 152, 42, "@s            [ITEMS AND ARMOR GALORE]")
+	        draw_text_nt(game_width / 2 - 152, 42, (floor(current_frame/8)*30 % 20 ? "@sVERSION 1.7" : "@pVERSION 1.7"));
+	        draw_text_nt(game_width / 2 - 152, 52, "@s[INSERT UPDATE RELEASE DATE]")
+	        draw_text_nt(game_width / 2 - 152, 42, "@s            [CURSED UPDATE]")
 	        var draw_y = -5
 	        draw_text_nt(game_width / 2 - 152, 66 + draw_y, "@s-PATCH NOTES-")
 	        draw_set_font(fntChat)
 	        draw_text_nt(game_width / 2 - 152, 182 + draw_y, "ITEMS: 38")
-					draw_text_nt(game_width / 2 - 152, 72 + draw_y, "@rGOBLET STOP ADDING TEXT DRAW FUNCTIONS #INSTEAD OF STARTING NEW LINES #AND START CHAINING LINES WITH THE HASH SYMBOL PLEASE")
+					draw_text_nt(game_width / 2 - 152, 72 + draw_y, "@w-Added \# cursed items #-Added \# other items#-Polished Menus#-Increased Preformance#-Fancier Effects#-#-@sReminder to myself to add more patch notes")
 	        draw_text_nt(game_width / 2 - 152, 191 + draw_y, "SHRINES: 9")
     		}
 
@@ -816,7 +825,7 @@ if instance_exists(CharSelect)
 						_strModeHard   = "@s#Enemies have more @rhp@s, are more #@ragressive@s, @yelites@s spawn more often,#@wdifficulty@s scales faster, and #everything sucks"
 				draw_set_halign(fa_left)
 				draw_set_alpha(1)
-				if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-30, draw_x-12, draw_y+10)
+				if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -42, draw_y-27, draw_x+0, draw_y+10)
 				{
 					draw_backdrop(_textx, _texty - string_height(_strModeNormal) / 2, _textx + 298,  _texty + string_height(_strModeNormal), "Normal Mode")
 	        draw_text_nt(_textx + 3, _texty, _strModeNormal)
@@ -827,7 +836,7 @@ if instance_exists(CharSelect)
 	        }
         }
         draw_x += x_offset
-		  	if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-30, draw_x-12, draw_y+10)
+		  	if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -42, draw_y-27, draw_x+0, draw_y+10)
 				{
 	        draw_backdrop(_textx, _texty - string_height(_strModeNormal) * 4 / 3 - 2, _textx + 298,  _texty + string_height(_strModeNormal), "Hard Mode")
 	        draw_text_nt(_textx + 3, _texty - string_height(_strModeNormal) * 4 / 3 - 2, _strModeHard)
@@ -904,7 +913,7 @@ if instance_exists(CharSelect)
 			if global.doubleShrines == true {global.doubleShrines = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.doubleShrines = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
 			save_save()}} //On/Off Toggle
 			//Double Shrines
-			//Debug Mode
+			//Force Support
 			draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 125; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
 			draw_text_nt(game_width / 2 - 150, draw_y, "FORCE SUPPORT") //Draw Label
 			if (global.forceSupport == true) { draw_text_nt(game_width / 2 - 15, draw_y, "ON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
@@ -914,9 +923,20 @@ if instance_exists(CharSelect)
 			draw_text_nt(game_width / 2 - 151, 190,"HOMING, AND BOUNCING, ENABLING THIS MAKES THEM EFFECTED")
 			draw_set_font(fntM0)
 			if button_pressed(i, "fire") { //Check if they clicked
-			if global.forceSupport == true {global.forceSupport = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.forceSupport = true; sound_play_pitch(sndGoldCrossbow, 1.2)
-			save_save()}}} //On/Off Toggle
-			//Debug Mode
+			if global.forceSupport == true {global.forceSupport = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.forceSupport = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
+			save_save()}} //On/Off Toggle
+			//Force Support
+			//60 FPS
+			draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 140; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
+			draw_text_nt(game_width / 2 - 150, draw_y, "60 FPS") //Draw Label
+			if (global.sixtyFPS == true) { draw_text_nt(game_width / 2 - 15, draw_y, "ON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
+			if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
+			draw_set_font(fntM0)
+			draw_text_nt(game_width / 2 - 151, 190,"@wTOGGLES 60 FRAMES PER SECOND")
+			if button_pressed(i, "fire") { //Check if they clicked
+			if global.sixtyFPS == true {global.sixtyFPS= false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.sixtyFPS = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
+			save_save()}} //On/Off Toggle
+			//60 Fps
 			//Cheats Warning
 			if global.doubleChests == true || global.doubleShrines == true {
 			draw_text_nt(game_width / 2 + 40, 44, "@rCHEATS ENABLED")
@@ -1018,17 +1038,11 @@ draw_sprite(global.sprSplash, 1, game_width / 2 + 160, game_height);
 draw_set_halign(1)
 draw_text_nt(game_width / 2 - 10, game_height / 2 + 10, "Click to continue")
  draw_text_nt(game_width / 2 - 10, game_height / 2 + 10, (floor(current_frame/8)*30 % 20 ? "@wClick to continue" : "@sClick to continue"));
-  draw_text_nt(game_width / 2 - 10, game_height / 2 + 25, (floor(current_frame/8)*30 % 20 ? "@sPress 1 to run at 30 FPS" : "@dPress 1 to run at 30 FPS"));
+ // draw_text_nt(game_width / 2 - 10, game_height / 2 + 25, (floor(current_frame/8)*30 % 20 ? "@sPress 1 to run at 30 FPS" : "@dPress 1 to run at 30 FPS"));
 for(var i = 0; i < 0.5; i += 1) {  if button_pressed(i, "fire") {
 global.menu = false;
 sound_play(sndHeavyRevoler)
-room_speed=60;
-current_time_scale=0.5
-} else if button_pressed(i, "key1") {
-global.menu = false;
-sound_play(sndHeavyRevoler)
-room_speed=30;
-current_time_scale=1
+
 }}
 }
 
@@ -1318,6 +1332,7 @@ if file_exists(savefile){
 		global.hpBars = real(_settings[1]);
 		global.bossBars = real(_settings[2]);
 		global.forceSupport = real(_settings[3]);
+		global.sixtyFPS = real(_settings[4]);
 		file_unload(savefile);
 	}
 
@@ -1328,6 +1343,6 @@ trace_color("Enemy HP Bars: " + string(global.hpBars), c_lime)
 trace_color("Boss HP Bars: " + string(global.bossBars), c_orange)
 trace_color("Force Support: " + string(global.forceSupport), c_blue)
 */
-var _str = "" + string(global.preformanceMode) + "|" + string(global.hpBars) + "|" + string(global.bossBars)+ "|" + string(global.forceSupport);
+var _str = "" + string(global.preformanceMode) + "|" + string(global.hpBars) + "|" + string(global.bossBars)+ "|" + string(global.forceSupport) + "|" + string(global.sixtyFPS);
 string_save(_str,savefile);
 //trace("Settings Saved");
