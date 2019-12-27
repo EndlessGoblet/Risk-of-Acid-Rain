@@ -1,0 +1,52 @@
+//THE TODO LIST
+
+* Level generation:
+  - Fix cursed chests spawning without meeting requirements
+  - Fix Chests spawning where they shouldnt
+  - redo shrine poulation
+  - add level specific generation bias, like only large or gold chests in palace
+
+* Add Classic Mode:
+  - get a couple of items per start (presets), gain more per loop
+
+* Add an Item Log:
+  - very low on the priority list but it would be very cool
+
+* Update interface elements on the main screen
+
+* Items that need to be changed:
+  - Focus:
+     smaller bullets dont work well in nt at all, its harder to spot them and
+  - Liquid Nitrogen:
+     effect is too weak to be of any value and the blue circle should either be
+     behind the player or removed by a custom "entering" particle on the incoming
+     projectile
+  - Broken Locket:
+     seems to spawn way too many Rusted Chests
+  - Mechanical lens:
+     make the homing work like smart nuke launcher homing, and not scale with stack size
+  - Gun Boots:
+     Being able to create projectiles just by moving seems kinda wierd and in late game
+     is broken due to multidudes of synergies. dont even have to use ammo to kill enemies
+  - Chopper:
+     see Gun Boots
+  - Perfect Prize:
+     add a prize break animation for when loosing prize effect instead of the popup text
+  - Fern:
+     overthink wether or not we actually want this
+  - Flower Cactus:
+     i like it, and im gonna line out here how i think it could work well
+     - on level start, carve a nook into the level similar to safe spawn and put the cactus in the middle
+     - cactus has an aoe that grants invisibility up to a limit, and heals you under certain circumstances (?)
+     - 1 health cactus
+  - Hard Times:
+     give the player 1 more per loop
+  - Ammo Extractor:
+     needs a resprite
+
+* Fix item inventory backdrop not scaling vertically properly
+
+* Add uncursed items, and make cursed items uncurse
+  - like cursed items but without the downside, with a custom rarity
+
+* Fix teleporter activation in scrapyards crashing the game sometimes

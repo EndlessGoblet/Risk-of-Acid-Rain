@@ -1,4 +1,4 @@
-#macro item mod_variable_get("mod", "itemlib", "ItemDirectory")
+#macro item 					 mod_variable_get("mod", "itemlib", "ItemDirectory");
 
 #define init
 #macro savefile "RoAR_Settings.txt" //Remembering settings
@@ -13,6 +13,7 @@ global.PlayerItems = [item[? "none"]]
 
 
 global.sprBerserkFX = sprite_add("sprites/other/sprBerserkFX.png", 3,  4, 4);
+global.mskLightBulb = sprite_add("sprites/other/mskLightBulb.png", 1, 32, 32);
 
 global.sprItemChest           = sprite_add_weapon("sprites/chests/sprItemChest.png"       ,     8, 8);
 global.sprGoldItemChest       = sprite_add_weapon("sprites/chests/sprGoldItemChest.png"   ,    13, 8);
@@ -66,10 +67,8 @@ global.BloodCounter = 0;
 global.GemCoeff = choose(-1, 1)
 global.hurtFloor = false;
 
-global.settings = false;
 global.PlusItems = 0;
 global.hideDes = 0;
-global.forceSupport = false;
 global.popoChance = 0;
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
@@ -100,6 +99,12 @@ while(true){
 	wait 1;
 }
 
+#macro preformanceMode mod_variable_get("mod", "main", "preformanceMode");
+#macro hpBars					 mod_variable_get("mod", "main", "hpBars");
+#macro bossBars        mod_variable_get("mod", "main", "bossBars");
+#macro doubleChests    mod_variable_get("mod", "main", "doubleChests");
+#macro doubleShrines   mod_variable_get("mod", "main", "doubleShrines");
+#macro forceSupport    mod_variable_get("mod", "main", "forceSupport");
 
 #define game_start
 if (global.fancy == 1) {
@@ -120,14 +125,13 @@ Player.firewoodCharge = 0;
 Player.firewoodKills  = 0;
 Player.armor          = 0;
 Player.perma_armor    = 0;
-Player.deathCounter = 0; 
+Player.deathCounter = 0;
 //Shrine
 Player.s_Combat    = 0;
 Player.s_Challenge = 0;
 
 
 global.descriptionTimer = 0;
-global.settings = false;
 
 //Visuals
 Player.fx_celesteel = 0;
@@ -169,7 +173,7 @@ global.descriptionTimer = 0;
 //SPAWN OBJECTS ON LEVEL START
 
 // CHESTS:
-var  _area_amount = 0,
+/*var  _area_amount = 0,
 	  _chest_amount = 3 + skill_get(28),
     _prize_amount = item_get_count("prize") * (global.hurtFloor = false ? 0 : 1),
 		_curse_amount = (GameCont.area = 104 ? 1 : 0) + irandom(99) > (crown_current != 1 ? (crown_current = 11 ? 66 : 14) : 0) ? 1 : 0,
@@ -184,7 +188,7 @@ switch GameCont.area // area specific extra chests
 }
 _chest_amount += _area_amount;
 
-_chest_amount *= (global.doubleChests + 1); // double chest options
+_chest_amount *= (doubleChests + 1); // double chest options
 
 with Floor // get a list of all "unoccupied" Floors
 {
@@ -247,7 +251,7 @@ if _curse_amount > 0 // guaranteed cursed chest spawn in caves + extra cursed ch
 	}
 }
 
-ds_list_destroy(_floorq)
+ds_list_destroy(_floorq)*/
 
 with ProtoStatue     instance_delete(self)
 with PizzaEntrance   instance_delete(self)
@@ -257,7 +261,7 @@ with WantBoss        instance_delete(self)
 with BecomeScrapBoss instance_delete(self)
 
 var floors = instances_matching(Floor, mod_current, undefined);
-if global.doubleShrines != true {
+if doubleShrines != true {
 var _roll = round(random_range(0, 2)) //SHRINE AMOUNTS-------------
 } else {
 var _roll = round(random_range(2, 4))
@@ -313,26 +317,30 @@ if distance_to_object(Wall) <= 10 && "boom" not in self {
 
 #define draw
 //HEALTH BARS
-if global.hpBars == true {
-with (enemy) {
-    if ("tag" not in self) && object_index != RavenFly && object_index != Mimic && object_index != SuperMimic {
-    var x_ = x; var y_ = y + 10
-    var maxy = maxhealth; if (maxy > 50) maxy = 50; if (maxy < 10) maxy = 10; //Maxy is maxhealth
-    var curry = my_health; if (curry < 0) curry = 0; //Curry is my_health
-    var barLength = curry * (maxy) / maxhealth
-    draw_set_color(c_black);draw_rectangle( ((maxy / 2) * -1) +x_, (3) +y_, (maxy / 2) + x_, (0) + y_, false)
-    draw_set_color(c_black);draw_rectangle( ((maxy / 2) * -1 + 1) +x_, (2) +y_, (maxy / 2 - 1) + x_, (1) + y_, false)
-    draw_set_color(c_red);draw_rectangle( ((0) * -1 + 1 - (maxy / 2)) +x_, (2) +y_, (barLength - 1) + x_ - (maxy / 2), (1) + y_, false) //health * length / maxhealth
-}}}
-
+if hpBars = true
+{
+	with (enemy)
+	{
+	  if ("tag" not in self) && object_index != RavenFly && object_index != Mimic && object_index != SuperMimic
+		{
+		  var _x     = x,
+			 		_y     = y,
+		   		_maxh  = clamp(maxhealth, 10, 50),
+		      _currh = max(my_health, 0);
+			draw_rectangle_colour(_x - _maxh / 2    , _y + sprite_get_height(sprite_index) / 2    , _x + _maxh / 2                              				      , _y + sprite_get_height(sprite_index) / 2 + 3, c_black, c_black, c_black, c_black, false);
+			if my_health > 0
+			draw_rectangle_colour(_x - _maxh / 2 + 1, _y + sprite_get_height(sprite_index) / 2 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, _y + sprite_get_height(sprite_index) / 2 + 2,   c_red,   c_red,   c_red,   c_red, false);
+		}
+	}
+}
 
 var amount = item_get_count("nitrogen"); //LIQUID NITROGEN
 if amount >= 1 && instance_exists(Player){
 var light = (45 + (amount * 7))
-if (global.preformanceMode == true) draw_set_alpha(1); draw_set_color(c_blue)
-if (global.preformanceMode == false) draw_set_alpha(0.15); draw_set_color(c_blue)
-if (global.preformanceMode == true) draw_circle(Player.x, Player.y, light, 1);
-if (global.preformanceMode == false) draw_circle(Player.x, Player.y, light, 0);
+if (preformanceMode == true) draw_set_alpha(1); draw_set_color(c_blue)
+if (preformanceMode == false) draw_set_alpha(0.15); draw_set_color(c_blue)
+if (preformanceMode == true) draw_circle(Player.x, Player.y, light, 1);
+if (preformanceMode == false) draw_circle(Player.x, Player.y, light, 0);
 
 with (projectile) { if distance_to_object(Player) <= (light) && point_in_circle(x, y, Player.x, Player.y, light) && team != 2 {
 speed *= 0.975;
@@ -341,27 +349,32 @@ if (speed <= 0.1) instance_destroy()
 draw_set_alpha(1)
 }
 
-
-
-var amount = item_get_count("bulb"); //PRE WAR LIGHT BULBSSSSSS---------ouch ooch the lag-----------
+var amount = item_get_count("bulb"); //PRE WAR LIGHT BULBS
 if amount >= 1 && instance_exists(Player)
 {
-  if (global.preformanceMode == true) draw_set_color(c_white); draw_set_alpha(0.8)
-  if (global.preformanceMode == false) draw_set_color(c_white); draw_set_alpha(0.2)
-  if (global.preformanceMode == false) var light = 25 + (amount * 10.5) + random(2)
-  if (global.preformanceMode == true) var light = 25 + (amount * 10.5)
-  if (global.preformanceMode == true) draw_circle(Player.x, Player.y, light, 1);
-  if (global.preformanceMode == false) draw_circle(Player.x, Player.y, light, 0);
-  draw_set_color(c_white); draw_set_alpha(1)
-  with (enemy)
+  if (preformanceMode == true) draw_set_alpha(0.8)
+  if (preformanceMode == false) draw_set_alpha(0.2)
+  if (preformanceMode == false) var light = 30 + random(2)
+  if (preformanceMode == true) var light = 35
+  if (preformanceMode == true) draw_circle(Player.x, Player.y, light, 1);
+  if (preformanceMode == false) draw_circle(Player.x, Player.y, light, 0);
+  draw_set_alpha(1)
+
+  with Player with instance_create(x + hspeed, y + vspeed, CustomSlash)
 	{
-    if distance_to_object(Player) <= light && point_in_circle(x, y, Player.x, Player.y, light)
-		{
-    	my_health -= 0.1 + (amount * 0.05) + (GameCont.level * 0.02)
-    }
+		team         = other.team;
+		creator      = other;
+		image_speed  = 0;
+		sprite_index = global.mskLightBulb;
+		image_alpha  = 0;
+		lifetime     = 1;
+		damage       = .175 + amount * .05
+
+		on_projectile = void;
+		on_step 			= bulb_step;
+		on_hit  			= bulb_hit;
 	}
 }
-
 
 if global.MaskCounter >= 0 && instance_exists(Player)
 {
@@ -605,8 +618,8 @@ switch(obj_name) {
 			spr_shadow = shd24;
 			spr_open = global.sprItemChestOpen;
 			sprite_index = global.sprItemChest;
-			if roll(1) tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
-			if tag = "none" && roll(4) tag = "large"  // 5% chance to turn into a large chest if gold chest roll failed
+			if roll_luck(1) tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
+			if tag = "none" && roll_luck(4) tag = "large"  // 5% chance to turn into a large chest if gold chest roll failed
 			chest_setup(tag)
 			on_open = itemchest_open;
 		}
@@ -662,7 +675,7 @@ else
 
 // Molding clay
 var _amount = 0;
-if roll(100 / (item_get_count("clay") + 1)) _amount = item_get_count("clay") + 1
+if roll_luck(100 / (item_get_count("clay") + 1)) _amount = item_get_count("clay") + 1
 global.ItemGetAmount = item_get_count("clay") > 0 ? _amount : 1
 if global.ItemGetAmount = 0
 {
@@ -723,8 +736,6 @@ if ITEM = item[? "plate"] && global.ItemGetAmount > 0
 	Player.armor += 2 * global.ItemGetAmount
 }
 
-add_item(ITEM, global.ItemGetAmount)
-
 if ITEM = item[? "diamond"]
 {
 	with (Player) {
@@ -738,7 +749,6 @@ typ_ammo[5] = round(typ_ammo[5] / 1.5)
 }
 
 //fx
-
 var _pitch = random_range(.8, 1.2)
 if ITEM.tier = 3 _pitch  *= .7
 sound_play_pitchvol(sndTVOn, 1.1 * _pitch, .4)
@@ -753,7 +763,7 @@ else
 {
 	// unique item pickup sound goes here
 }
-//add_item(ITEM, 1)
+add_item(ITEM, global.ItemGetAmount)
 
 #define step
 //Invincibility
@@ -798,7 +808,7 @@ with (Player) if my_health < lsthealth
 	damageTaken = clamp(damageTaken - armor, 0, damageTaken)
 	Player.my_health += (_ord - damageTaken)
 	lsthealth = my_health
-  if !roll(((4 * item_get_count("celesteel")) / (item_get_count("celesteel") / 30 + 1))) && Player.armor > 0
+  if !roll_luck(((4 * item_get_count("celesteel")) / (item_get_count("celesteel") / 30 + 1))) && Player.armor > 0
 	{
 		Player.fx_steel = 1
     Player.armor--
@@ -920,19 +930,7 @@ with instances_matching(chestprop, "name", "ItemChest")
 	 }
 }
 
-if instance_exists(CharSelect) && "closeSettings" not in self {
-    CharSelect.closeSettings = false;
-}
-if instance_exists(CharSelect) && "closeInfo" not in self {
-    CharSelect.closeInfo = false;
-}
-if instance_exists(CharSelect) && (CharSelect.closeSettings == true) {
-    global.settings = false;
-    CharSelect.closeSettings = false;
-}
-
-
-if (global.preformanceMode == true) {
+if (preformanceMode == true) {
     if instance_number(Effect) > 75 {
         with instance_find(Effect, instance_number(Effect) - 1) instance_delete(self);
     }
@@ -950,67 +948,10 @@ with (Player)
 	{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too // yeah because you set Player.debug to true is my guess //My brain is smol
 		{
-			/*
-			with obj_create(mouse_x, mouse_y, "ItemChest")
-			{
-				tag = "rusty"
-				chest_setup(tag)
-			}
-			with obj_create(mouse_x, mouse_y, "ItemChest")
-			{
-				tag = "large"
-				chest_setup(tag)
-			}
-			with obj_create(mouse_x, mouse_y, "ItemChest")
-			{
-				tag = "cursed"
-				chest_setup(tag)
-			}
-			with obj_create(mouse_x, mouse_y, "ItemChest")
-			{
-				tag = "gold"
-				chest_setup(tag)
-			}
-			with obj_create(mouse_x, mouse_y, "CustomPickup")
-			{
-				tag = "armor"
-				sprite_index = global.sprArmorPickup
-				num = 4
-			}
-			with obj_create(mouse_x, mouse_y, "CustomPickup")
-			{
-				tag = "infammo"
-				sprite_index = global.sprInfammoPickup
-				num = 1
-			}*/
 			with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
 				tag = "item"
-				item_index = item[? choose("brooch", "clay", "fel", "heater", "gem")]
-				chest_setup(tag)
-			}
-			with obj_create(mouse_x, mouse_y, "ItemChest")
-			{
-				tag = "item"
-				item_index = item[? "info"]
-				chest_setup(tag)
-			}
-			with obj_create(mouse_x, mouse_y, "ItemChest")
-			{
-				tag = "item"
-				item_index = item[? "incendiary"]
-				chest_setup(tag)
-			}
-			with obj_create(mouse_x, mouse_y, "ItemChest")
-			{
-				tag = "item"
-				item_index = item[? "fillings"]
-				chest_setup(tag)
-			}
-			with obj_create(mouse_x, mouse_y, "ItemChest")
-			{
-				tag = "item"
-				item_index = item[? "energy"]
+				item_index = item[? choose("bulb")]
 				chest_setup(tag)
 			}
 		}
@@ -1039,7 +980,7 @@ with (choice) {
     effect = true;
     }}}}
 with instances_matching_le(choice,"my_health",0){
-    if roll(10 * amount) { instance_create(Player.x, Player.y, AmmoPickup); } }
+    if roll_luck(10 * amount) { instance_create(Player.x, Player.y, AmmoPickup); } }
 }
 //inside information (more damage to IDPD and they drop more stuff)
 
@@ -1064,7 +1005,7 @@ if amount >= 1
 	{
     if object_index != Laser && object_index != Lightning && instance_exists(Player)
 		{
-    	if (global.forceSupport == true) || object_index != CustomProjectile
+    	if (forceSupport == true) || object_index != CustomProjectile
 			{
        	if "slowed" not in self
 			 	{
@@ -1086,7 +1027,7 @@ if amount >= 1
 		}
 	}
 }
-//Mechanical Lens (Homing
+//Mechanical Lens (Homing)
 
 //Golden Shots (random crits)
 var amount = item_get_count("golden");
@@ -1096,7 +1037,7 @@ if amount >= 1
 	{
 		if "crit" not in self
 		{
-				if roll(10 * amount)
+				if roll_luck(10 * amount)
 				{
 		    	extra_damage++;
 		    	image_blend = merge_color(c_red, c_white, 0.2)
@@ -1242,10 +1183,9 @@ with instances_matching_ge(enemy, "OnFire", 1)
 }
 //Incendiary Rounds
 
-
 //Fel Rounds
 var amount = item_get_count("fel");
-if amount >= 1 && roll(4 + amount * 2) {with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFel = true}}}
+if amount >= 1 && roll_luck(4 + amount * 2) {with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFel = true}}}
 {with instances_matching(projectile, "isFel", true){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFel = true}}}
 
 with instances_matching_ge(hitme, "OnFel", 1)
@@ -1332,7 +1272,7 @@ if amount >= 1
 {
 	with instances_matching_le(enemy,"my_health",0)
 	{
-		if instance_exists(Player) if roll(10 + 15 * amount) repeat(size + 1) with instance_create(x + random_range(-5, 5), y + random_range(-5, 5), MeatExplosion) team = Player.team
+		if instance_exists(Player) if roll_luck(10 + 15 * amount) repeat(size + 1) with instance_create(x + random_range(-5, 5), y + random_range(-5, 5), MeatExplosion) team = Player.team
 	}
 }
 //Occult Artifact
@@ -1400,7 +1340,7 @@ if amount >= 1
 	{
 	  if "jam" not in self && team != 2
 		{
-	  	if roll(clamp(8 * amount, 0, 40)){instance_destroy(); exit}else{jam = true}
+	  	if roll_luck(clamp(8 * amount, 0, 40)){instance_destroy(); exit}else{jam = true}
 	  }
 	}
 }
@@ -1415,7 +1355,7 @@ if amount >= 1
 	  if "filling" not in self && mask_index = mskPickup
 		{
 	  	filling = true
-			num *= (1 + amount * .25)
+			num += roll(amount * .25)
 	  }
 	}
 }
@@ -1466,7 +1406,7 @@ if amount >= 1
 {
 	with (enemy) if "Shrink" not in self
 	{
-    var chance = roll(6 + 8 * amount)
+    var chance = roll_luck(6 + 8 * amount)
     Shrink = true
     if chance == 1
 		{
@@ -1519,7 +1459,7 @@ if amount >= 1
 {
   with (projectile) if "blessed" not in self && "sacred" not in self && team = 2
 	{
-		if roll((1 - 1/(.15 * amount + 1))*100) with instance_create(x,y,object_index) // hyperbolic item stacking
+		if roll_luck((1 - 1/(.15 * amount + 1))*100) with instance_create(x,y,object_index) // hyperbolic item stacking
 		{
 			motion_set(other.direction,other.speed*1.2)
 			image_angle = direction
@@ -1640,7 +1580,7 @@ if amount >= 1
 {
 	with instances_matching_le(enemy, "my_health", 0)
 	{
-		if size > 0 && roll((5 + (1.7 * amount))/(1 + amount * .1)) // 7% base chance to drop chest + 2% per stack
+		if size > 0 && roll_luck((5 + (1.7 * amount))/(1 + amount * .1)) // 7% base chance to drop chest + 2% per stack
 		{
 			with obj_create(x, y, "ItemChest")
 			{
@@ -1747,7 +1687,7 @@ if amount >= 1 && instance_exists(Player)
 {
 Player.deathCounter += (1 * amount)
 if (Player.deathCounter) >= (30 * (room_speed / 30)) / amount {
-var HURT = (round(Player.maxhealth / 8)) 
+var HURT = (round(Player.maxhealth / 8))
 if (HURT < 0) HURT = 1
 Player.my_health -= HURT
 Player.deathCounter = 0;
@@ -1799,7 +1739,7 @@ if (Player.redFlash > 0) Player.redFlash -= 0.5
 draw_set_alpha(1)
 draw_armor()
 //Drawing Boss Health Bar
-if global.bossBars == true
+if bossBars == true
 {
 	var Boss = [BanditBoss, HyperCrystal, FrogQueen, OasisBoss, LilHunter, Nothing2, Nothing, ScrapBoss, TechnoMancer, Turtle, SuperFireBaller],
 	    _mxh = 0,
@@ -1982,7 +1922,7 @@ if (global.descriptionTimer > 0)
   var draw_x = -120
 	draw_set_alpha(_alpha)
 	draw_sprite(sprBossNameSplat, 3, game_width / 2 + draw_x + x_offset + 36, 210)
-	draw_sprite(sprScoreSplat, 2, game_width / 2 + draw_x + x_offset + 146, 216)
+	draw_sprite(sprScoreSplat   , 2, game_width / 2 + draw_x + x_offset + 146, 216)
 	switch _item.tier
 	{
 		case 0 : draw_set_color(c_white); break;
@@ -2008,7 +1948,7 @@ draw_armor()
 
 // dont make item collection draw when not on the main pause screen
 var _e = false;
-if !instance_exists(menubutton){_e = true}
+if !instance_exists(menubutton) || array_length_1d(global.PlayerItems) = 1 {_e = true}
 with OptionMenuButton  _e = true
 with AudioMenuButton   _e = true
 with VisualsMenuButton _e = true
@@ -2054,12 +1994,6 @@ for(i = 1; i < array_length_1d(global.PlayerItems); i++)
 		draw_set_font(fntChat)
 		if global.PlayerItems[i].count > 1 draw_text_nt(cx + (itemx * 21) - 9, cy + 45 + (20 * (line + 1)) - 8 - _hover,"x" + string(global.PlayerItems[i].count))
 }
-
-
-
-/*
-IMPORTANT - Remember that projectiles have creators, allowning you to buff certain enemy projectiles (????)
-*/
 
 #define popoSpawn
 var _roll = round(random_range(1, (100)))
@@ -2229,6 +2163,10 @@ if amount_rare     > 0 {global.PlayerItems[3] = global.RareItems[random_range(0,
 for (var i = 0, iLen = array_length_1d(inherited_items); i < iLen; i++){global.PlayerItems[4 + i] = inherited_items[i,0]; add_item(inherited_items[i,0], inherited_items[i,1])}
 
 #define roll(VALUE)
+var _chance = irandom_range(1,100);
+if _chance <= (frac(VALUE) * 100) return (VALUE - frac(VALUE) + 1) else return (VALUE - frac(VALUE));
+
+#define roll_luck(VALUE)
 var _chance = irandom_range(1,100),
     _luck   = item_get_count("coin") + ((item_get_count("gem") > 0 ? 3 : 0) + item_get_count("gem") * 2) * global.GemCoeff + (crown_current = 10 ? 7 : 0); // lucky coin + cracked gem + crown of luck
 if _luck != 0
@@ -2359,6 +2297,17 @@ if image_xscale < maxradius
 	image_yscale = image_xscale / 2
 }
 if lifetime > 0 lifetime-- else instance_destroy()
+
+#define bulb_step
+if lifetime > 0{lifetime -= current_time_scale}else{instance_delete(self)}
+
+#define bulb_hit
+if projectile_canhit(other) with other
+{
+	my_health -= other.damage;
+	x -= lengthdir_x(speed, direction)/2;
+	y -= lengthdir_y(speed, direction)/2;
+}
 
 #define inv_hit
 

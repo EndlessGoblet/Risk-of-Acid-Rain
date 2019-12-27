@@ -3,11 +3,11 @@
 
 #define game_start
 with (Player) {
-typ_ammo[1] += 20;	// +8 Bullets
-	typ_ammo[2] += 5;	// +2 Shells
-	typ_ammo[3] += 4;	// +2 Bolts
-	typ_ammo[4] += 4;	// +2 Explosives
-	typ_ammo[5] += 7;
+  typ_ammo[1] += 20; // +8 Bullets
+	typ_ammo[2] +=  5; // +2 Shells
+	typ_ammo[3] +=  4; // +2 Bolts
+	typ_ammo[4] +=  4; // +2 Explosives
+	typ_ammo[5] +=  7;
 }
 
 #define step
@@ -45,7 +45,7 @@ with (Rad) {
 //Balancing Bosses
 with (BanditBoss) if "Balanced" not in self {
     maxhealth *= 2
-    my_health *= 2  
+    my_health *= 2
     Balanced = true;
 }
 
