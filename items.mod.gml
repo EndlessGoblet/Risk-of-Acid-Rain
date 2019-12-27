@@ -6,7 +6,7 @@ global.fancy = false;
 global.preformanceMode = false //Turn on to avoid lag (recommended)
 global.hpBars = true;
 global.bossBars = true;
-
+global.settings = false;
 global.PlayerItems = [item[? "none"]]
 
 
@@ -1799,18 +1799,10 @@ draw_set_alpha(1); draw_set_color(c_white)
 draw_set_font(fntM0)
 //settings OwO
  if instance_exists(CharSelect) {
-draw_text_nt(game_width - 81, 20, "SETTINGS")
+
 
 for(var i = 0; i < 0.5; i += 1) {
-                var draw_x = game_width - 31; var draw_y = 20; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+2, draw_y+10, 1); draw_set_alpha(1) draw_set_color(c_white)
-            	if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+2, draw_y+10) {
-                var draw_x = game_width - 31; var draw_y = 20; draw_set_alpha(0.25); draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+2, draw_y+10, 0); draw_set_alpha(1) draw_set_color(c_white)
-                }
-                if button_pressed(i, "fire") && point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+2, draw_y+10)
-                 {
-                if global.settings == true {global.settings = false} else {global.settings = true; CharSelect.closeInfo = true;}
-                sound_play_pitch(sndClick, random_range(0.8, 1.2))
-                }
+
                 if global.settings == true {
 
                 draw_x = game_width / 2 + 35; draw_y = 20; draw_set_alpha(0.85); draw_set_color(c_black); draw_rectangle(120+draw_x, 20+draw_y, -190+draw_x, 180+draw_y, 0) //Draw Box
