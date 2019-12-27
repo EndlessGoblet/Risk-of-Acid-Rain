@@ -610,6 +610,15 @@ item_CD = {
 	tier              : 3
 };
 
+// ITEM 55: CD
+#macro item_coin item[? "coin"]
+item_coin = {
+  name              : "Cursed Coin",
+	description_small : "@sAmount of @pcursed coins @sgotten this run",
+	description_large : "-",
+	spr_index         : 55,
+	tier              : 5
+};
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),

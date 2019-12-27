@@ -7,7 +7,7 @@ global.hpBars = true;
 global.bossBars = true;
 global.settings = false;
 global.PlayerItems = [item[? "none"]]
-
+global.coinGet = 0;
 
 
 
@@ -73,7 +73,7 @@ global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: Fern
 global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"], item[? "CD"]] // Todo: brooch
-global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"]]
+global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "coin"]]
 
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
@@ -105,6 +105,9 @@ while(true){
 #macro forceSupport    mod_variable_get("mod", "main", "forceSupport");
 
 #define game_start
+Player.lunarDrops = 1;
+global.PlayerItems = [item[? "none"]]
+
 if (global.fancy == 1) {
 	Player.fancy = 1
 } else {
@@ -653,8 +656,17 @@ switch(obj_name) {
 
 #define get_item(ITEM)
 global.itemGet = ITEM
-global.descriptionTimer = room_speed * 4
-
+if (ITEM != item[? "coin"])global.descriptionTimer = room_speed * 4
+if (ITEM = item[? "coin"]) {
+c = mod_variable_get("mod", "main", "coins");	
+mod_variable_set("mod", "main", "coins", c + 1);
+repeat(3)instance_create(Player.x, Player.y, Smoke)
+with instance_create(Player.x, Player.y, PopupText)
+	{
+		text = "@p+1 CURSED COIN"
+		time = 10;
+	}
+}
 //fx
 var _pitch = random_range(.8, 1.2)
 if ITEM.tier = 3 _pitch  *= .7
@@ -764,6 +776,19 @@ else
 add_item(ITEM, global.ItemGetAmount)
 
 #define step
+if instance_exists(Player) {
+with instances_matching_le(enemy,"my_health",0){
+chance = round(random_range(1, (500 * Player.lunarDrops)))
+if (chance == 1) {
+	Player.lunarDrops++
+	with obj_create(x, y, "ItemChest")
+			{
+				tag = "coin"
+				item_index = item[? choose("coin")]
+				chest_setup(tag)
+			}
+}
+}}
 //Invincibility
 with (Player)
 {
@@ -914,6 +939,7 @@ with instances_matching(chestprop, "name", "ItemChest")
 		 case "gold"   : if irandom(19) = 0 with instance_create( x+random_range(-8, 8), y+random_range(-13,13), CaveSparkle) depth = other.depth - 1; break;
 		 case "cursed" : if irandom( 4) = 0 instance_create(x+random_range(-5, 5), y+random_range( -8, 8), Curse); break;
 		 case "item"   : image_index  = item_index.spr_index; y -= sin(current_frame / 10) / 4 / (room_speed / 30); spr_shadow_y  += sin(current_frame / 10) / 4 / (room_speed / 30); break;
+		case  "coin"   : image_index  = item_index.spr_index; y -= sin(current_frame / 10) / 4 / (room_speed / 30); spr_shadow_y  += sin(current_frame / 10) / 4 / (room_speed / 30); if irandom( 4) = 0 instance_create(x+random_range(-10, 10) - 7, y+random_range( -8, 8), Curse); if irandom(24) = 0 instance_create(x+random_range(-10, 10) - 7, y+random_range( -8, 8), Smoke);break;
 	 }
 
 	 if place_meeting(x, y, Player) || place_meeting(x, y, PortalShock) || instance_exists(BigPortal){
@@ -922,15 +948,19 @@ with instances_matching(chestprop, "name", "ItemChest")
 
 				// fx
 			 instance_create(x, y, FXChestOpen);
+			 if tag == "coin" {
+			 repeat(5)instance_create(x, y, Smoke);
+			Player.cursedFlash = (3 -(room_speed / 30)) * 5
+			 }
 			 with instance_create(x, y, ChestOpen) sprite_index = other.spr_open;
 
 			 instance_delete(id);
 	 }
 }
 /*
-if (preformanceMode == true) {
+if (preformanceMode == true) { // /!\ This causes the game to softlock for unknown reasons /!\
     if instance_number(Effect) > 75 {
-        with instance_find(Effect, instance_number(Effect) - 1) instance_delete(self);
+        with instance_find(Effect, instance_number(Effect) - 1) { instance_delete(self); }
     }
 }*/
 with (Player) if (my_health > maxhealth) my_health = maxhealth
@@ -946,18 +976,18 @@ with (Player)
 	{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 		{
-			/*with obj_create(mouse_x, mouse_y, "ItemChest")
-			{
-				tag = "item"
-				item_index = item[? choose("CD")]
-				chest_setup(tag)
-			}*/
-
 			with obj_create(mouse_x, mouse_y, "ItemChest")
+			{
+				tag = "coin"
+				item_index = item[? choose("coin")]
+				chest_setup(tag)
+			}
+
+			/*with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
 				tag = "none";
 				chest_setup(tag)
-			}
+			}*/
 		}
 	}
 }
@@ -1751,6 +1781,13 @@ if instance_exists(Player)
 with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction + 1 instance_destroy()}
 
 #define draw_gui
+//Drawing purple flash from cursed coins
+with (Player) if "cursedFlash" in self {
+draw_set_alpha(Player.cursedFlash / 10)
+draw_set_color(c_purple)
+draw_rectangle(0, 0, game_width, game_height, 0);
+if (Player.cursedFlash > 0) Player.cursedFlash -= 0.5
+}
 //Drawing Red flash from blood god's blood armor
 with (Player) if "redFlash" in self {
 draw_set_alpha(Player.redFlash / 10)
@@ -2018,19 +2055,21 @@ if "tag" in self
 										break;
 		case "test"   : tem = item[? "brooch"] // this is for testing
 								    break;
+		case "coin"   : tem = item[? "coin"] // this is for testing
+								    break;
 		case "none"   :
 		default       : if _roll <= 92 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
 									  if _roll >  92 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
                     if _roll >= 99 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
 									  break;
 	}
-	if tag = "item" with instance_create(x, y, CustomObject){on_step = antifx_step}
+	if tag == "item" || tag == "coin" with instance_create(x, y, CustomObject){on_step = antifx_step}
 }
 
 get_item(tem)
 
 // crown of hatred
-if crown_current = 6 && place_meeting(x, y, Player) && tag != "item"
+if crown_current = 6 && place_meeting(x, y, Player) && tag != "item" && tag != "coin"
 {
 	projectile_hit(Player, 1, 0, random(360))
 	repeat(16) with instance_create(x, y, Rad) motion_set(random(360), random_range(3, 6))
@@ -2062,6 +2101,16 @@ switch TAG
 		spr_shadow_y = 1
 		break;
 	case "item" :
+		sprite_index = global.sprItems
+		image_index  = item_index.spr_index
+		image_speed  = 0
+		spr_open   = mskNone
+		spr_shadow = shd16
+		x += sprite_get_width(global.sprItems) / 2
+		spr_shadow_x = -8
+		spr_shadow_y = 2
+		break;
+	case "coin" :
 		sprite_index = global.sprItems
 		image_index  = item_index.spr_index
 		image_speed  = 0

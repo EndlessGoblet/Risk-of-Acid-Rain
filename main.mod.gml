@@ -1,6 +1,7 @@
 #macro item mod_variable_get("mod", "itemlib", "ItemDirectory");
 
 #define init
+
 #macro savefile "RoAR_Settings.txt" //Remembering settings
 if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
 //DEBUG
@@ -15,7 +16,7 @@ global.frame = 0;
 global.seconds = 0;
 global.minutes = 0;
 global.hours = 0;
-
+global.coins = 0;
 global.teleporter = false;
 
 global.CircleSurf = -1;
@@ -74,10 +75,12 @@ global.mskTeleporter       = sprite_add("sprites/teleporter/mskTeleporter.png"  
 global.sprButtons  		 = sprite_add("sprites/other/sprButtons.png", 3, 12, 12);
 global.sprButtonsSplat = sprite_add("sprites/other/sprButtonsSplat.png", 1, 14, 14);
 global.sprModes = sprite_add("sprites/other/sprModes.png", 2, 41, 41);
+global.sprCoinSplat = sprite_add("sprites/other/sprCoinSplat.png", 1, 35, 13)
 
 if (instance_exists(CharSelect)) global.menu = true;
 
 load_save()
+save_save()
 //set new level function
 global.newLevel = instance_exists(GenCont);
 global.hasGenCont = false;
@@ -636,6 +639,7 @@ with (enemy) {
    if (roll >= 7) image_blend = merge_color(c_green, c_white, 1);
 }}
 #define game_start
+save_save()
 global.AnomalyGet  = false;
 global.HardmodeGet = false;
 Player.debug1 = 0;
@@ -676,7 +680,10 @@ else
 }
 
 if instance_exists(CharSelect)
-{
+{	
+	//Coin Count
+	draw_sprite(global.sprCoinSplat, 1, game_width - 2, 50)
+	draw_text_nt(game_width - 24, 40, "@w" + string(global.coins))
 		/// GAMEMODES
     draw_set_halign(fa_center)
     if global.Gamemode = 1 // Hardmode Header
@@ -1336,6 +1343,7 @@ if file_exists(savefile){
 		global.bossBars = real(_settings[2]);
 		global.forceSupport = real(_settings[3]);
 		global.sixtyFPS = real(_settings[4]);
+		global.coins = real(_settings[5]);
 		file_unload(savefile);
 		
 	}
@@ -1347,6 +1355,6 @@ trace_color("Enemy HP Bars: " + string(global.hpBars), c_lime)
 trace_color("Boss HP Bars: " + string(global.bossBars), c_orange)
 trace_color("Force Support: " + string(global.forceSupport), c_blue)
 */
-var _str = "" + string(global.preformanceMode) + "|" + string(global.hpBars) + "|" + string(global.bossBars)+ "|" + string(global.forceSupport) + "|" + string(global.sixtyFPS);
+var _str = "" + string(global.preformanceMode) + "|" + string(global.hpBars) + "|" + string(global.bossBars)+ "|" + string(global.forceSupport) + "|" + string(global.sixtyFPS) + "|" + string(global.coins);
 string_save(_str,savefile);
 //trace("Settings Saved");
