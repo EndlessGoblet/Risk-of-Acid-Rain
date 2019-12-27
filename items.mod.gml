@@ -9,8 +9,6 @@ global.settings = false;
 global.PlayerItems = [item[? "none"]]
 global.coinGet = 0;
 
-
-
 global.sprBerserkFX = sprite_add("sprites/other/sprBerserkFX.png", 3,  4, 4);
 global.mskLightBulb = sprite_add("sprites/other/mskLightBulb.png", 1, 32, 32);
 
@@ -81,7 +79,6 @@ if instance_exists(CharSelect) CharSelect.debug = false;
 if instance_exists(CharSelect) CharSelect.closeInfo = true;
 global.doubleChests = false;
 global.doubleShrines = false;
-
 
 //ITEMS
 global.newLevel = instance_exists(GenCont);
@@ -320,9 +317,21 @@ if distance_to_object(Wall) <= 10 && "boom" not in self {
 //HEALTH BARS
 if hpBars = true
 {
-	with (enemy)
+	with enemy
 	{
-	  if ("tag" not in self) && object_index != RavenFly && object_index != Mimic && object_index != SuperMimic
+		var _col = c_white;
+
+		if "tag" in self
+		{
+			switch tag
+			{
+				case "boss" : _col = c_red   ; break;
+				case "god"  : _col = c_white ; break;
+				default     : _col = c_orange; break;
+			}
+		}
+		else{_col = c_orange}
+	  if object_index != RavenFly && object_index != Mimic && object_index != SuperMimic
 		{
 		  var _x     = x,
 			 		_y     = y,
@@ -330,7 +339,7 @@ if hpBars = true
 		      _currh = max(my_health, 0);
 			draw_rectangle_colour(_x - _maxh / 2    , _y + sprite_get_height(sprite_index) / 2    , _x + _maxh / 2                              				      , _y + sprite_get_height(sprite_index) / 2 + 3, c_black, c_black, c_black, c_black, false);
 			if my_health > 0
-			draw_rectangle_colour(_x - _maxh / 2 + 1, _y + sprite_get_height(sprite_index) / 2 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, _y + sprite_get_height(sprite_index) / 2 + 2,   c_red,   c_red,   c_red,   c_red, false);
+			draw_rectangle_colour(_x - _maxh / 2 + 1, _y + sprite_get_height(sprite_index) / 2 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, _y + sprite_get_height(sprite_index) / 2 + 2,    _col,    _col,    _col,    _col, false);
 		}
 	}
 }
@@ -351,14 +360,20 @@ draw_set_alpha(1)
 }
 
 var amount = item_get_count("bulb"); //PRE WAR LIGHT BULBS
+var _light = 30 + random(2);
 if amount >= 1 && instance_exists(Player)
 {
-  if (preformanceMode == true) draw_set_alpha(0.8)
-  if (preformanceMode == false) draw_set_alpha(0.2)
-  if (preformanceMode == false) var light = 30 + random(2)
-  if (preformanceMode == true) var light = 35
-  if (preformanceMode == true) draw_circle(Player.x, Player.y, light, 1);
-  if (preformanceMode == false) draw_circle(Player.x, Player.y, light, 0);
+	if preformanceMode = true
+	{
+		draw_set_alpha(0.8)
+		draw_circle(Player.x, Player.y, _light, 1);
+	}
+	else
+	{
+		_light = 31;
+		draw_set_alpha(0.2)
+		draw_circle(Player.x, Player.y, _light, 0);
+	}
   draw_set_alpha(1)
 
   with Player with instance_create(x + hspeed, y + vspeed, CustomSlash)
@@ -532,7 +547,7 @@ if (type == "Order")
 }
 
 if (type == "Printing")
-{ 
+{
 	if array_length(global.PlayerItems) > 1
 	{
 		var i = 0;
@@ -658,7 +673,7 @@ switch(obj_name) {
 global.itemGet = ITEM
 if (ITEM != item[? "coin"])global.descriptionTimer = room_speed * 4
 if (ITEM = item[? "coin"]) {
-c = mod_variable_get("mod", "main", "coins");	
+c = mod_variable_get("mod", "main", "coins");
 mod_variable_set("mod", "main", "coins", c + 1);
 repeat(3)instance_create(Player.x, Player.y, Smoke)
 with instance_create(Player.x, Player.y, PopupText)
@@ -978,8 +993,8 @@ with (Player)
 		{
 			with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
-				tag = "coin"
-				item_index = item[? choose("coin")]
+				tag = "item"
+				item_index = item[? choose("boots")]
 				chest_setup(tag)
 			}
 
@@ -1510,26 +1525,36 @@ if amount >= 1
 
 //Gun Boots
 var amount = item_get_count("boots");
-if amount >= 1 && instance_exists(Player) {
-    with (Player) if "GunBoots" not in self {
-        GunBoots = 0;
-    }
-    if (Player.race = "Skeleton") var speedLimit = 2.55
-    var speedLimit = 3.55
-if (Player.speed) > speedLimit {
-    Player.GunBoots += (room_speed / 60)
-    if Player.GunBoots >= (30 / amount) {
-        Player.GunBoots = 0;
-        sound_play_pitch(sndPopgun, random_range(0.8, 1.2))
-    with instance_create(Player.x, Player.y, HeavyBullet) {
-        direction = Player.direction + 180
-        motion_set(Player.direction + 180,10)
-        image_xscale = 0.75
-        image_yscale = 0.75
-        image_angle = direction
-        team = Player.team;
-    }}
-}
+if amount >= 1 && instance_exists(Player)
+{
+	with Player
+	{
+		if "BootsTime" not in self BootsTime = 0;
+		if "BootRight" not in self BootRight = 1; // Shameful display
+
+		extra_speed += .1;
+		if (nexthurt == current_frame + 5 && !instance_exists(Portal)) BootsTime = room_speed * (1.5 + amount * .5)
+
+		if BootsTime > 0
+		{
+			extra_speed += .4;
+			BootsTime--;
+			if BootsTime mod (max(round(7 - speed), 1) * current_time_scale) = 0 && speed > 1
+			{
+				BootRight *= -1;
+				sound_play_pitchvol(sndPopgun, 1 + BootRight * .7, .7);
+
+				with instance_create(x, y, Bullet2)
+				{
+					team    = other.team;
+					creator = other;
+					move_contact_solid(other.direction + other.BootRight * 20, 24)
+					motion_add(other.direction - 180, 9);
+					image_angle = direction;
+				}
+			}
+		}
+	}
 }
 //Gun Boots
 
@@ -1614,7 +1639,7 @@ if amount >= 1
 {
 	with instances_matching_le(enemy, "my_health", 0)
 	{
-		if size > 0 && roll_luck((5 + (1.7 * amount))/(1 + amount * .1)) // 7% base chance to drop chest + 2% per stack
+		if size > 1 && roll_luck((5 + (1.7 * amount))/(1 + amount * .1)) // 7% base chance to drop chest + 2% per stack
 		{
 			with obj_create(x, y, "ItemChest")
 			{
@@ -1747,7 +1772,7 @@ if (chance == 1) with instance_create(x, y, Disc) {
         image_xscale = 1
         image_yscale = 1
         team = 3;
-    
+
 }
 }
 }
@@ -1798,7 +1823,7 @@ if (Player.redFlash > 0) Player.redFlash -= 0.5
 draw_set_alpha(1)
 draw_armor()
 //Drawing Boss Health Bar
-if bossBars == true
+if bossBars = true
 {
 	var Boss = [BanditBoss, HyperCrystal, FrogQueen, OasisBoss, LilHunter, Nothing2, Nothing, ScrapBoss, TechnoMancer, Turtle, SuperFireBaller],
 	    _mxh = 0,
@@ -1833,17 +1858,19 @@ if bossBars == true
 		}
 		if _myh != 0
 		{
-			draw_set_color(c_white)
-			draw_set_alpha(1);
 			draw_X = -154 + game_width / 2
 			draw_Y = 220
+
 			draw_set_color(c_black);draw_rectangle(-1 + draw_X, 13 + draw_Y    , 308 + draw_X, 0 + draw_Y    , false)
 			draw_set_color(c_white);draw_rectangle( 0 + draw_X, 11 + draw_Y    , 307 + draw_X, 1 + draw_Y    , false)
 			draw_set_color(c_black);draw_rectangle( 1 + draw_X,  8 + draw_Y + 2, 306 + draw_X, 0 + draw_Y + 2, false)
+
 			global.BarLength = max(0, (_myh/ (global.BossBarMaxHP > _mxh ? global.BossBarMaxHP : _mxh) * 306)) //health * length / maxhealth
 			draw_set_color(c_red);draw_rectangle(1 + draw_X, 10 + draw_Y, (global.BarLength) + draw_X, 3 + draw_Y, false)
 			draw_set_font(fntSmall)
+
 			if _amo > 1 draw_text_nt(game_width / 2 - 152, 224, "+" + string(_amo - 1))
+
 			draw_set_halign(1)
 			draw_set_font(fntM)
 			draw_text_nt(game_width / 2, 210, _nam)
@@ -1856,16 +1883,6 @@ if bossBars == true
 draw_set_halign(fa_left)
 draw_set_alpha(1); draw_set_color(c_white)
 draw_set_font(fntM0)
-//settings OwO
- if instance_exists(CharSelect) {
-
-
-
-
-
-
-
- }
 
 //ITEM POPUP + ITEM DESCRIPTIONS-------------------------------------------------------------------------------------------------------------
 if (global.descriptionTimer > 0)
@@ -2290,6 +2307,3 @@ if projectile_canhit(other) with other
 #define void
 
 #define point_in_teleporter(OBJECT) return mod_script_call("mod", "main","point_in_teleporter", OBJECT)
-
-
-
