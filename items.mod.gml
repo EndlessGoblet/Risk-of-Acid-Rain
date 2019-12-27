@@ -1,8 +1,16 @@
 #macro item mod_variable_get("mod", "itemlib", "ItemDirectory")
 
 #define init
-
+#macro savefile "RoAR_Settings.txt" //Remembering settings
+global.fancy = false;
 global.preformanceMode = false //Turn on to avoid lag (recommended)
+global.hpBars = true;
+global.bossBars = true;
+
+global.PlayerItems = [item[? "none"]]
+
+
+
 
 global.sprBerserkFX = sprite_add("sprites/other/sprBerserkFX.png", 3,  4, 4);
 
@@ -53,7 +61,6 @@ global.itemGet = -4;
 global.ItemGetAmount = 1;
 global.descriptionTimer = 0;
 
-global.PlayerItems = [item[? "none"]]
 global.MaskCounter = 0;
 global.BloodCounter = 0;
 global.GemCoeff = choose(-1, 1)
@@ -67,19 +74,21 @@ global.popoChance = 0;
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: Fern
-global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"]] // Todo: brooch
+global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"]] // Todo: brooch
 global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"]]
+
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
 if instance_exists(CharSelect) CharSelect.debug = false;
 if instance_exists(CharSelect) CharSelect.closeInfo = true;
-global.hpBars = true;
-global.bossBars = true;
 global.doubleChests = false;
 global.doubleShrines = false;
+
+
 //ITEMS
 global.newLevel = instance_exists(GenCont);
 global.hasGenCont = false;
+load_save()	
 while(true){
 	if(instance_exists(GenCont)) global.newLevel = 1;
 	else if(global.newLevel){
@@ -91,7 +100,13 @@ while(true){
 	wait 1;
 }
 
+
 #define game_start
+if (global.fancy == 1) {
+	Player.fancy = 1
+} else {
+	Player.fancy = 0;
+}
 //Stats
 Player.reloadspeed_base = Player.reloadspeed;
 Player.speed_base       = Player.maxspeed;
@@ -110,7 +125,7 @@ Player.deathCounter = 0;
 Player.s_Combat    = 0;
 Player.s_Challenge = 0;
 
-global.PlayerItems = [item[? "none"]]
+
 global.descriptionTimer = 0;
 global.settings = false;
 
@@ -129,7 +144,18 @@ Player.s_Combat = 0;
 Player.s_Challenge = 0;
 
 global.GemCoeff = choose(-1, 1)
+if item_get_count("gem") > 0 {
+if global.GemCoeff == (1) {
+with instance_create(Player.x, Player.y, PopupText) {
+	text = "@gLucky"
+	 }
+} else {
+with instance_create(Player.x, Player.y, PopupText) {
+	text = "@rUnlucky"
+	 }
+}
 
+}
 //Perfect Prize
 // See level generation
 //Perfect Prize
@@ -469,6 +495,8 @@ if (type == "Balance") { //BALANCE SHRINE---------------------
 if (type == "Crowns") {
     with instances_matching(CustomProp, "name", "Teleporter"){portal = "vault"}
     wait(1);
+	with instance_create(x,y,GreenExplosion) { damage = 0; mask_index = mskNone}
+	sound_play_pitch(sndLevelUp, 0.9)
     instance_destroy()
     global.popoChance = 99
     popoSpawn();
@@ -490,7 +518,7 @@ if (type == "Order")
 }
 
 if (type == "Printing")
-{ // /!\ Still Doesn't Work /!\
+{ 
 	if array_length(global.PlayerItems) > 1
 	{
 		var i = 0;
@@ -725,7 +753,7 @@ else
 {
 	// unique item pickup sound goes here
 }
-add_item(ITEM)
+//add_item(ITEM, 1)
 
 #define step
 //Invincibility
@@ -1097,7 +1125,7 @@ sound_play_pitch(sndHPPickup, 1.3)
 //Radiated Snack
 
 //Rubber Projectile
-var amount = item_get_count("rubber");
+var amount = item_get_count("rubber");    //Doesn't increase per rubber projectile
 if amount >= 1
 {
 	with instances_matching(projectile, "team", 2)
@@ -1855,7 +1883,8 @@ for(var i = 0; i < 0.5; i += 1) {
                 draw_text_nt(game_width / 2 - 151, 180, "DOES MANY DIFFERENT THINGS TO INCREASE")
                 draw_text_nt(game_width / 2 - 151, 190, "PERFORMANCE @dSLIGHTY LOWERS QUALITY")
                 if button_pressed(i, "fire") { //Check if they clicked
-                if global.preformanceMode == true {global.preformanceMode = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.preformanceMode = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+                if global.preformanceMode == true {global.preformanceMode = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.preformanceMode = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
+				save_save()}} //On/Off Toggle
                 //Preformance Mode Toggle
                 //Enemy HP Bars
                 draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 65; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
@@ -1864,7 +1893,8 @@ for(var i = 0; i < 0.5; i += 1) {
                 if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
                 draw_text_nt(game_width / 2 - 151, 190, "SMALL HEALTH BARS UNDER ENEMIES")
                 if button_pressed(i, "fire") { //Check if they clicked
-                if global.hpBars == true {global.hpBars = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.hpBars = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+                if global.hpBars == true {global.hpBars = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.hpBars = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
+				save_save()}} //On/Off Toggle
                 //Enemy HP Bars
                 //Boss HP Bars
                 draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 80; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
@@ -1873,7 +1903,8 @@ for(var i = 0; i < 0.5; i += 1) {
                 if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
                 draw_text_nt(game_width / 2 - 151, 190, "BIG ON SCREEN HEALTH BARS FOR BOSSES")
                 if button_pressed(i, "fire") { //Check if they clicked
-                if global.bossBars == true {global.bossBars = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.bossBars = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+                if global.bossBars == true {global.bossBars = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.bossBars = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
+				save_save()}} //On/Off Toggle
                 //Boss HP Bars
                 //Double Chests
                 draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 95; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
@@ -1882,7 +1913,8 @@ for(var i = 0; i < 0.5; i += 1) {
                 if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
                 draw_text_nt(game_width / 2 - 151, 190,"DOUBLES THE AMOUNT OF ITEM CHESTS")
                 if button_pressed(i, "fire") { //Check if they clicked
-                if global.doubleChests == true {global.doubleChests = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.doubleChests = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+                if global.doubleChests == true {global.doubleChests = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.doubleChests = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
+				save_save()}} //On/Off Toggle
                 //Double Chests
                 //Double Shrines
                 draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 110; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
@@ -1891,8 +1923,21 @@ for(var i = 0; i < 0.5; i += 1) {
                 if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
                 draw_text_nt(game_width / 2 - 151, 190,"DOUBLES THE AMOUNT OF SHRINES")
                 if button_pressed(i, "fire") { //Check if they clicked
-                if global.doubleShrines == true {global.doubleShrines = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.doubleShrines = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+                if global.doubleShrines == true {global.doubleShrines = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.doubleShrines = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
+				save_save()}} //On/Off Toggle
                 //Double Shrines
+				//Fancy Teleporter
+                draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 140; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
+                draw_text_nt(game_width / 2 - 150, draw_y, "FANCY TELEPORTER") //Draw Label
+                if (global.fancy == true) { draw_text_nt(game_width / 2 - 15, draw_y, "ON") } else { draw_text_nt(game_width / 2 - 15, draw_y, "OFF") } //Draw ON/OFF
+                if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -52, draw_y-4, draw_x+4*3+69, draw_y+10) { //Check if they hovered
+				draw_set_font(fntChat);
+                draw_text_nt(game_width / 2 - 151, 175,"Adds fancier and cooler looking graphics to the teleporter#@rMay cause graphical issues on some devices")
+				draw_set_font(fntM0)
+                if button_pressed(i, "fire") { //Check if they clicked
+                if global.fancy == true {global.fancy = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.fancy = true sound_play_pitch(sndGoldCrossbow, 1.2)}
+				save_save()}} //On/Off Toggle
+                //Fancy Teleporter
                 //Debug Mode
                 draw_set_alpha(1) draw_set_color(c_white); var draw_x = game_width / 2 - 101; var draw_y = 125; draw_rectangle(0+draw_x-52, draw_y-4, draw_x+4*3+69, draw_y+10, 1) //Draw Box
                 draw_text_nt(game_width / 2 - 150, draw_y, "FORCE SUPPORT") //Draw Label
@@ -1903,7 +1948,8 @@ for(var i = 0; i < 0.5; i += 1) {
                 draw_text_nt(game_width / 2 - 151, 190,"HOMING, AND BOUNCING, ENABLING THIS MAKES THEM EFFECTED")
                 draw_set_font(fntM0)
                 if button_pressed(i, "fire") { //Check if they clicked
-                if global.forceSupport == true {global.forceSupport = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.forceSupport = true; sound_play_pitch(sndGoldCrossbow, 1.2)}}} //On/Off Toggle
+                if global.forceSupport == true {global.forceSupport = false; sound_play_pitch(sndGoldCrossbow, 1)} else {global.forceSupport = true; sound_play_pitch(sndGoldCrossbow, 1.2)}
+				save_save()}} //On/Off Toggle
                 //Debug Mode
                 //Cheats Warning
                 if global.doubleChests == true || global.doubleShrines == true {
@@ -2319,3 +2365,30 @@ if lifetime > 0 lifetime-- else instance_destroy()
 #define void
 
 #define point_in_teleporter(OBJECT) return mod_script_call("mod", "main","point_in_teleporter", OBJECT)
+
+
+
+#define load_save
+//trace("Attempted Load")
+wait file_load(savefile);
+if file_exists(savefile){
+		var _settings = string_load(savefile);
+		_settings = string_split(_settings,"|");
+		global.preformanceMode = real(_settings[0]);
+		//trace("Settings Loaded: " + string(global.preformanceMode));
+		global.hpBars = real(_settings[1]);
+		global.bossBars = real(_settings[2]);
+		global.forceSupport = real(_settings[3]);
+		file_unload(savefile);
+	}
+
+#define save_save
+/*
+trace_color("Preformance Mode: " + string(global.preformanceMode), c_red)
+trace_color("Enemy HP Bars: " + string(global.hpBars), c_lime)
+trace_color("Boss HP Bars: " + string(global.bossBars), c_orange)
+trace_color("Force Support: " + string(global.forceSupport), c_blue)
+*/
+var _str = "" + string(global.preformanceMode) + "|" + string(global.hpBars) + "|" + string(global.bossBars)+ "|" + string(global.forceSupport);
+string_save(_str,savefile);
+//trace("Settings Saved");

@@ -3,6 +3,7 @@
 #define init
 if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
 //DEBUG
+global.fancy = 0;
 global.debug = true;
 //Create important initial variables
 global.AnomalyGet  = 0;
@@ -85,6 +86,8 @@ while(true){
 #macro c_fel $FF271C;
 
 #define level_start
+if (Player.fancy == 1) global.fancy = 1
+if (Player.fancy == 0) global.fancy = 0
 with instance_create(0, 0, CustomObject)
 {
 	name = "RoRSurfaceHandler"
@@ -387,13 +390,13 @@ if instance_exists(Portal) && global.crownVault == true {
 	}
 }
 
-var minutes_ = 3 //How many minutes for difficulty to go up
-if (global.mode == 1) var minutes_ = 5
+var minutes_ = 5 //How many minutes for difficulty to go up
+if (global.mode == 1) var minutes_ = 3
 //global.timeControl = 60 * 60 * (21600) //Time Control
 global.timeControl = (minutes_ * 2) * (60 * 60)
 
 //Hard Mode
-
+if (item_get_count("times") > 0) {
 with (enemy) {
 for(i = 0; i < 5; i++){
 			var _speed_hardmode = global.mode = 1 ? 1 : 0,
@@ -455,7 +458,7 @@ if "convert" not in self && global.mode = 1 {
 	}
 	convert = true;
 	}
-}
+} }
 
 if global.AnomalyGet = false && instance_exists(Player) && Player.race = "horror"
 {
@@ -465,11 +468,11 @@ if global.AnomalyGet = false && instance_exists(Player) && Player.race = "horror
 		get_item(item[? "energy"], 2)
 	}
 }
-
+//trace(global.HardmodeGet)
 if global.HardmodeGet = false && global.mode = 1 && instance_exists(Player) && !instance_exists(SpiralCont)
 {
 	global.HardmodeGet = true
-	get_item(item[? "times"], 1)
+	get_item(item[? "times"], 2)
 }
 
 if instance_exists(CharSelect) {
@@ -1072,9 +1075,9 @@ with instances_matching(CustomProp, "name", "Teleporter")
 		var _x = x - view_xview,
 		    _y = y - view_yview;
 
-		surface_set_target(global.CircleSurf)
+		if (global.fancy == 1) surface_set_target(global.CircleSurf)
 		draw_circle_colour(_x -4, _y, global.radi, c_red, c_red, false);
-		surface_reset_target();
+		if (global.fancy == 1) surface_reset_target();
 	}
 }
 with instances_matching(CustomSlash, "name", "Inv Area")
@@ -1082,9 +1085,9 @@ with instances_matching(CustomSlash, "name", "Inv Area")
 	var _x = x - view_xview,
 			_y = y - view_yview;
 
-	surface_set_target(global.CircleSurf)
+	if (global.fancy == 1) surface_set_target(global.CircleSurf)
 	draw_circle_colour(_x, _y, image_xscale, c_fel, c_fel, false);
-	surface_reset_target();
+	if (global.fancy == 1) surface_reset_target();
 }
 
 with instances_matching(CustomProp, "name", "Teleporter")
@@ -1102,11 +1105,11 @@ with instances_matching(CustomProp, "name", "Teleporter")
 		var _x = x - view_xview,
 		    _y = y - view_yview;
 
-		surface_set_target(global.CircleSurf)
+		if (global.fancy == 1) surface_set_target(global.CircleSurf)
 		draw_set_blend_mode(bm_subtract)
 		draw_circle_colour(_x -4, _y, global.radi - 2, c_white, c_white, false);
 		draw_set_blend_mode(bm_normal)
-		surface_reset_target();
+		if (global.fancy == 1) surface_reset_target();
 
 		draw_set_alpha(.15)
 		draw_circle_colour(x -4, y, global.radi, c_red, c_red, false)
@@ -1118,11 +1121,11 @@ with instances_matching(CustomSlash, "name", "Inv Area")
 	var _x = x - view_xview,
 			_y = y - view_yview;
 
-	surface_set_target(global.CircleSurf)
+	if (global.fancy == 1) surface_set_target(global.CircleSurf)
 	draw_set_blend_mode(bm_subtract)
 	draw_circle_colour(_x, _y, image_xscale - 2, c_white, c_white, false);
 	draw_set_blend_mode(bm_normal)
-	surface_reset_target();
+	if (global.fancy == 1) surface_reset_target();
 
 	draw_set_alpha(.25)
 	draw_circle_colour(x, y, global.radi, c_fel, c_fel, false)
@@ -1131,8 +1134,8 @@ with instances_matching(CustomSlash, "name", "Inv Area")
 
 if surface_exists(global.CircleSurf) = true
 {
-	draw_surface_ext(global.CircleSurf, view_xview, view_yview, 1, 1, 0, c_white, .8)
-	surface_free(global.CircleSurf)
+	if (global.fancy == 1) draw_surface_ext(global.CircleSurf, view_xview, view_yview, 1, 1, 0, c_white, .8)
+	if (global.fancy == 1) surface_free(global.CircleSurf)
 }
 
 #define point_in_teleporter(OBJECT)
@@ -1146,6 +1149,6 @@ return false;
 #define chest_setup(TAG)																 return mod_script_call("mod", "items","chest_setup"   , TAG)
 #define obj_create(X, Y, OBJ_NAME)											 return mod_script_call("mod", "items","obj_create"    , X, Y, OBJ_NAME)
 #define add_item(ITEM)																	 return mod_script_call("mod", "items","add_item"      , ITEM)
-#define get_item(ITEM, AMOUNT)     			                 return mod_script_call("mod", "items","get_item"      , ITEM. AMOUNT)
+#define get_item(ITEM, AMOUNT)     			                 return mod_script_call("mod", "items","get_item"      , ITEM, AMOUNT)
 #define item_get_count(ITEM)                             return mod_script_call("mod", "items","item_get_count", ITEM)
 #define draw_backdrop(XSTART, YSTART, XEND, YEND, TITLE) return mod_script_call("mod", "items", "draw_backdrop", XSTART, YSTART, XEND, YEND, TITLE)
