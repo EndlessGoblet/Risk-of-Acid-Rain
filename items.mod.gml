@@ -72,7 +72,7 @@ global.popoChance = 0;
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: Fern
-global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"]] // Todo: brooch
+global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"], item[? "CD"]] // Todo: brooch
 global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"]]
 
 //set new level function
@@ -927,12 +927,12 @@ with instances_matching(chestprop, "name", "ItemChest")
 			 instance_delete(id);
 	 }
 }
-
+/*
 if (preformanceMode == true) {
     if instance_number(Effect) > 75 {
         with instance_find(Effect, instance_number(Effect) - 1) instance_delete(self);
     }
-}
+}*/
 with (Player) if (my_health > maxhealth) my_health = maxhealth
 with (Player) if round(Player.my_health)
 //DEBUG
@@ -944,12 +944,18 @@ with (Player)
 {
 	if(button_pressed(index, "horn"))
 	{
-		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" //I don't know if you know this but it still happens when I press B too // yeah because you set Player.debug to true is my guess //My brain is smol
+		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 		{
-			with obj_create(mouse_x, mouse_y, "ItemChest")
+			/*with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
 				tag = "item"
-				item_index = item[? choose("bulb")]
+				item_index = item[? choose("CD")]
+				chest_setup(tag)
+			}*/
+
+			with obj_create(mouse_x, mouse_y, "ItemChest")
+			{
+				tag = "none";
 				chest_setup(tag)
 			}
 		}
@@ -1698,6 +1704,24 @@ Player.my_health += HEAL * amount
 
 //Death's Scythe /!\ NOT FINISHED /!\
 
+//Sharp CD
+var amount = item_get_count("CD");
+if amount >= 1 && instance_exists(Player)
+{
+with instances_matching_le(enemy,"my_health",0){
+var chance = round(random_range(1, (1 / amount)))
+if (chance == 1) with instance_create(x, y, Disc) {
+		n = instance_nearest(x, y, enemy)
+		direction = point_direction(x, y, n.x, n.y)
+		speed = 10
+        image_xscale = 1
+        image_yscale = 1
+        team = 3;
+    
+}
+}
+}
+//Sharp CD
 //Scale health with level
 if (GameCont.level >= 2) { extra_health += 3} // 4
 if (GameCont.level >= 3) { extra_health += 3} // 4

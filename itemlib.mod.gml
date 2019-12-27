@@ -1,4 +1,4 @@
-	
+
 #define init
 _init()
 items_finalize()
@@ -599,6 +599,17 @@ item_death_scythe = {
 	spr_index         : 53,
 	tier              : 3
 };
+
+// ITEM 54: CD
+#macro item_CD item[? "CD"]
+item_CD = {
+  name              : "Sharp CD",
+	description_small : "@sEnemies have a chance to @wshoot discs",
+	description_large : "-",
+	spr_index         : 54,
+	tier              : 3
+};
+
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),

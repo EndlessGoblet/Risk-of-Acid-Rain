@@ -9,7 +9,7 @@ global.debug = false;
 global.AnomalyGet  = 0;
 global.HardmodeGet = 0;
 global.difficulty = 0;
-
+global.fancy = true;
 global.time = 0;
 global.frame = 0;
 global.seconds = 0;
@@ -1322,9 +1322,12 @@ return false;
 #define draw_backdrop(XSTART, YSTART, XEND, YEND, TITLE) return mod_script_call("mod", "items", "draw_backdrop", XSTART, YSTART, XEND, YEND, TITLE)
 
 #define load_save
+
 //trace("Attempted Load")
+
 wait file_load(savefile);
 if file_exists(savefile){
+	/* */
 		var _settings = string_load(savefile);
 		_settings = string_split(_settings,"|");
 		global.preformanceMode = real(_settings[0]);
@@ -1334,6 +1337,7 @@ if file_exists(savefile){
 		global.forceSupport = real(_settings[3]);
 		global.sixtyFPS = real(_settings[4]);
 		file_unload(savefile);
+		
 	}
 
 #define save_save
