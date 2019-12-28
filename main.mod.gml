@@ -84,9 +84,11 @@ save_save()
 //set new level function
 global.newLevel = instance_exists(GenCont);
 global.hasGenCont = false;
-while(true){
+while(true)
+{
 	if(instance_exists(GenCont)) global.newLevel = 1;
-	else if(global.newLevel){
+	else if(global.newLevel)
+	{
 		global.newLevel = 0;
 		level_start();
 	}
@@ -109,9 +111,9 @@ with instance_create(0, 0, CustomObject)
 
 global.crownVault = false;
 //Reset vars
-global.BossesLeft = 0 // 0 at level start, after teleport activation = amount of boss enemies, at 0 spawns an item
-global.subareaChoice = 0
-global.areaChoice = 0
+global.BossesLeft    = 0; // 0 at level start, after teleport activation = amount of boss enemies, at 0 again spawns an item
+global.subareaChoice = 0;
+global.areaChoice    = 0;
 
 global.respawn = irandom_range(6, 12) * (crown_current = 7 ? 2 : 1) // double enemies with cob
 //Spawn invincible anti-portal maggot
@@ -125,16 +127,21 @@ if (GameCont.area != 100) with instance_create(Player.x-500, Player.y-500, Maggo
     my_health = 999999999;
     tag = "god"
 }
-if (global.Gamemode = 1) {
-with (WeaponChest) {
-    if (GameCont.area = 1 || GameCont.area == 101) {
-        wait(2)
-        if instance_exists(WeaponChest) {
-        instance_create(x, y, BigWeaponChest)
-        instance_delete(self);
-        }
-    }
-}}
+if (global.Gamemode = 1)
+{
+	with (WeaponChest)
+	{
+	  if (GameCont.area = 1 || GameCont.area == 101)
+		{
+	    wait(2)
+	    if instance_exists(WeaponChest)
+			{
+		  	instance_create(x, y, BigWeaponChest)
+		    instance_delete(self);
+	    }
+	  }
+	}
+}
 
 //SPAWN OBJECTS ON LEVEL START
 with Player
@@ -291,12 +298,12 @@ with (Player)
 				case 105: if _roll = 0
 									{
 										GameCont.area    = 106;
-										GameCont.subarea = 5;
+										GameCont.subarea = 1;
 									}
 									else
 									{
 										GameCont.area    = 5;
-										GameCont.subarea = 3;
+										GameCont.subarea = 1;
 									}
 									break;
 				case 104: if _roll = 0
@@ -318,7 +325,7 @@ with (Player)
 									else
 									{
 										GameCont.area    = 3;
-										GameCont.subarea = 3;
+										GameCont.subarea = 1;
 									}
 									break;
 				case 102: if _roll = 0
@@ -340,33 +347,23 @@ with (Player)
 									else
 									{
 										GameCont.area    = 1;
-										GameCont.subarea = 3;
+										GameCont.subarea = 1;
 									}
 									break;
-				case   1: if _roll = 0
-									{
-										GameCont.area = 102
-									}
+				case   1: if _roll = 0{GameCont.area = 102}
+													else{GameCont.area = 2  }
 									break;
-				case   2: if _roll = 0
-									{
-										GameCont.area = 103
-									}
+				case   2: if _roll = 0{GameCont.area = 103}
+													else{GameCont.area = 3  }
 									break;
-				case   3: if _roll = 0
-					 				{
-					 					GameCont.area = 104
-					 				}
+				case   3: if _roll = 0{GameCont.area = 104}
+													else{GameCont.area = 4  }
 									break;
-			  case   4: if _roll = 0
-									{
-										GameCont.area = 105
-									}
+			  case   4: if _roll = 0{GameCont.area = 105}
+													else{GameCont.area = 5  }
 									break;
-			  case   5: if _roll = 0
-									{
-										GameCont.area = 106
-									}
+			  case   5: if _roll = 0{GameCont.area = 106}
+													else{GameCont.area = 6  }
 									break;
 			}
 			with instance_create(_tele.x, _tele.y, Portal){if _tele.portal = "vault" {GameCont.area = 100; type = 2}else{type = 1}}
@@ -384,19 +381,23 @@ with instances_matching(Maggot, "tag", "god")
 	y = -10000;
 }
 
-if global.sixtyFPS == true {
-room_speed = 60
-current_time_scale = 0.5
-} else {
-room_speed = 30
-current_time_scale = 1
+if global.sixtyFPS == true
+{
+	room_speed = 60
+	current_time_scale = 0.5
+}
+else
+{
+	room_speed = 30
+	current_time_scale = 1
 }
 
 if irandom(instance_number(enemy) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
 
 //Crown Vault Fix
 if instance_exists(CrownPed) global.crownVault = true;
-if instance_exists(Portal) && global.crownVault == true {
+if instance_exists(Portal) && global.crownVault == true
+{
   GameCont.area = (GameCont.lastarea );
   GameCont.subarea = 3;
 }

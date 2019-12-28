@@ -9,10 +9,18 @@
 * Add Classic Mode:
   - get a couple of items per start (presets), gain more per loop
 
+* Overhaul armor visuals, perhaps pur them on the hp bars instead of next to them
+
+* Hard Times currently dont seem to be handed out at the start of hardmode
+
+* Oasis Boss is really hard in the early game
+
+* Completely overhaul shrines
+
+* Exiting Scrapyard for the first time makes you enter Scrapyard again
+
 * Add an Item Log:
   - very low on the priority list but it would be very cool
-
-* Update interface elements on the main screen
 
 * Items that need to be changed:
   - Focus:
@@ -21,19 +29,13 @@
      effect is too weak to be of any value and the blue circle should either be
      behind the player or removed by a custom "entering" particle on the incoming
      projectile
-  - Broken Locket:
-     seems to spawn way too many Rusted Chests
   - Mechanical lens:
      make the homing work like smart nuke launcher homing, and not scale with stack size
-  - Gun Boots:
+  - Chopper:
      Being able to create projectiles just by moving seems kinda wierd and in late game
      is broken due to multidudes of synergies. dont even have to use ammo to kill enemies
-  - Chopper:
-     see Gun Boots
   - Perfect Prize:
      add a prize break animation for when loosing prize effect instead of the popup text
-  - Fern:
-     overthink wether or not we actually want this
   - Flower Cactus:
      i like it, and im gonna line out here how i think it could work well
      - on level start, carve a nook into the level similar to safe spawn and put the cactus in the middle
@@ -43,10 +45,5 @@
      give the player 1 more per loop
   - Ammo Extractor:
      needs a resprite
-
-* Fix item inventory backdrop not scaling vertically properly
-
-* Add uncursed items, and make cursed items uncurse
-  - like cursed items but without the downside, with a custom rarity
 
 * Fix teleporter activation in scrapyards crashing the game sometimes
