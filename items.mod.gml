@@ -1,4 +1,4 @@
-#macro item 					 mod_variable_get("mod", "itemlib", "ItemDirectory");
+#macro item mod_variable_get("mod", "itemlib", "ItemDirectory");
 
 #define init
 global.fancy = true;
@@ -282,8 +282,8 @@ with instances_matching(chestprop, "name", "ItemChest")
 {
 if (tag == "cursed") && place_meeting(x, y, Player) {
 	draw_x = 0; draw_y = 20;
-	draw_set_color(c_black); draw_set_alpha(0.65);
-	draw_rectangle(x+8, y-11 + draw_y, x-9, y-2 + draw_y, 0)
+	draw_set_alpha(0.65);
+	draw_rectangle_colour(x+8, y-11 + draw_y, x-9, y-2 + draw_y, c_black, c_black, c_black, c_black, 0)
 	draw_set_alpha(1)
 	draw_text_nt(x, y - 35 + draw_y, "@1(keysmall:pick)")
 	draw_text_nt(x , y - 10 + draw_y, " 1")
@@ -740,7 +740,7 @@ else
 {
 	// unique item pickup sound goes here
 }
-add_item(ITEM, global.ItemGetAmount)
+add_item(ITEM, ITEM = item[? "currency"] ? 1 : global.ItemGetAmount)
 
 #define step
 
@@ -758,7 +758,8 @@ if (g == 0) chance = round(random_range(1, 500 * Player.lunarDrops))
 if (g == 1) chance = round(random_range(1, 250 * Player.lunarDrops))
 if (g == 2) chance = round(random_range(1, 500))
 
-if (chance == 1) {
+if (chance == 1) 
+{
 	Player.lunarDrops++
 	with obj_create(x, y, "ItemChest")
 			{
@@ -767,8 +768,9 @@ if (chance == 1) {
 				if (global.cheats == true) item_index = item[? choose("Fcurrency")]
 				chest_setup(tag)
 			}
+		}
+	}
 }
-}}
 //Invincibility
 with (Player)
 {
@@ -968,13 +970,18 @@ with (Player)
 	{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 		{
-			with shrine_create(mouse_x, mouse_y)
+			with obj_create(mouse_x, mouse_y, "ItemChest")
+			{
+				tag = "coin";
+				item_index = item[? "currency"]
+				chest_setup(tag)
+			}
+			/*with shrine_create(mouse_x, mouse_y)
 			{
 				index = crwn_hatred;
 				shrine_setup();
 			}
-
-			/*with obj_create(mouse_x, mouse_y, "ItemChest")
+			with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
 				tag = "none";
 				chest_setup(tag)

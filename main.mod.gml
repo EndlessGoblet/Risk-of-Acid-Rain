@@ -74,10 +74,10 @@ global.sprTeleporterIdle   = sprite_add("sprites/teleporter/sprTeleporterIdle.pn
 global.sprTeleporterSiphon = sprite_add("sprites/teleporter/sprTeleporterSiphon.png", 2, 24, 20);
 global.mskTeleporter       = sprite_add("sprites/teleporter/mskTeleporter.png"      , 1, 24, 20);
 
-global.sprButtons  		 = sprite_add("sprites/other/sprButtons.png", 3, 12, 12);
-global.sprButtonsSplat = sprite_add("sprites/other/sprButtonsSplat.png", 1, 14, 14);
-global.sprModes 		= sprite_add("sprites/other/sprModes.png", 3, 41, 41);
-global.sprCoinSplat = sprite_add("sprites/other/sprCoinSplat.png", 1, 0, 0);
+global.sprButtons  		  = sprite_add("sprites/other/sprButtons.png", 3, 12, 12);
+global.sprButtonsSplat  = sprite_add("sprites/other/sprButtonsSplat.png", 1, 14, 14);
+global.sprModes 		    = sprite_add("sprites/other/sprModes.png", 3, 41, 41);
+global.sprCoinSplatMain = sprite_add("sprites/other/sprCoinSplatMain.png", 1, 0, 0);
 
 if (instance_exists(CharSelect)) global.menu = true;
 
@@ -859,7 +859,7 @@ if instance_exists(CharSelect)
 			_strbutton = "";
 
 	//Coin Count
-	draw_sprite(global.sprCoinSplat, 1, _draw_x - 14, 34)
+	draw_sprite(global.sprCoinSplatMain, 1, _draw_x - 14, 34)
 	draw_text_nt(_draw_x, 37, "@w" + string(global.coins))
 
 	// Button backdrop
