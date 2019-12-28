@@ -19,6 +19,7 @@ global.hours = 0;
 global.coins = 3;
 global.teleporter = false;
 global.reset = 5;
+global.BossesLeft = 0;
 
 global.CircleSurf = -1;
 //Garbo Variables
@@ -101,8 +102,12 @@ while(true)
 #macro c_fel $FF271C;
 
 #define level_start
+global.BossesLeft    = 0; // 0 at level start, after teleport activation = amount of boss enemies, at 0 again spawns an item
+
 if (global.Gamemode == 2) {
 //Arena mode setup
+wait(1);
+//Deleting everything
 with(Floor) instance_delete(self)
 	with(Wall) instance_delete(self)
 	with(Top) instance_delete(self)
@@ -130,12 +135,61 @@ var _x
 var _y 
 var DWall = 3;
 if (GameCont.area == 1) DWall = 6
+if (GameCont.area == 101) DWall = 12
+if (GameCont.area == 2) DWall = 8
 for(i = 1; i < DWall; i++) {
 _x = round(random_range(9867, 10132)) 
 _y = round(random_range(9883, 10002)) //Draw random walls
 instance_create(_x, _y, Wall)
 if (GameCont.area = 3) instance_create(_x, _y, Trap)
 }
+
+//Spawning Boss
+with (Player) var w = instance_furthest(x, y, Wall) 
+var _boss_amount = 1;
+switch GameCont.area
+				{
+					case   1: _boss  = BanditBoss;
+								  	sound_play_music( musBoss1);
+								  	break;
+					case   2: _boss  = FrogQueen;
+								  	sound_play_music( musBoss5);
+								  	break;
+					case   3: _boss  = ScrapBoss;
+								  	sound_play_music( musBoss2);
+								  	break;
+					case   4: _boss  = HyperCrystal;
+										sound_play_music( musBoss6);
+										break;
+					case 	 5: _boss  = LilHunter;
+										sound_play_music( musBoss3);
+										break;
+					case 	 6: _boss  = TechnoMancer;
+										sound_play_music( musBoss7);
+										break;
+					case	 7: _boss  = Nothing2;
+										sound_play_music(musBoss4B);
+										break;
+					case   0: _boss  = Nothing2;
+					 			  	sound_play_music( musBoss8);
+								  	break;
+					case 101: _boss  = OasisBoss;
+										sound_play_music(musBoss3);
+										break;
+					case 102: _boss  = Turtle;
+					 					sound_play_music(musBoss3);
+										_boss_amount += 3;
+										break;
+					case 103: _boss  = SuperFireBaller;
+										sound_play_music(mus104);
+					    			_boss_amount += 4;
+										break;
+				}
+				repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
+					tag = "boss"
+				}
+global.BossesLeft++
+if (GameCont.area == 1) GameCont.subarea = 1;
 }
 
 
@@ -150,7 +204,6 @@ with instance_create(0, 0, CustomObject)
 
 global.crownVault = false;
 //Reset vars
-global.BossesLeft    = 0; // 0 at level start, after teleport activation = amount of boss enemies, at 0 again spawns an item
 global.subareaChoice = 0;
 global.areaChoice    = 0;
 
@@ -413,15 +466,40 @@ with (Player)
 }
 
 #define step
-//Boss Rush Mode
-if (GameCont.area == 1) && (global.Gamemode == 2) && global.BossesLeft = 0 {
-	with (Player) var w = instance_furthest(x, y, Wall) 
-	instance_create(w.x, w.y, BanditBoss)
-	global.BossesLeft++
-	GameCont.subarea = 1;
-	break;
+//Boss Rush stuff
+if global.Gamemode == 2 && instance_exists(Player) {
+with instances_matching_le(enemy,"my_health",0) {
+	chance = round(random_range(1, (18)))
+	if (global.doubleChests == true) chance = round(random_range(1, 9))
+	trace(chance)
+	if chance == 1 && global.BossesLeft >= 1 {
+		with obj_create(x, y, "ItemChest")
+			{
+				tag = "item"
+				item_index = mod_variable_get("mod", "items", "CommonItems")[random_range(0, array_length(mod_variable_get("mod", "items", "CommonItems")) - 1)]
+				chest_setup(tag)
+
+			}
+	}
+		if (chance == 2) && global.BossesLeft >= 1 {
+		instance_create(x, y, WeaponChest)
+
+	}
 }
 
+with (Floor) {
+	chance = round(random_range(1, (room_speed * 200)))
+	if (chance = 1) instance_create(x + 16, y + 16, AmmoPickup)
+	}
+
+if (Player.portalTimer > 0) Player.portalTimer--
+if (Player.portalTimer = 0) && global.BossesLeft == 0 {
+var f_ = instance_find(Floor, irandom(instance_number(Floor) - 1));
+instance_create(f_.x, f_.y, Portal)
+GameCont.subarea = 3;
+}
+if instance_exists(Portal) || instance_exists(SpiralCont)Player.portalTimer = (room_speed * 10)
+}
 save = mod_variable_get("mod", "items", "forceSave")
 if (save == 1) {
 mod_variable_set("mod", "items", "forceSave", 0)
@@ -444,7 +522,7 @@ else
 	current_time_scale = 1
 }
 var BossRushModifier = 0;
-if (global.Gamemode == 2) BossRushModifier = 5
+if (global.Gamemode == 2) BossRushModifier = 10
 if irandom(instance_number(enemy) + (BossRushModifier * 20) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
 
 //Crown Vault Fix
@@ -465,9 +543,15 @@ if instance_exists(Portal) && global.crownVault == true
 		{
 			repeat(Player.s_Challenge) with obj_create(x, y, "ItemChest")
 			{
+				if (global.Gamemode != 2) {
 				tag = "item"
 				item_index = mod_variable_get("mod", "items", "UncommonItems")[random_range(0, array_length(mod_variable_get("mod", "items", "UncommonItems")) - 1)]
+				} else {
+				tag = "large"	
+				Player.portalTimer = (room_speed * 16)
+				}
 				chest_setup(tag)
+
 			}
 		}
 	}
@@ -700,12 +784,15 @@ with (enemy) {
    if (roll >= 7) image_blend = merge_color(c_green, c_white, 1);
 }}
 #define game_start
+Player.portalTimer = (room_speed * 5)
+if (global.Gamemode == 2) 	Player.bossKilled = false
+
 save_save()
 global.AnomalyGet  = false;
 global.HardmodeGet = false;
 Player.debug1 = 0;
 
-if irandom_range(1, 3) = 1
+if irandom_range(1, 3) = 1 && Gamemode != 2
 {
 	GameCont.area        = 101;
 	global.areaChoice    = 101;

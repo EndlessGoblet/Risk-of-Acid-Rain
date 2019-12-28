@@ -188,7 +188,7 @@ switch GameCont.area // area specific extra chests
 _chest_amount += _area_amount;
 
 _chest_amount *= (doubleChests + 1); // double chest options
-if (mod_variable_get("mod", "main", "gamemode") != 2) {
+if ((mod_variable_get("mod", "main", "gamemode") != 2)) {
 with Floor // get a list of all "unoccupied" Floors
 {
 	var _d = 0;
@@ -753,13 +753,17 @@ if (dc_ == false && ds_ == false) global.cheats = false;
 with (Player) if distance_to_object(CustomObject)
 if instance_exists(Player) {
 with instances_matching_le(enemy,"my_health",0){
-chance = round(random_range(1, ((500 - mod_variable_get("mod", "main", "Gamemode") * 250) * Player.lunarDrops)))
+g = mod_variable_get("mod", "main", "Gamemode")
+if (g == 0) chance = round(random_range(1, 500 * Player.lunarDrops))
+if (g == 1) chance = round(random_range(1, 250 * Player.lunarDrops))
+if (g == 2) chance = round(random_range(1, 500))
+
 if (chance == 1) {
 	Player.lunarDrops++
 	with obj_create(x, y, "ItemChest")
 			{
 				tag = "coin"
-				if (global.cheats == false) item_index = item[? choose("coin")]
+				if (global.cheats == false) item_index = item[? choose("currency")]
 				if (global.cheats == true) item_index = item[? choose("Fcurrency")]
 				chest_setup(tag)
 			}
