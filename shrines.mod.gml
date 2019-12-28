@@ -1,4 +1,10 @@
 #define init
+global.sprRadSplat  	= sprite_add("sprites/other/sprRadSplat.png" 		, 1, 0, 0);
+global.sprCoinSplat 	= sprite_add("sprites/other/sprCoinSplat.png"		, 1, 0, 0);
+global.sprMaxHPSplat  = sprite_add("sprites/other/sprMaxHPSplat.png"  , 1, 0, 0);
+global.sprHealthSplat = sprite_add("sprites/other/sprHealthSplat.png" , 1, 0, 0);
+
+global.sprShrineHatred = sprite_add("sprites/shrines/sprShrineHatred.png", 1, 16, 50);
 
 #macro CommonItems   mod_variable_get("mod", "items", "CommonItems" );
 #macro UncommonItems mod_variable_get("mod", "items", "UncmmonItems");
@@ -9,9 +15,12 @@ var _s = instance_create(X, Y, CustomObject);
 with _s
 {
 	mask_index = sprThroneStatue;
+	name   = "shrine";
+	near   = false;
 	index  =  0;
-	cost   = -1; // index of cost, -1 = nothing, 0 = rads, 1 = HP. 2 = Max HP, "item name" = item, "rarity" = item of certain rarity, "currency" = Cursed coin
+	cost   = -1; // index of cost, -1 = nothing, 0 = rads, 1 = HP. 2 = Max HP, 3 = Cursed coin
 	costval = 0; // how much of the cost needs to be spent
+	canuse  = false; // whether or not the player has the currency for this shrine
 
 	var _i = 0;
 	do
@@ -42,23 +51,23 @@ switch index
 												  	break;
 	// Shrine of Hatred
 	case   6: case "hatred":  on_interact  = hatred_interact;
-													  sprite_index = sprThroneStatue;
+													  sprite_index = global.sprShrineHatred;
 														sprite_broke = sprYVStatueDead;
-													  cost    = "currency";
+													  cost    = 3;
 													  costval = 1;
 													  break;
 	// Shrine of Destiny
 	 case  8:	case "destiny": on_interact  = destiny_interact;
 														sprite_index = sprThroneStatue;
 														sprite_broke = sprYVStatueDead;
-														cost    = "currency";
+														cost    = 3;
 														costval = 2;
 														break;
 	// Shrine of Luck
 	case 10: case "luck":     on_interact  = luck_interact;
 														sprite_index = sprThroneStatue;
 														sprite_broke = sprYVStatueDead;
-														cost    = "currency";
+														cost    = 3;
 														costval = 1;
 														break;
 	// Shrine of Risk
@@ -76,12 +85,48 @@ switch index
 												    costval = 1;
 												    break;
 }
+mask_index = mskBanditBoss;
 
 #define shrine_step
-if place_meeting(x, y, Player)
+if place_meeting(x, y, Player){near = true}else{near = false}
+canuse = false;
+
+if near = true
 {
-	script_execute(on_interact);
-	instance_destroy();
+	// Determining if player needs something to give to use or not
+	var _costvar = -4;
+
+	switch cost
+	{
+		case -1: _costvar = -4;  							         								break;
+		case  0: _costvar = GameCont.rads;             								break;
+		case  1: _costvar = Player.my_health;   									    break;
+		case  2: _costvar = -4;                 									  	break;
+		case  3: _costvar = mod_variable_get("mod", "main", "coins"); break;
+	}
+	if canuse = false
+	{
+		if button_pressed(Player.index, "pick")
+		{
+			if _costvar = -4
+			{
+				canuse = true;
+			}
+			else if _costvar >= costval
+			{
+				_costvar -= costval;
+				canuse    = true;
+				if cost = 3{mod_variable_set("mod", "main", "coins", mod_variable_get("mod", "main", "coins") - costval); save_save()}
+			}
+		}
+		else{sound_play(sndCursedReminder)}
+	}
+	if canuse = true
+	{
+		script_execute(on_interact);
+		if cost = 2{get_item(item[? "injury"])}
+		instance_destroy();
+	}
 }
 
 #define hatred_interact // 6: Shrine of Hatred
@@ -159,7 +204,28 @@ get_item(item[? "injury"])
 
 // Uncursing Pool
 
+#define draw
+with instances_matching(CustomObject, "name", "shrine")
+{
+	if near = true
+	{
+		var _splat = mskNone;
+		switch cost
+		{
+			case 0: _splat = global.sprRadSplat 	; break;
+			case 1: _splat = global.sprHealthSplat; break;
+			case 2: _splat = global.sprMaxHPSplat ; break;
+			case 3: _splat = global.sprCoinSplat	; break;
+		}
+		draw_sprite(_splat, 0, x - sprite_get_width(_splat)/2, y)
+		draw_text(x - sprite_get_width(_splat)/2 + 16, y + 3, string(costval))
+	}
+}
+
+#define step
+
 #define reorder() 										return mod_script_call("mod", "items", "reorder");
+#define save_save()                   return mod_script_call("mod", "main" , "save_save");
 #define get_item(ITEM)								return mod_script_call("mod", "items", "get_item", ITEM);
 #define chest_setup() 								return mod_script_call("mod", "items", "chest_setup");
 #define obj_create(X, Y, OBJECT_NAME) return mod_script_call("mod", "items", "obj_create", X, Y, OBJECT_NAME);
