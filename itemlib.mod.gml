@@ -219,7 +219,6 @@ item_liquid_nitrogen = {
 	description_large : "-",
 	spr_index         : 18,
 	tier              : 1
-
 };
 
 // ITEM 19: FOCUS
@@ -303,7 +302,7 @@ item_gun_gods_blessing = {
 #macro item_gun_boots item[? "boots"]
 item_gun_boots = {
   name              : "Gun Boots",
-	description_small : "@sWalk to @wshoot @sbehind you",
+	description_small : "@wPanic run @safter getting @whit",
 	description_large : "-",
 	spr_index         : 26,
 	tier              : 0
