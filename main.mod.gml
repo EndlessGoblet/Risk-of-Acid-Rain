@@ -16,8 +16,9 @@ global.frame = 0;
 global.seconds = 0;
 global.minutes = 0;
 global.hours = 0;
-global.coins = 0;
+global.coins = 3;
 global.teleporter = false;
+global.reset = 5;
 
 global.CircleSurf = -1;
 //Garbo Variables
@@ -74,7 +75,7 @@ global.mskTeleporter       = sprite_add("sprites/teleporter/mskTeleporter.png"  
 
 global.sprButtons  		 = sprite_add("sprites/other/sprButtons.png", 3, 12, 12);
 global.sprButtonsSplat = sprite_add("sprites/other/sprButtonsSplat.png", 1, 14, 14);
-global.sprModes 		= sprite_add("sprites/other/sprModes.png", 2, 41, 41);
+global.sprModes 		= sprite_add("sprites/other/sprModes.png", 3, 41, 41);
 global.sprCoinSplat = sprite_add("sprites/other/sprCoinSplat.png", 1, 0, 0);
 
 if (instance_exists(CharSelect)) global.menu = true;
@@ -374,7 +375,11 @@ with (Player)
 }
 
 #define step
-
+save = mod_variable_get("mod", "items", "forceSave")
+if (save == 1) {
+mod_variable_set("mod", "items", "forceSave", 0)
+save_save()
+}
 with instances_matching(Maggot, "tag", "god")
 {
 	x = -10000;
@@ -672,7 +677,7 @@ global.minutes = 0;
 global.hours = 0;
 global.teleporter = false;
 global.MenuIndex = -1;
-global.Gamemode  = 0;
+//global.Gamemode  = 0;
 
 #define draw_gui
 // Black backdrop
@@ -688,6 +693,15 @@ if instance_exists(CharSelect)
 
 	/// GAMEMODES
   draw_set_halign(fa_center)
+  if global.Gamemode = 2 // Boss mode Header
+	{
+		draw_set_alpha(0.5)
+		//draw_text_nt(game_width / 2, sin(current_frame / 10) * 2/ (room_speed / 30) + 22, "@yBOSS RUSH")
+		draw_text_nt(game_width / 2, sin(current_frame / 10 + 3) * 2/ (room_speed / 30) + 20, "@yBOSS RUSH")
+		draw_set_alpha(1)
+		draw_text_nt(game_width / 2, sin(current_frame / 10) * 2/ (room_speed / 30) + 20, "@yBOSS RUSH")
+  }
+
   if global.Gamemode = 1 // Hardmode Header
 	{
 	  draw_set_alpha(0.7)
@@ -814,7 +828,7 @@ if instance_exists(CharSelect)
 	        draw_text_nt(game_width / 2 - 120, 66 + draw_y, "@s-PATCH NOTES-")
 	        draw_set_font(fntChat)
 	        draw_text_nt(game_width / 2 - 120, 182 + draw_y, "ITEMS: 38")
-					draw_text_nt(game_width / 2 - 120, 72 + draw_y, "@w-Added \# cursed items #-Added \# other items#-Polished Menus#-Increased Preformance#-Fancier Effects#-#-@sReminder to myself to add more patch notes")
+					draw_text_nt(game_width / 2 - 120, 72 + draw_y, "@w-Added \# cursed items #-Added \# other items#-Polished Menus#-Increased Preformance#-Fancier Effects#@w-Options now @ysave#@w-Added @pCursed Coins, @wcan be used to open @pcursed chests")
 	        draw_text_nt(game_width / 2 - 120, 191 + draw_y, "SHRINES: 9")
     		}
 
@@ -828,17 +842,20 @@ if instance_exists(CharSelect)
         draw_set_alpha(0.5)
         draw_sprite(global.sprModes, 0, draw_x + 1           , draw_y + y_offset + 1)
         draw_sprite(global.sprModes, 1, draw_x + 1 + x_offset, draw_y + y_offset + 1)
+		draw_sprite(global.sprModes, 2, draw_x + 1 + x_offset * 2, draw_y + y_offset + 1)
         draw_set_alpha(1)
         draw_set_color(c_white)
         draw_rectangle(draw_x - 42 + global.Gamemode * x_offset, draw_y - 27 , draw_x + global.Gamemode * x_offset, draw_y + 15, 0)
 
         draw_sprite(global.sprModes, 0, draw_x           , draw_y + y_offset)
         draw_sprite(global.sprModes, 1, draw_x + x_offset, draw_y + y_offset)
+		draw_sprite(global.sprModes, 2, draw_x + x_offset * 2, draw_y + y_offset)
         draw_set_color(c_white); draw_set_alpha(0.2);
 				var _textx = 9,
 				    _texty = 169,
 						_strModeNormal = "@sThe default difficulty, for those who#don't wanna die every 2 seconds",
-						_strModeHard   = "@s#Enemies have more @rhp@s, are more #@ragressive@s, @yelites@s spawn more often,#@wdifficulty@s scales faster, and #everything sucks"
+						_strModeHard   = "@s#Enemies have more @rhp@s, are more #@ragressive@s, @yelites@s spawn more often,#@wdifficulty@s scales faster, more #@pcursed coins @sand everything sucks"
+						_strModeBoss   = "@s###Fight @wall bosses @sin a row, gaining #@yitems@s and @rweapons @son the way"
 				draw_set_halign(fa_left)
 				draw_set_alpha(1)
 				if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -42, draw_y-27, draw_x+0, draw_y+10)
@@ -861,6 +878,19 @@ if instance_exists(CharSelect)
 		        global.Gamemode = 1;
 		        sound_play_pitch(sndClick, 1)
 		        sound_play_pitch(sndMeatExplo, 1)
+	        }
+        }
+
+		draw_x += x_offset
+		  	if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -42, draw_y-27, draw_x+0, draw_y+10)
+				{
+	        draw_backdrop(_textx, _texty - string_height(_strModeNormal) / 2, _textx + 298,  _texty + string_height(_strModeNormal), "Boss Rush")
+	        draw_text_nt(_textx + 3, _texty - string_height(_strModeNormal) * 4 / 3 - 2, _strModeBoss)
+	        if button_pressed(i, "fire")
+					{
+		        global.Gamemode = 2;
+		        sound_play_pitch(sndClick, 1)
+		        sound_play_pitch(sndSwapShotgun, 0.8)
 	        }
         }
     }
@@ -1004,7 +1034,7 @@ if instance_exists(CharSelect)
 			{
 				_c 			= "@w";
 				_inbox  = true;
-				_detstr = "TOGGLES 60 FPS MODE, WICH LOOKS SMOOTHER BUT MAY LAG THE GAME";
+				_detstr = "TOGGLES 60 FPS MODE, WHICH LOOKS SMOOTHER BUT MAY LAG THE GAME";
 			}
 			draw_text_nt(_x1, _y1 - (_inbox = true ? 1 : 0), _c + _str);
 			draw_text_nt(_x1 + _vardst, _y1 - (_inbox = true ? 1 : 0), _c + _varstr);
@@ -1091,6 +1121,36 @@ if instance_exists(CharSelect)
 				draw_set_font(fntSmall);
 				draw_text_nt(_x2, _y1, "@rCHEAT ENABLED");
 				draw_set_font(fntM);
+			}
+
+			// RESET PROGRESS
+			_str    = "RESET PROGRESS IN " + string(global.reset);
+			_y1    += string_height(_str) + 27;
+			_y2     = _y1 + string_height(_str);
+			_c      = "@y";
+			_inbox  = false;
+			_varstr = " "
+
+			if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i], _x1, _y1, _x2, _y2)
+			{
+				_c 			= "@r";
+				_inbox  = true;
+				_detstr = "RESET ALL RISK OF ACID RAIN PROGRESS";
+			}
+			draw_text_nt(_x1, _y1 - (_inbox = true ? 1 : 0), _c + _str);
+			draw_text_nt(_x1 + _vardst, _y1 - (_inbox = true ? 1 : 0), _c + _varstr);
+			if _inbox = true
+			{
+				draw_sprite(sprDailySplat, 2, _x1 - 20, _y1 + 5);
+				draw_text_nt(_x1, _y1 - (_inbox = true ? 1 : 0), _c + _str);
+				draw_text_nt(_x1 + _vardst, _y1 - (_inbox = true ? 1 : 0), _c + _varstr);
+				if button_pressed(i, "fire")
+				{
+					sound_play_pitch(sndClick, 0.8 - ((4 - global.reset * 1.5)/10));
+					if (global.reset >= 1) global.reset--
+					if (global.reset <= 0) resetProgress();
+					save_save();
+				}
 			}
 
 			draw_set_font(fntSmall);
@@ -1505,3 +1565,11 @@ trace_color("Force Support: " + string(global.forceSupport), c_blue)
 var _str = "" + string(global.preformanceMode) + "|" + string(global.hpBars) + "|" + string(global.bossBars)+ "|" + string(global.forceSupport) + "|" + string(global.sixtyFPS) + "|" + string(global.coins);
 string_save(_str,savefile);
 //trace("Settings Saved");
+
+#define resetProgress
+global.reset = 5
+trace_color("Progress Reset", c_red)
+sound_play_pitch(sndExplosion, 1)
+
+//Progress Reset: (Include all non-settings saved progress here)
+global.coins = 3;

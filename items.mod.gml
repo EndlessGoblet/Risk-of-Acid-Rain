@@ -8,6 +8,7 @@ global.bossBars = true;
 global.settings = false;
 global.PlayerItems = [item[? "none"]]
 global.coinGet = 0;
+global.forceSave = 0;
 
 global.sprBerserkFX = sprite_add("sprites/other/sprBerserkFX.png", 3,  4, 4);
 global.mskLightBulb = sprite_add("sprites/other/mskLightBulb.png", 1, 32, 32);
@@ -36,7 +37,7 @@ global.sprArmorShine = sprite_add_weapon("sprites/other/sprArmorShine.png", 9, 9
 global.sprItems     = sprite_add(    "sprites/items/sprItems.png", 101, 17, 17);
 global.sprItemsBack = sprite_add("sprites/items/sprItemsBack.png",   5, 20, 20);
 
-global.sprText = sprite_add("sprites/other/sprText.png", 1, 8, 8);
+global.sprText2 = sprite_add("sprites/other/sprText2.png", 1, 8, 8);
 
 global.sprBackdropCornerTop     = sprite_add_base64("iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAOSURBVBhXY0CA////AwAGCAL++VY/agAAAABJRU5ErkJggg=="     , 1, 0, 0);
 global.sprBackdropCornerBottom  = sprite_add_base64("iVBORw0KGgoAAAANSUhEUgAAAAIAAAADCAIAAAA2iEnWAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAATSURBVBhXYwCC////gygYYGAAAC/lAv7Wwl7SAAAAAElFTkSuQmCC" , 1, 0, 0);
@@ -99,8 +100,7 @@ while(true){
 #macro bossBars        mod_variable_get("mod", "main", "bossBars");
 #macro doubleChests    mod_variable_get("mod", "main", "doubleChests");
 #macro doubleShrines   mod_variable_get("mod", "main", "doubleShrines");
-#macro forceSupport    mod_variable_get("mod", "main", "forceSupport");
-
+#macro forceSupport    mod_variable_get("mod", "main", "forceSupport");   	   
 #define game_start
 Player.lunarDrops = 1;
 global.PlayerItems = [item[? "none"]]
@@ -171,7 +171,7 @@ global.descriptionTimer = 0;
 //SPAWN OBJECTS ON LEVEL START
 
 // CHESTS:
-/*var  _area_amount = 0,
+var  _area_amount = 0,
 	  _chest_amount = 3 + skill_get(28),
     _prize_amount = item_get_count("prize") * (global.hurtFloor = false ? 0 : 1),
 		_curse_amount = (GameCont.area = 104 ? 1 : 0) + irandom(99) > (crown_current != 1 ? (crown_current = 11 ? 66 : 14) : 0) ? 1 : 0,
@@ -249,7 +249,7 @@ if _curse_amount > 0 // guaranteed cursed chest spawn in caves + extra cursed ch
 	}
 }
 
-ds_list_destroy(_floorq)*/
+ds_list_destroy(_floorq)
 
 with ProtoStatue     instance_delete(self)
 with PizzaEntrance   instance_delete(self)
@@ -276,6 +276,20 @@ for(i = 0; i < _roll; i++)
 }
 
 #define draw
+//near cursed chests text
+with instances_matching(chestprop, "name", "ItemChest")
+{
+if (tag == "cursed") && place_meeting(x, y, Player) {
+	draw_x = 0; draw_y = 20;
+	draw_set_color(c_black); draw_set_alpha(0.65);
+	draw_rectangle(x+8, y-11 + draw_y, x-9, y-2 + draw_y, 0)
+	draw_set_alpha(1)
+	draw_text_nt(x, y - 35 + draw_y, "@1(keysmall:pick)")
+	draw_text_nt(x , y - 10 + draw_y, " 1")
+	draw_sprite(global.sprText2, 1, x, y - 2 + draw_y)
+}
+
+}
 //HEALTH BARS
 if hpBars = true
 {
@@ -569,7 +583,7 @@ switch(obj_name) {
 			if roll_luck(1) tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
 			if tag = "none" && roll_luck(4) tag = "large"  // 5% chance to turn into a large chest if gold chest roll failed
 			chest_setup(tag)
-			on_open = itemchest_open;
+			if (tag != "cursed") on_open = itemchest_open;
 		}
 		return _obj;
 	case "CustomPickup":
@@ -610,9 +624,11 @@ if (ITEM = item[? "currency"])
 	repeat(3)instance_create(Player.x, Player.y, Smoke)
 	with instance_create(Player.x, Player.y, PopupText)
 	{
-		text = "@p+1 CURSED COIN"
+		text = "+1 CURSED COIN"
 		time = 10;
 	}
+sound_play_pitch(sndExplosion, 1.5)
+sound_play_pitch(sndHyperCrystalDead, 5)
 }
 //fx
 var _pitch = random_range(.8, 1.2)
@@ -724,9 +740,13 @@ else
 add_item(ITEM, global.ItemGetAmount)
 
 #define step
+//Cursed Chest Opening
+with (Player) if distance_to_object(CustomObject)
 if instance_exists(Player) {
 with instances_matching_le(enemy,"my_health",0){
-chance = round(random_range(1, (500 * Player.lunarDrops)))
+g = mod_variable_get("mod", "main", "Gamemode");
+if (g == 0) chance = round(random_range(1, (500 * Player.lunarDrops)))
+if (g == 1) chance = round(random_range(1, (250 * Player.lunarDrops)))
 if (chance == 1) {
 	Player.lunarDrops++
 	with obj_create(x, y, "ItemChest")
@@ -894,7 +914,30 @@ with instances_matching(chestprop, "name", "ItemChest")
 
 	 if place_meeting(x, y, Player) || place_meeting(x, y, PortalShock) || instance_exists(BigPortal){
 				// run open code
-			 script_execute(on_open)
+				//cursed
+					//normal
+			c = mod_variable_get("mod", "main", "coins")
+			if button_pressed(Player.index, "pick") && c <= 0 {
+				sound_play_pitch(sndClick, random_range(0.8, 1.2))
+				with instance_create(Player.x, Player.y, PopupText)
+				{
+					text = "@wNot enough"
+					time = 10;
+				}
+			}
+			if (tag != "cursed") || button_pressed(Player.index, "pick") && c >= 1 {
+			if (tag == "cursed") {
+				mod_variable_set("mod", "main", "coins", c-1)
+				Player.cursedFlash = (3 -(room_speed / 30)) * 5
+			}
+			script_execute(on_open)
+			// fx
+			instance_create(x, y, FXChestOpen);
+			if tag == "coin" {
+				repeat(5)instance_create(x, y, Smoke);
+				//Player.cursedFlash = (3 -(room_speed / 30)) * 5
+			}
+			with instance_create(x, y, ChestOpen) sprite_index = other.spr_open;
 
 				// fx
 			 instance_create(x, y, FXChestOpen);
@@ -1472,7 +1515,7 @@ if amount >= 1 && instance_exists(Player)
 			BootsTime--;
 			if BootsTime mod (max(round(7 - speed), 1) * current_time_scale) = 0 && speed > 1
 			{
-				BootRight *= -1;
+				BootRight *= 0;
 				sound_play_pitchvol(sndPopgun, 1 + BootRight * .7, .7);
 
 				with instance_create(x, y, Bullet2)
