@@ -609,7 +609,7 @@ item_CD = {
 	tier              : 3
 };
 
-// ITEM 55: CD
+// ITEM 55: Cursed Coin
 #macro item_coin item[? "coin"]
 item_coin = {
   name              : "Cursed Coin",
@@ -618,6 +618,17 @@ item_coin = {
 	spr_index         : 55,
 	tier              : 5
 };
+
+// ITEM 56: Fake Cursed Coin 
+#macro item_Fcoin item[? "Fcoin"]
+item_Fcoin = {
+  name              : "Fake Coin",
+	description_small : "@dCheaters get @sfake coins",
+	description_large : "-",
+	spr_index         : 56,
+	tier              : 5
+};
+
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),

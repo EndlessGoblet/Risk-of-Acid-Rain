@@ -99,6 +99,44 @@ while(true){
 #macro c_fel $FF271C;
 
 #define level_start
+if (global.Gamemode == 2) {
+//Arena mode setup
+with(Floor) instance_delete(self)
+	with(Wall) instance_delete(self)
+	with(Top) instance_delete(self)
+	with(TopSmall) instance_delete(self)
+	with(TopPot) instance_delete(self)
+	with(Bones) instance_delete(self)
+	with(Detail) instance_delete(self)
+with(enemy) instance_delete(self);
+with(prop) instance_delete(self);
+with(chestprop) instance_delete(self);
+//Creating the arenaaa
+for(o = 1; o < 14; o++) { // Creating Floor
+for(i = 1; i < 7; i++) {instance_create(Player.x - i * 32, 10032 - o * 16, Floor)}//Floor (X)
+for(i = 1; i > -5; i--) {instance_create(Player.x - i * 32, 10032 - o * 16, Floor)}}//Floor (Y)
+for(i = 1; i < 15; i++) { instance_create(9808, 10048 - i * 16, Wall) //Left Wall
+ instance_create(10176, 10048 - i * 16, Wall)}//Right Wall
+for(i = 1; i < 24; i++) { instance_create(9808 + i*16, 10048, Wall) //Bottom Wall
+ instance_create(9808 + i*16, 9824, Wall)} //Top Wall
+for(i = 1; i < 30; i++) {instance_create(9808 - 16, 10048 - i * 8, Top)//Top of Left Wall
+instance_create(10176 + 16, 10048 - i * 8, Top)} //Top of Right Wall
+for(i = 1; i < 48; i++) {instance_create(9808 + i*8, 10048, Top) //Top of Bottom Wall
+instance_create(9808 + i*8, 9824, Top)} //Top of Bottom Wall
+//Creating extra walls
+var _x
+var _y 
+var DWall = 3;
+if (GameCont.area == 1) DWall = 6
+for(i = 1; i < DWall; i++) {
+_x = round(random_range(9867, 10132)) 
+_y = round(random_range(9883, 10002)) //Draw random walls
+instance_create(_x, _y, Wall)
+if (GameCont.area = 3) instance_create(_x, _y, Trap)
+}
+}
+
+
 if (Player.fancy == 1) global.fancy = 1
 if (Player.fancy == 0) global.fancy = 0
 with instance_create(0, 0, CustomObject)
@@ -141,7 +179,7 @@ with (WeaponChest) {
 with Player
 {
 	// Teleporter
-	if GameCont.area != 100 with instance_create(instance_furthest(x, y, Floor).x - sprite_xoffset + sprite_width / 2, instance_furthest(x, y, Floor).y - sprite_yoffset + sprite_height / 2, CustomProp)
+	if GameCont.area != 100 && global.Gamemode != 2 with instance_create(instance_furthest(x, y, Floor).x - sprite_xoffset + sprite_width / 2, instance_furthest(x, y, Floor).y - sprite_yoffset + sprite_height / 2, CustomProp)
 	{
 		name     = "Teleporter"
 		teledone = false
@@ -396,8 +434,9 @@ current_time_scale = 0.5
 room_speed = 30
 current_time_scale = 1
 }
-
-if irandom(instance_number(enemy) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
+var BossRushModifier = 0;
+if (global.Gamemode == 2) BossRushModifier = 5
+if irandom(instance_number(enemy) + (BossRushModifier * 20) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
 
 //Crown Vault Fix
 if instance_exists(CrownPed) global.crownVault = true;

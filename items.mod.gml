@@ -9,6 +9,7 @@ global.settings = false;
 global.PlayerItems = [item[? "none"]]
 global.coinGet = 0;
 global.forceSave = 0;
+global.cheats = false;
 
 global.sprBerserkFX = sprite_add("sprites/other/sprBerserkFX.png", 3,  4, 4);
 global.mskLightBulb = sprite_add("sprites/other/mskLightBulb.png", 1, 32, 32);
@@ -72,7 +73,7 @@ global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: Fern
 global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"], item[? "CD"]] // Todo: brooch
-global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "coin"]]
+global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "coin"], item[? "Fcoin"]]
 
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
@@ -187,7 +188,7 @@ switch GameCont.area // area specific extra chests
 _chest_amount += _area_amount;
 
 _chest_amount *= (doubleChests + 1); // double chest options
-
+if (mod_variable_get("mod", "main", "gamemode") != 2) {
 with Floor // get a list of all "unoccupied" Floors
 {
 	var _d = 0;
@@ -250,7 +251,7 @@ if _curse_amount > 0 // guaranteed cursed chest spawn in caves + extra cursed ch
 }
 
 ds_list_destroy(_floorq)
-
+}
 with ProtoStatue     instance_delete(self)
 with PizzaEntrance   instance_delete(self)
 with CarVenus        instance_delete(self)
@@ -580,6 +581,7 @@ if (type == "Printing")
 	    	text = "*SNAP*"
 	    	time = 5
 			}
+			sound_play_pitch(sndExplosion, 1)
 			sleep(7)
 			view_shake_at(x, y, 5)
 			with instance_create(x, y, GreenExplosion){damage = 0; mask_index = mskNone}
@@ -685,7 +687,7 @@ switch(obj_name) {
 
 #define get_item(ITEM)
 global.itemGet = ITEM
-if (ITEM != item[? "coin"])global.descriptionTimer = room_speed * 4
+if (ITEM != item[? "coin"] && ITEM != item[? "Fcoin"]) global.descriptionTimer = room_speed * 4
 if (ITEM = item[? "coin"]) {
 c = mod_variable_get("mod", "main", "coins");
 mod_variable_set("mod", "main", "coins", c + 1);
@@ -808,6 +810,12 @@ else
 add_item(ITEM, global.ItemGetAmount)
 
 #define step
+
+//Cross Variables
+dc_ = mod_variable_get("mod", "main", "doubleChests")
+ds_ = mod_variable_get("mod", "main", "doubleShrines")
+if (dc_ == true || ds_ == true) global.cheats = true;
+if (dc_ == false && ds_ == false) global.cheats = false;
 //Cursed Chest Opening
 with (Player) if distance_to_object(CustomObject)
 if instance_exists(Player) {
@@ -820,7 +828,8 @@ if (chance == 1) {
 	with obj_create(x, y, "ItemChest")
 			{
 				tag = "coin"
-				item_index = item[? choose("coin")]
+				if (global.cheats == false) item_index = item[? choose("coin")]
+				if (global.cheats == true) item_index = item[? choose("Fcoin")]
 				chest_setup(tag)
 			}
 }
@@ -1042,7 +1051,8 @@ with (Player)
 			with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
 				tag = "coin"
-				item_index = item[? choose("coin")]
+				if (global.cheats == false) item_index = item[? choose("coin")]
+				if (global.cheats == true) item_index = item[? choose("Fcoin")]
 				chest_setup(tag)
 			}
 
@@ -2120,7 +2130,8 @@ if "tag" in self
 										break;
 		case "test"   : tem = item[? "brooch"] // this is for testing
 								    break;
-		case "coin"   : tem = item[? "coin"] // this is for testing
+		case "coin"   : if (global.cheats == false) tem = item[? "coin"] // coin time
+						if (global.cheats == true) tem = item[? "Fcoin"]
 								    break;
 		case "none"   :
 		default       : if _roll <= 92 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
