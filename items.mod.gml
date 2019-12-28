@@ -101,7 +101,7 @@ while(true){
 #macro bossBars        mod_variable_get("mod", "main", "bossBars");
 #macro doubleChests    mod_variable_get("mod", "main", "doubleChests");
 #macro doubleShrines   mod_variable_get("mod", "main", "doubleShrines");
-#macro forceSupport    mod_variable_get("mod", "main", "forceSupport");   	   
+#macro forceSupport    mod_variable_get("mod", "main", "forceSupport");
 #define game_start
 Player.lunarDrops = 1;
 global.PlayerItems = [item[? "none"]]
@@ -753,9 +753,7 @@ if (dc_ == false && ds_ == false) global.cheats = false;
 with (Player) if distance_to_object(CustomObject)
 if instance_exists(Player) {
 with instances_matching_le(enemy,"my_health",0){
-g = mod_variable_get("mod", "main", "Gamemode");
-if (g == 0) chance = round(random_range(1, (500 * Player.lunarDrops)))
-if (g == 1) chance = round(random_range(1, (250 * Player.lunarDrops)))
+chance = round(random_range(1, ((500 - mod_variable_get("mod", "main", "Gamemode") * 250) * Player.lunarDrops)))
 if (chance == 1) {
 	Player.lunarDrops++
 	with obj_create(x, y, "ItemChest")
@@ -922,12 +920,11 @@ with instances_matching(chestprop, "name", "ItemChest")
 										 break;
 	 }
 
-	 if place_meeting(x, y, Player) || place_meeting(x, y, PortalShock) || instance_exists(BigPortal){
-				// run open code
-				//cursed
-					//normal
-			c = mod_variable_get("mod", "main", "coins")
-			if button_pressed(Player.index, "pick") && c <= 0 {
+	 if place_meeting(x, y, Player) || place_meeting(x, y, PortalShock) || instance_exists(BigPortal)
+	 {
+
+			if button_pressed(Player.index, "pick") && mod_variable_get("mod", "main", "coins") <= 0
+			{
 				sound_play_pitch(sndClick, random_range(0.8, 1.2))
 				with instance_create(Player.x, Player.y, PopupText)
 				{
@@ -935,38 +932,29 @@ with instances_matching(chestprop, "name", "ItemChest")
 					time = 10;
 				}
 			}
-			if (tag != "cursed") || button_pressed(Player.index, "pick") && c >= 1 {
-			if (tag == "cursed") {
-				mod_variable_set("mod", "main", "coins", c-1)
-				Player.cursedFlash = (3 -(room_speed / 30)) * 5
-			}
-			script_execute(on_open)
-			// fx
-			instance_create(x, y, FXChestOpen);
-			if tag == "coin" {
-				repeat(5)instance_create(x, y, Smoke);
-				//Player.cursedFlash = (3 -(room_speed / 30)) * 5
-			}
-			with instance_create(x, y, ChestOpen) sprite_index = other.spr_open;
+			if (tag != "cursed") || button_pressed(Player.index, "pick") && mod_variable_get("mod", "main", "coins") >= 1
+			{
+				if (tag == "cursed")
+				{
+					mod_variable_set("mod", "main", "coins", mod_variable_get("mod", "main", "coins") - 1)
+					Player.cursedFlash = (3 -(room_speed / 30)) * 5
+				}
+				script_execute(on_open)
 
 				// fx
-			 instance_create(x, y, FXChestOpen);
-			 if tag = "coin"{ repeat(5)	with instance_create(x, y, Smoke){motion_add(random(360), random_range(2, 3))}}
-			 with instance_create(x, y, ChestOpen) sprite_index = other.spr_open;
+			  instance_create(x, y, FXChestOpen);
+			  if tag = "coin"{repeat(5)	with instance_create(x, y, Smoke){motion_add(random(360), random_range(2, 3))}}
+			  with instance_create(x, y, ChestOpen) sprite_index = other.spr_open;
 
 			 instance_delete(id);
-	 }
+		 }
+	}
 }
-/*
-if (preformanceMode == true) { // /!\ This causes the game to softlock for unknown reasons /!\
-    if instance_number(Effect) > 75 {
-        with instance_find(Effect, instance_number(Effect) - 1) { instance_delete(self); }
-    }
-}*/
+
 with (Player) if (my_health > maxhealth) my_health = maxhealth
-with (Player) if round(Player.my_health)
+
 //DEBUG
-Player.debug2 = array_length_1d(global.PlayerItems) - 1
+if instance_exists(Player) Player.debug2 = array_length_1d(global.PlayerItems) - 1
 
 
 //Cheats--------------------------------------------------------------------------------------------------------------------------------------------------------
@@ -1454,7 +1442,8 @@ if amount >= 1
 
 //Bullet Grease
 var amount = item_get_count("grease");
-if amount >= 1 {
+if amount >= 1
+{
 	if instance_exists(Player) with instances_matching(projectile, "team", Player.team)
 	{
 		if "grease" not in self
@@ -1523,9 +1512,9 @@ if amount >= 1 && instance_exists(Player)
 		{
 			extra_speed += .4;
 			BootsTime--;
-			if BootsTime mod (max(round(7 - speed), 1) * current_time_scale) = 0 && speed > 1
+			if BootsTime mod (max(round(12 - speed), 1) * current_time_scale) = 0 && speed > 1
 			{
-				BootRight *= 0;
+				BootRight *= -1;
 				sound_play_pitchvol(sndPopgun, 1 + BootRight * .7, .7);
 
 				with instance_create(x, y, Bullet2)
@@ -1700,13 +1689,14 @@ if amount >= 1 && instance_exists(Player)
 var amount = item_get_count("explo");
 if amount >= 1 && instance_exists(Player)
 {
-with (Effect) {
-	if object_index == BulletHit || object_index == LightningHit || object_index == DiscDisappear || object_index == DiscBounce {
-		repeat(amount) instance_create(x, y, SmallExplosion)
-		instance_destroy();
+	with (Effect)
+	{
+		if object_index == BulletHit || object_index == LightningHit || object_index == DiscDisappear || object_index == DiscBounce
+		{
+			repeat(amount) instance_create(x, y, SmallExplosion)
+			instance_destroy();
+		}
 	}
-
-}
 }
 //Explosive Rounds
 
@@ -1718,25 +1708,31 @@ with (Effect) {
 var amount = item_get_count("collider");
 if amount >= 1 && instance_exists(Player)
 {
-with (projectile) {
-if (team = 2) {
-team = 3;
-damage *= (1 + (amount * .5))
-}}}
+	with (projectile)
+	{
+		if (team = 2)
+		{
+			team = 3;
+			damage *= (1 + (amount * .5))
+		}
+	}
+}
 //Collider
 
 //Diamond Bullets
 var amount = item_get_count("diamond");
 if amount >= 1 && instance_exists(Player)
 {
-Player.reloadspeed += (0.5 * amount)
-with (projectile) {
-	if team == 2 && "diamond" not in self {
-		diamond = true;
-		damage *= (1.5 * amount)
-		speed *= (1.2 + (amount * .1))
+	Player.reloadspeed += (0.5 * amount)
+	with (projectile)
+	{
+		if team == 2 && "diamond" not in self
+		{
+			diamond = true;
+			damage *= (1.5 * amount)
+			speed *= (1.2 + (amount * .1))
+		}
 	}
-}
 }
 //Diamond Bullets
 
@@ -1744,17 +1740,18 @@ with (projectile) {
 var amount = item_get_count("scythe");
 if amount >= 1 && instance_exists(Player)
 {
-Player.deathCounter += (1 * amount)
-if (Player.deathCounter) >= (30 * (room_speed / 30)) / amount {
-var HURT = (round(Player.maxhealth / 8))
-if (HURT < 0) HURT = 1
-Player.my_health -= HURT
-Player.deathCounter = 0;
-}
-with instances_matching_le(enemy,"my_health",0){
-var HEAL = round(Player.maxhealth / 16) if HEAL < 1 { HEAL = 1}
-Player.my_health += HEAL * amount
-}
+		Player.deathCounter += (1 * amount)
+		if (Player.deathCounter) >= (30 * (room_speed / 30)) / amount
+		{
+			var HURT = (round(Player.maxhealth / 8))
+			if (HURT < 0) HURT = 1
+			Player.my_health -= HURT
+			Player.deathCounter = 0;
+		}
+		with instances_matching_le(enemy,"my_health",0){
+		var HEAL = round(Player.maxhealth / 16) if HEAL < 1 { HEAL = 1}
+		Player.my_health += HEAL * amount
+	}
 }
 
 //Death's Scythe /!\ NOT FINISHED /!\
