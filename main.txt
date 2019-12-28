@@ -3,3 +3,4 @@
 /loadmod balancing
 /loadmod items
 /loadmod bounce
+/loadmod shrines

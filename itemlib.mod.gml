@@ -423,7 +423,7 @@ item_lucky_coin = {
 #macro item_glowing_fern item[? "fern"]
 item_glowing_fern = {
   name              : "Glowing Fern",
-	description_small : "@gHeal @sbeyond @rmax health",
+	description_small : "@wEnemies @smay drop @wStealth Packs",
 	description_large : "-",
 	spr_index         : 37,
 	tier              : 2
@@ -490,7 +490,7 @@ item_scrap_missile = {
 #macro item_mercenary_canteen item[? "canteen"]
 item_mercenary_canteen = {
   name              : "MERC'S CANTEEN",
-	description_small : "@wEnemies @sdrop @yarmor",
+	description_small : "@wEnemies @smay drop @yarmor",
 	description_large : "-",
 	spr_index         : 43,
 	tier              : 1
@@ -501,7 +501,7 @@ item_mercenary_canteen = {
 #macro item_injury item[? "injury"]
 item_injury = {
   name              : "INJURY",
-	description_small : "@s-@w20 @rMax HP",
+	description_small : "@s-@w2 @rMax HP",
 	description_large : "-",
 	spr_index         : 44,
 	tier              : 4
@@ -609,9 +609,9 @@ item_CD = {
 	tier              : 3
 };
 
-// ITEM 55: Cursed Coin
-#macro item_coin item[? "coin"]
-item_coin = {
+// ITEM 55: CURSED COIN
+#macro item_currency item[? "currency"]
+item_currency = {
   name              : "Cursed Coin",
 	description_small : "@sAmount of @pcursed coins @sgotten this run",
 	description_large : "-",
@@ -619,16 +619,35 @@ item_coin = {
 	tier              : 5
 };
 
-// ITEM 56: Fake Cursed Coin 
+// ITEM 56: SARKORA
+#macro item_sarkora item[? "sarkora"]
+item_sarkora = {
+  name              : "Sarkora",
+	description_small : "@s+@w25% @pThrone Butt @sStrength",
+	description_large : "-",
+	spr_index         : 56,
+	tier              : 4
+};
+
+// ITEM 57: PAPORA
+#macro item_papora item[? "papora"]
+item_sarkora = {
+  name              : "papora",
+	description_small : "@s+@w10% @gMutation @sStrength",
+	description_large : "-",
+	spr_index         : 57,
+	tier              : 4
+};
+
+// ITEM 58: Fake Cursed Coin 
 #macro item_Fcoin item[? "Fcoin"]
 item_Fcoin = {
   name              : "Fake Coin",
 	description_small : "@dCheaters get @sfake coins",
 	description_large : "-",
-	spr_index         : 56,
+	spr_index         : 58,
 	tier              : 5
-};
-
+	
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),
