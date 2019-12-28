@@ -73,7 +73,7 @@ global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: Fern
 global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"], item[? "CD"]] // Todo: brooch
-global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "currency"], item[? "Fcoin"]]
+global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "currency"], item[? "Fcurrency"]]
 
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
@@ -619,7 +619,7 @@ switch(obj_name) {
 
 #define get_item(ITEM)
 global.itemGet = ITEM
-if (ITEM != item[? "currency"] && ITEM != item[? "Fcoin"]) global.descriptionTimer = room_speed * 4
+if (ITEM != item[? "currency"] && ITEM != item[? "Fcurrency"]) global.descriptionTimer = room_speed * 4
 if (ITEM = item[? "currency"]) {
 c = mod_variable_get("mod", "main", "coins");
 mod_variable_set("mod", "main", "coins", c + 1);
@@ -762,7 +762,7 @@ if (chance == 1) {
 			{
 				tag = "coin"
 				if (global.cheats == false) item_index = item[? choose("coin")]
-				if (global.cheats == true) item_index = item[? choose("Fcoin")]
+				if (global.cheats == true) item_index = item[? choose("Fcurrency")]
 				chest_setup(tag)
 			}
 }
@@ -2072,7 +2072,7 @@ if "tag" in self
 		case "test"   : tem = item[? "brooch"] // this is for testing
 								    break;
 		case "coin"   : if (global.cheats == false) tem = item[? "currency"] // coin time
-						if (global.cheats == true) tem = item[? "Fcoin"]
+						if (global.cheats == true) tem = item[? "Fcurrency"]
 								    break;
 		case "none"   :
 		default       : if _roll <= 92 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }

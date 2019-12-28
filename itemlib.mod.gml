@@ -647,7 +647,8 @@ item_Fcoin = {
 	description_large : "-",
 	spr_index         : 58,
 	tier              : 5
-	
+};
+
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),

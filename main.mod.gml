@@ -413,6 +413,15 @@ with (Player)
 }
 
 #define step
+//Boss Rush Mode
+if (GameCont.area == 1) && (global.Gamemode == 2) && global.BossesLeft = 0 {
+	with (Player) var w = instance_furthest(x, y, Wall) 
+	instance_create(w.x, w.y, BanditBoss)
+	global.BossesLeft++
+	GameCont.subarea = 1;
+	break;
+}
+
 save = mod_variable_get("mod", "items", "forceSave")
 if (save == 1) {
 mod_variable_set("mod", "items", "forceSave", 0)
