@@ -16,7 +16,7 @@ global.frame = 0;
 global.seconds = 0;
 global.minutes = 0;
 global.hours = 0;
-global.coins = 0;
+global.coins = 3;
 global.teleporter = false;
 
 global.CircleSurf = -1;
@@ -664,7 +664,7 @@ global.minutes = 0;
 global.hours = 0;
 global.teleporter = false;
 global.MenuIndex = -1;
-global.Gamemode  = 0;
+//global.Gamemode  = 0;
 
 #define draw_gui
 // Black backdrop
@@ -805,7 +805,7 @@ if instance_exists(CharSelect)
 	        draw_text_nt(game_width / 2 - 152, 66 + draw_y, "@s-PATCH NOTES-")
 	        draw_set_font(fntChat)
 	        draw_text_nt(game_width / 2 - 152, 182 + draw_y, "ITEMS: 38")
-					draw_text_nt(game_width / 2 - 152, 72 + draw_y, "@w-Added \# cursed items #-Added \# other items#-Polished Menus#-Increased Preformance#-Fancier Effects#-#-@sReminder to myself to add more patch notes")
+					draw_text_nt(game_width / 2 - 152, 72 + draw_y, "@w-Added \# cursed items #-Added \# other items#-Polished Menus#-Increased Preformance#-Fancier Effects#@w-Options now @ysave#@w-Added @pCursed Coins, @wcan be used to open @pcursed chests")
 	        draw_text_nt(game_width / 2 - 152, 191 + draw_y, "SHRINES: 9")
     		}
 
@@ -829,7 +829,7 @@ if instance_exists(CharSelect)
 				var _textx = 9,
 				    _texty = 169,
 						_strModeNormal = "@sThe default difficulty, for those who#don't wanna die every 2 seconds",
-						_strModeHard   = "@s#Enemies have more @rhp@s, are more #@ragressive@s, @yelites@s spawn more often,#@wdifficulty@s scales faster, and #everything sucks"
+						_strModeHard   = "@s#Enemies have more @rhp@s, are more #@ragressive@s, @yelites@s spawn more often,#@wdifficulty@s scales faster, more #@pcursed coins @sand everything sucks"
 				draw_set_halign(fa_left)
 				draw_set_alpha(1)
 				if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -42, draw_y-27, draw_x+0, draw_y+10)

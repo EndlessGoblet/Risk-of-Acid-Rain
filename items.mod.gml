@@ -102,8 +102,7 @@ while(true){
 #macro bossBars        mod_variable_get("mod", "main", "bossBars");
 #macro doubleChests    mod_variable_get("mod", "main", "doubleChests");
 #macro doubleShrines   mod_variable_get("mod", "main", "doubleShrines");
-#macro forceSupport    mod_variable_get("mod", "main", "forceSupport");
-
+#macro forceSupport    mod_variable_get("mod", "main", "forceSupport");   	   
 #define game_start
 Player.lunarDrops = 1;
 global.PlayerItems = [item[? "none"]]
@@ -174,7 +173,7 @@ global.descriptionTimer = 0;
 //SPAWN OBJECTS ON LEVEL START
 
 // CHESTS:
-/*var  _area_amount = 0,
+var  _area_amount = 0,
 	  _chest_amount = 3 + skill_get(28),
     _prize_amount = item_get_count("prize") * (global.hurtFloor = false ? 0 : 1),
 		_curse_amount = (GameCont.area = 104 ? 1 : 0) + irandom(99) > (crown_current != 1 ? (crown_current = 11 ? 66 : 14) : 0) ? 1 : 0,
@@ -252,7 +251,7 @@ if _curse_amount > 0 // guaranteed cursed chest spawn in caves + extra cursed ch
 	}
 }
 
-ds_list_destroy(_floorq)*/
+ds_list_destroy(_floorq)
 
 with ProtoStatue     instance_delete(self)
 with PizzaEntrance   instance_delete(self)
@@ -778,7 +777,9 @@ add_item(ITEM, global.ItemGetAmount)
 #define step
 if instance_exists(Player) {
 with instances_matching_le(enemy,"my_health",0){
-chance = round(random_range(1, (500 * Player.lunarDrops)))
+g = mod_variable_get("mod", "main", "Gamemode");
+if (g == 0) chance = round(random_range(1, (500 * Player.lunarDrops)))
+if (g == 1) chance = round(random_range(1, (250 * Player.lunarDrops)))
 if (chance == 1) {
 	Player.lunarDrops++
 	with obj_create(x, y, "ItemChest")
