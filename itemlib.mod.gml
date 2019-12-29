@@ -639,6 +639,25 @@ item_sarkora = {
 	tier              : 4
 };
 
+// ITEM 58: Fake Cursed Coin 
+#macro item_Fcoin item[? "Fcoin"]
+item_Fcoin = {
+  name              : "Fake Coin",
+	description_small : "@dCheaters get @sfake coins",
+	description_large : "-",
+	spr_index         : 58,
+	tier              : 5
+};
+
+// ITEM 59: Fake Cursed Coin 
+#macro item_pearl item[? "pearl"]
+item_pearl = {
+  name              : "Lost Pearl",
+	description_small : "@p+@r5@y0@g% @bI@pT@rE@yM @gP@bO@pW@rE@yR@g, @rINCREASED DIFFICULTY",
+	description_large : "-",
+	spr_index         : 59,
+	tier              : 5
+};
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),
