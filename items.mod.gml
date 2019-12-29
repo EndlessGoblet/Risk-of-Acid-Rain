@@ -73,7 +73,7 @@ global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: Fern
 global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"], item[? "CD"]] // Todo: brooch
-global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "currency"], item[? "Fcurrency"]]
+global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "currency"], item[? "Fcurrency"], item[? "pearl"]]
 
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
@@ -137,10 +137,10 @@ Player.fx_celesteel = 0;
 Player.shakeText    = 0;
 
 #define level_start
-var amount = item_get_count("metal");
+var amount = item_get_count("metal") * pearls
 if amount >= 1{Player.armor += 2 * amount}
 
-var amount = item_get_count("brooch");
+var amount = item_get_count("brooch") * pearls
 if amount >= 1{reorder()}
 
 Player.s_Combat = 0;
@@ -164,7 +164,7 @@ with instance_create(Player.x, Player.y, PopupText) {
 //Perfect Prize
 
 //Bandit Mask
-var amount = item_get_count("mask")
+var amount = item_get_count("mask") * pearls
 if (amount >= 1) global.MaskCounter = (room_speed * (1 + 4 *  amount))
 //Bandit Mask
 
@@ -321,7 +321,7 @@ if hpBars = true
 	}
 }
 
-var amount = item_get_count("nitrogen"); //LIQUID NITROGEN
+var amount = item_get_count("nitrogen") * pearls //LIQUID NITROGEN
 if amount >= 1 && instance_exists(Player){
 var light = (45 + (amount * 7))
 if (preformanceMode == true) draw_set_alpha(1); draw_set_color(c_blue)
@@ -336,7 +336,7 @@ if (speed <= 0.1) instance_destroy()
 draw_set_alpha(1)
 }
 
-var amount = item_get_count("bulb"); //PRE WAR LIGHT BULBS
+var amount = item_get_count("bulb") * pearls //PRE WAR LIGHT BULBS
 var _light = 30 + random(2);
 if amount >= 1 && instance_exists(Player)
 {
@@ -687,6 +687,11 @@ if ITEM = item[? "celesteel"] && global.ItemGetAmount > 0
 {
     Player.armor += 5 * global.ItemGetAmount
 }
+if ITEM = item[? "pearl"] && global.ItemGetAmount > 0
+{
+	d = mod_variable_get("mod", "main", "difficulty")
+	mod_variable_set("mod", "main", "difficulty", d + 2 * global.ItemGetAmount)
+}
 if ITEM = item[? "missile"] && global.ItemGetAmount > 0
 {
     Player.armor += 8 * global.ItemGetAmount
@@ -972,8 +977,8 @@ with (Player)
 		{
 			with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
-				tag = "coin";
-				item_index = item[? "currency"]
+				tag = "item";
+				item_index = item[? "pearl"]
 				chest_setup(tag)
 			}
 			/*with shrine_create(mouse_x, mouse_y)
@@ -998,15 +1003,17 @@ var extra_reload    = 0,
 		extra_health    = 0,
 		extra_accuracy  = 0,
 		extra_damage    = 0;
+pearls = 1;
+if (item_get_count("pearl") >= 1) pearls = item_get_count("pearl") + .5
 
 //inside information (more damage to IDPD and they drop more stuff)
-var amount = item_get_count("info");
+var amount = item_get_count("info") * pearls
 var IDPD = [Grunt, Shielder, Inspector, EliteGrunt, EliteShielder, EliteInspector, Van, Last]
 for (var i = 0, iLen = array_length_1d(IDPD); i < iLen; i++) {
 var choice = IDPD[i]
 if instance_exists(choice) {
 with (choice) {
-    if amount >= 1 {
+    if amount >= 1  {
     if "effect" not in self {
     my_health *= (1 - (amount * 0.2))
     effect = true;
@@ -1017,7 +1024,7 @@ with instances_matching_le(choice,"my_health",0){
 //inside information (more damage to IDPD and they drop more stuff)
 
 //radi gumdrop (heal overtime)
-var amount = item_get_count("gumdrop");
+var amount = item_get_count("gumdrop") * pearls
 if amount >= 1 {
     with (Player) {
         var _x = (amount * 2); if (_x >= 15) _x = 15;
@@ -1030,7 +1037,7 @@ if (my_health > maxhealth) my_health = maxhealth
 //radi gumdrop (heal overtime)
 
 //Mechanical Lens (Homing)
-var amount = item_get_count("lens");
+var amount = item_get_count("lens") * pearls
 if amount >= 1
 {
 	with instances_matching(projectile, "team", 2)
@@ -1062,7 +1069,7 @@ if amount >= 1
 //Mechanical Lens (Homing)
 
 //Golden Shots (random crits)
-var amount = item_get_count("golden");
+var amount = item_get_count("golden") * pearls
 if amount >= 1
 {
 	with instances_matching(projectile, "team", 2)
@@ -1082,7 +1089,7 @@ if amount >= 1
 //Golden Shots (random crits)
 
 //Radiated Snack
-var amount = item_get_count("snack");
+var amount = item_get_count("snack") * pearls
 if amount >= 1 {
 with (Rad) {
 if "Touched" not in self {
@@ -1098,7 +1105,7 @@ sound_play_pitch(sndHPPickup, 1.3)
 //Radiated Snack
 
 //Rubber Projectile
-var amount = item_get_count("rubber");    //Doesn't increase per rubber projectile
+var amount = item_get_count("rubber") * pearls  //Doesn't increase per rubber projectile
 if amount >= 1
 {
 	with instances_matching(projectile, "team", 2)
@@ -1109,7 +1116,7 @@ if amount >= 1
 //Rubber Projectile
 
 //Bandit Mask
-var amount = item_get_count("mask");
+var amount = item_get_count("mask") * pearls
 with (Player)
 {
   if global.MaskCounter > 0
@@ -1129,7 +1136,7 @@ with (Player)
 //Bandit Mask
 
 //Ancient Armor Plate
-var amount = item_get_count("plate");
+var amount = item_get_count("plate") * pearls
 if amount >= 1
 {
   with (enemy)
@@ -1148,7 +1155,7 @@ if amount >= 1
 //Pre-War Light Bulb
 
 //Cryo Rounds
-var amount = item_get_count("cryo");
+var amount = item_get_count("cryo") * pearls
 if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).freezeTime = 25 * amount}}}
 
 with instances_matching_ge(enemy, "freezeTime", 1)
@@ -1167,7 +1174,7 @@ with instances_matching_ge(enemy, "freezeTime", 1)
 //Cryo Rounds
 
 //Incendiary Rounds
-var amount = item_get_count("incendiary");
+var amount = item_get_count("incendiary") * pearls
 if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFire = (4 + amount * 2) * (GameCont.area = 101 ? 0 : 1)}}}
 
 with instances_matching_ge(enemy, "OnFire", 1)
@@ -1216,7 +1223,7 @@ with instances_matching_ge(enemy, "OnFire", 1)
 //Incendiary Rounds
 
 //Fel Rounds
-var amount = item_get_count("fel");
+var amount = item_get_count("fel") * pearls
 if amount >= 1 && roll_luck(4 + amount * 2) {with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFel = true}}}
 {with instances_matching(projectile, "isFel", true){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFel = true}}}
 
@@ -1299,7 +1306,7 @@ with instances_matching_ge(hitme, "OnFel", 1)
 //Fel Rounds
 
 //Occult Artifact
-var amount = item_get_count("artifact");
+var amount = item_get_count("artifact") * pearls
 if amount >= 1
 {
 	with instances_matching_le(enemy,"my_health",0)
@@ -1311,7 +1318,7 @@ if amount >= 1
 
 
 //Slosher
-var amount = item_get_count("slosher");
+var amount = item_get_count("slosher") * pearls
 if amount >= 1 {
     with instances_matching(projectile, "team", 2) {
         if "sloshed" not in self {
@@ -1338,7 +1345,7 @@ if amount >= 1 {
 
 
 //Growth Fungus
-var amount = item_get_count("fungus");
+var amount = item_get_count("fungus") * pearls
 if amount >= 1 {
     with instances_matching(projectile, "team", 2) {
         if "growth" not in self && object_index != Lightning {
@@ -1352,7 +1359,7 @@ if amount >= 1 {
 //Growth Fungus
 
 //R-Wing
-var amount = item_get_count("wing");
+var amount = item_get_count("wing") * pearls
 if amount >= 1 {
 with (projectile) {
     if team != 2 && "RWING" not in self {
@@ -1365,7 +1372,7 @@ with (projectile) {
 //R-Wing
 
 //Sabotage Tools
-var amount = item_get_count("tools");
+var amount = item_get_count("tools") * pearls
 if amount >= 1
 {
 	with (projectile)
@@ -1379,7 +1386,7 @@ if amount >= 1
 //Sabotage Tools
 
 //Metafillings
-var amount = item_get_count("fillings");
+var amount = item_get_count("fillings") * pearls
 if amount >= 1
 {
 	with(Pickup)
@@ -1394,7 +1401,7 @@ if amount >= 1
 //Metafillings
 
 //Bloody Lust
-var amount = item_get_count("lust");
+var amount = item_get_count("lust") * pearls
 if amount >= 1 {
 with (Player) if nexthurt == current_frame + 5 && !instance_exists(Portal){sleep(20); global.BloodCounter = (room_speed * 3 + room_speed * amount)}
 if global.BloodCounter > 0 {
@@ -1422,7 +1429,7 @@ if (global.BloodCounter = 1) with (Player){
 //Liquid Nitrogen
 
 //Focus
-var amount = item_get_count("focus");
+var amount = item_get_count("focus") * pearls
 if amount >= 1 {
     with (projectile) { if team != 2 && "Focus" not in self{
     image_xscale = clamp(image_xscale - (amount * 0.05), .6, image_xscale - (amount * 0.05))
@@ -1433,7 +1440,7 @@ if amount >= 1 {
 //Focus
 
 //Binky
-var amount = item_get_count("binky");
+var amount = item_get_count("binky") * pearls
 if amount >= 1
 {
 	with (enemy) if "Shrink" not in self
@@ -1452,7 +1459,7 @@ if amount >= 1
 //Binky
 
 //Bullet Grease
-var amount = item_get_count("grease");
+var amount = item_get_count("grease") * pearls
 if amount >= 1
 {
 	if instance_exists(Player) with instances_matching(projectile, "team", Player.team)
@@ -1472,7 +1479,7 @@ if amount >= 1
 //Forgotten Gift
 
 //Mini-Mush
-var amount = item_get_count("mush");
+var amount = item_get_count("mush") * pearls
 if amount >= 1
 {
 	with (Player)
@@ -1487,7 +1494,7 @@ if amount >= 1
 //Mini-Mush
 
 //Gun God's Blessing
-var amount = item_get_count("blessing");
+var amount = item_get_count("blessing") * pearls
 if amount >= 1
 {
   with (projectile) if "blessed" not in self && "sacred" not in self && team = 2
@@ -1508,7 +1515,7 @@ if amount >= 1
 //Gun God's Blessing
 
 //Gun Boots
-var amount = item_get_count("boots");
+var amount = item_get_count("boots") * pearls
 if amount >= 1 && instance_exists(Player)
 {
 	with Player
@@ -1543,7 +1550,7 @@ if amount >= 1 && instance_exists(Player)
 //Gun Boots
 
 //Teleporter Siphon
-var amount = item_get_count("siphon");
+var amount = item_get_count("siphon") * pearls
 if amount >= 1 && instance_exists(Player)
 {
 	if point_in_teleporter(Player) = true extra_reload += .1 + (.2 * amount)
@@ -1551,7 +1558,7 @@ if amount >= 1 && instance_exists(Player)
 //Teleporter Siphon
 
 //Firewood
-var amount = item_get_count("firewood");
+var amount = item_get_count("firewood") * pearls
 if amount >= 1 && instance_exists(Player){
     with (Player) if "firewoodCharge" not in self { Player.firewoodCharge = 0 }
     with (Player) if "firewoodKills" not in self { Player.firewoodKills = 0 }
@@ -1581,7 +1588,7 @@ Player.firewoodCharge = 0;
 //Firewood
 
 //Ammo Extractor
-var amount = item_get_count("extractor");
+var amount = item_get_count("extractor") * pearls
 if amount >= 1
 {
 	with instances_matching_le(enemy, "my_health", 0) if size > 0
@@ -1597,7 +1604,7 @@ if amount >= 1
 //Ammo Extractor
 
 //Glowing Fern
-var amount = item_get_count("fern");
+var amount = item_get_count("fern") * pearls
 if amount >= 1
 {
 	with instances_matching_le(enemy, "my_health", 0) if size > 0
@@ -1613,7 +1620,7 @@ if amount >= 1
 //Glowing Fern
 
 //Chopper
-var amount = item_get_count("chopper");
+var amount = item_get_count("chopper") * pearls
 if amount >= 1
 {
   with (Player)
@@ -1634,7 +1641,7 @@ if amount >= 1
 //Chopper
 
 //Broken Locket
-var amount = item_get_count("locket");
+var amount = item_get_count("locket") * pearls
 if amount >= 1
 {
 	with instances_matching_le(enemy, "my_health", 0)
@@ -1652,7 +1659,7 @@ if amount >= 1
 //Broken Locket
 
 // Merc Canteen
-var amount = item_get_count("canteen");
+var amount = item_get_count("canteen") * pearls
 if amount >= 1
 {
 	with instances_matching_le(enemy, "my_health", 0)
@@ -1672,12 +1679,12 @@ if amount >= 1
 // Merc Canteen
 
 //Scrap Missile
-var amount = item_get_count("missile");
+var amount = item_get_count("missile") * pearls
 if amount >= 1 && instance_exists(Player){extra_damage += (Player.armor + Player.perma_armor) * (.05 + .025 * amount)}
 //Scrap Missile
 
 //backup Heart
-var amount = item_get_count("heart");
+var amount = item_get_count("heart") * pearls
 if amount >= 1 && instance_exists(Player)
 {
 	if Player.my_health <= 0
@@ -1697,7 +1704,7 @@ if amount >= 1 && instance_exists(Player)
 //backup heart
 
 //Explosive Rounds
-var amount = item_get_count("explo");
+var amount = item_get_count("explo") * pearls
 if amount >= 1 && instance_exists(Player)
 {
 	with (Effect)
@@ -1716,7 +1723,7 @@ if amount >= 1 && instance_exists(Player)
 //Molding Clay
 
 //Collider
-var amount = item_get_count("collider");
+var amount = item_get_count("collider") * pearls
 if amount >= 1 && instance_exists(Player)
 {
 	with (projectile)
@@ -1731,7 +1738,7 @@ if amount >= 1 && instance_exists(Player)
 //Collider
 
 //Diamond Bullets
-var amount = item_get_count("diamond");
+var amount = item_get_count("diamond") * pearls
 if amount >= 1 && instance_exists(Player)
 {
 	Player.reloadspeed += (0.5 * amount)
@@ -1748,7 +1755,7 @@ if amount >= 1 && instance_exists(Player)
 //Diamond Bullets
 
 //Death's Scythe   /!\ NOT FINISHED /!\
-var amount = item_get_count("scythe");
+var amount = item_get_count("scythe") * pearls
 if amount >= 1 && instance_exists(Player)
 {
 		Player.deathCounter += (1 * amount)
@@ -1768,7 +1775,7 @@ if amount >= 1 && instance_exists(Player)
 //Death's Scythe /!\ NOT FINISHED /!\
 
 //Sharp CD
-var amount = item_get_count("CD");
+var amount = item_get_count("CD") * pearls
 if amount >= 1 && instance_exists(Player)
 {
 	with instances_matching_le(enemy,"my_health",0)
