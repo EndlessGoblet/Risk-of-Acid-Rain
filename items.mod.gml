@@ -69,9 +69,9 @@ global.PlusItems = 0;
 global.hideDes = 0;
 global.popoChance = 0;
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
-global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
-global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: Fern
-global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"], item[? "CD"]] // Todo: brooch
+global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"], item[? "fern"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
+global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: None
+global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"]    , item[? "CD"]] // Todo: brooch
 global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "currency"]]
 
 //set new level function
@@ -101,6 +101,7 @@ while(true){
 #macro doubleChests    mod_variable_get("mod", "main", "doubleChests");
 #macro doubleShrines   mod_variable_get("mod", "main", "doubleShrines");
 #macro forceSupport    mod_variable_get("mod", "main", "forceSupport");
+
 #define game_start
 Player.lunarDrops = 1;
 global.PlayerItems = [item[? "none"]]
@@ -571,48 +572,81 @@ draw_sprite(global.shrineIcons, sprite, x + 6, y-20)
 
 #define obj_create(_x, _y, obj_name)
 var _obj = -4
-switch(obj_name) {
-	case "ItemChest":
-		_obj = instance_create(_x, _y, chestprop)
-		with(_obj)
-		{
-			name = "ItemChest";
-			spr_shadow = shd24;
-			spr_open = global.sprItemChestOpen;
-			sprite_index = global.sprItemChest;
-			if roll_luck(1) tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
-			if tag = "none" && roll_luck(4) tag = "large"  // 5% chance to turn into a large chest if gold chest roll failed
-			chest_setup(tag)
-			if (tag != "cursed") on_open = itemchest_open;
-		}
-		return _obj;
-	case "CustomPickup":
-		_obj = instance_create(_x, _y, Pickup);
-		with _obj
-		{
-			name = "CustomPickup";
-			sprite_index = global.sprFernPickup
-			mask_index   = mskPickup
-			image_speed  = 0
-			friction = .2
-			num = 1 + (crown_current = 4 ? room_speed * 1 : 0)
-			tag  = "none"
-			anim = 20 + irandom(30)
-			if (irandom(9) + 1) <= skill_get(mut_rabbit_paw) * 4 instance_create(x, y, RabbitPaw)
-			lifetime = room_speed * 10 - (crown_current = 4 ? room_speed * 5 : 0) + irandom(15)
-			on_pickup = ror_pickup
-		}
-		return _obj;
+switch(obj_name)
+{
+	case "Coin":
+				_obj = obj_create(_x, _y, "ItemChest");
+				with _obj
+				{
+					tag = "coin";
+					item_index = item[? choose("currency")];
+					chest_setup(tag);
+				}
+				return _obj;
 	case "Shrine":
-		_obj = instance_create(_x, _y, CustomObject)
-		with _obj
-		{
-			image_speed = 0.2;
-      name = "Shrine"
-      sprite_index = sprThroneStatue;
-	    itemPrint = global.CommonItems[irandom(array_length(global.CommonItems) - 1)]
-		}
-		return _obj;
+				_obj = shrine_create(_x, _y);
+				return _obj;
+	case "AmmoChest":
+				_obj  =instance_create(_x, _y, AmmoChest)
+				return _obj;
+	case "RadChest":
+				_obj  =instance_create(_x, _y, RadChest)
+				return _obj;
+	case "WeaponChest":
+				_obj  =instance_create(_x, _y, WeaponChest)
+				return _obj;
+	case "BigWeaponChest":
+				_obj  =instance_create(_x, _y, BigWeaponChest)
+				return _obj;
+	case "WeaponChest?":
+				if roll_luck(5) = true{_obj  =instance_create(_x, _y, BigWeaponChest)}
+													else{_obj  =instance_create(_x, _y, WeaponChest)}
+				return _obj;
+	case "ItemChest":
+				_obj = instance_create(_x, _y, chestprop)
+				with _obj
+				{
+					name = "ItemChest";
+					spr_shadow = shd24;
+					spr_open = global.sprItemChestOpen;
+					sprite_index = global.sprItemChest;
+					if roll_luck(1) tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
+					if tag = "none" && roll_luck(4) tag = "large"  // 5% chance to turn into a large chest if gold chest roll failed
+					chest_setup(tag)
+					if (tag != "cursed") on_open = itemchest_open;
+				}
+				return _obj;
+	case "LargeItemChest":
+				_obj = obj_create(_x, _y, "ItemChest")
+				with _obj
+				{
+					name = "LargeItemChest";
+					tag = "large"
+					chest_setup(tag)
+					on_open = itemchest_open;
+				}
+				return _obj;
+	case "ItemChest?":
+				if roll_luck(5) = true{_obj  =obj_create(_x, _y, "ItemChest")}
+													else{_obj  =obj_create(_x, _y, "LargeItemChest")}
+				return _obj;
+	case "CustomPickup":
+				_obj = instance_create(_x, _y, Pickup);
+				with _obj
+				{
+					name = "CustomPickup";
+					sprite_index = global.sprFernPickup
+					mask_index   = mskPickup
+					image_speed  = 0
+					friction = .2
+					num = 1 + (crown_current = 4 ? room_speed * 1 : 0)
+					tag  = "none"
+					anim = 20 + irandom(30)
+					if (irandom(9) + 1) <= skill_get(mut_rabbit_paw) * 4 instance_create(x, y, RabbitPaw)
+					lifetime = room_speed * 10 - (crown_current = 4 ? room_speed * 5 : 0) + irandom(15)
+					on_pickup = ror_pickup
+				}
+				return _obj;
 }
 
 #define get_item(ITEM)
@@ -750,12 +784,7 @@ if instance_exists(Player)
 		if (chance == 1)
 		{
 			Player.lunarDrops++
-			with obj_create(x, y, "ItemChest")
-			{
-				tag = "coin"
-				item_index = item[? choose("currency")]
-				chest_setup(tag)
-			}
+			obj_create(x, y, "Coin")
 		}
 	}
 }
@@ -958,17 +987,12 @@ with (Player)
 	{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 		{
-			with obj_create(mouse_x, mouse_y, "ItemChest")
+			with shrine_create(mouse_x, mouse_y)
 			{
-				tag = "coin";
-				item_index = item[? "currency"]
-				chest_setup(tag)
-			}
-			/*with shrine_create(mouse_x, mouse_y)
-			{
-				index = crwn_hatred;
+				index = crwn_risk;
 				shrine_setup();
 			}
+			/*
 			with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
 				tag = "none";
@@ -2135,20 +2159,26 @@ switch TAG
 }
 
 #define reorder()
-var amount_common   = 0,
-		amount_uncommon = 0,
-		amount_rare     = 0;
-inherited_items[0,0] = -4
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 0{amount_common   += global.PlayerItems[i].count}};
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 1{amount_uncommon += global.PlayerItems[i].count}};
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 2{amount_rare     += global.PlayerItems[i].count}};
-for (var i = 0, j = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier > 2{inherited_items[j,0] = global.PlayerItems[i];inherited_items[j,1] = global.PlayerItems[i].count; j++}};
-global.PlayerItems = []
-global.PlayerItems[0] = item[? "none"]
-if amount_common   > 0 {global.PlayerItems[1] = global.CommonItems[random_range(0, array_length(global.CommonItems))]     ;global.PlayerItems[1].count = amount_common  }
-if amount_uncommon > 0 {global.PlayerItems[2] = global.UncommonItems[random_range(0, array_length(global.UncommonItems))] ;global.PlayerItems[2].count = amount_uncommon}
-if amount_rare     > 0 {global.PlayerItems[3] = global.RareItems[random_range(0, array_length(global.RareItems))]         ;global.PlayerItems[3].count = amount_rare    }
-for (var i = 0, iLen = array_length_1d(inherited_items); i < iLen; i++){global.PlayerItems[4 + i] = inherited_items[i,0]; add_item(inherited_items[i,0], inherited_items[i,1])}
+if array_length_1d(global.PlayerItems) > 1
+{
+	var amount_common   = 0,
+			amount_uncommon = 0,
+			amount_rare     = 0;
+	inherited_items[0] = -4
+	inherited_count[0]  =0
+	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 0{amount_common   += global.PlayerItems[i].count}};
+	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 1{amount_uncommon += global.PlayerItems[i].count}};
+	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 2{amount_rare     += global.PlayerItems[i].count}};
+	for (var i = 0, j = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier > 2{inherited_items[j] = global.PlayerItems[i];inherited_count[j] = global.PlayerItems[i].count; j++}};
+	global.PlayerItems = []
+	global.PlayerItems[0] = item[? "none"]
+	if amount_common   > 0 {add_item(global.CommonItems[random_range(0, array_length(global.CommonItems))]    , amount_common  )}
+	if amount_uncommon > 0 {add_item(global.UncommonItems[random_range(0, array_length(global.UncommonItems))], amount_uncommon)}
+	if amount_rare     > 0 {add_item(global.RareItems[random_range(0, array_length(global.RareItems))]        , amount_rare    )}
+	if array_length_1d(inherited_items) >= 1 for (var i = 0, iLen = array_length_1d(inherited_items); i < iLen; i++){add_item(inherited_items[i], inherited_count[i])}
+	return true;
+}
+else return false;
 
 #define roll(VALUE)
 var _chance = irandom_range(1,100);

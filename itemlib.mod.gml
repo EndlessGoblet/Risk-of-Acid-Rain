@@ -426,7 +426,7 @@ item_glowing_fern = {
 	description_small : "@wEnemies @smay drop @wStealth Packs",
 	description_large : "-",
 	spr_index         : 37,
-	tier              : 2
+	tier              : 1
 
 };
 

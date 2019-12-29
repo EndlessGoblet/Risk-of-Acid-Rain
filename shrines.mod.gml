@@ -4,7 +4,7 @@ global.sprCoinSplat 	= sprite_add("sprites/other/sprCoinSplat.png"		, 1, 0, 0);
 global.sprMaxHPSplat  = sprite_add("sprites/other/sprMaxHPSplat.png"  , 1, 0, 0);
 global.sprHealthSplat = sprite_add("sprites/other/sprHealthSplat.png" , 1, 0, 0);
 
-global.sprShrineHatred = sprite_add("sprites/shrines/sprShrineHatred.png", 1, 16, 50);
+global.sprShrineHatred = sprThroneStatue //sprite_add("sprites/shrines/sprShrineHatred.png", 1, 16, 50);
 
 #macro CommonItems   mod_variable_get("mod", "items", "CommonItems" );
 #macro UncommonItems mod_variable_get("mod", "items", "UncmmonItems");
@@ -35,7 +35,8 @@ with _s
 	with Debris instance_delete(self);
 
 	shrine_setup()
-	on_step = shrine_step
+	on_step 	 = shrine_step
+	on_destroy = shrine_destroy
 }
 return _s;
 
@@ -45,42 +46,42 @@ switch index
 	// Shrine of Death
 	case   2: case "death":  	on_interact  = death_interact;
 												  	sprite_index = sprThroneStatue;
-														sprite_broke = sprYVStatueDead;
+														sprite_broke = sprThroneStatueDead;
 												  	cost    = -1;
 												  	costval = -1;
 												  	break;
 	// Shrine of Hatred
 	case   6: case "hatred":  on_interact  = hatred_interact;
 													  sprite_index = global.sprShrineHatred;
-														sprite_broke = sprYVStatueDead;
+														sprite_broke = sprThroneStatueDead;
 													  cost    = 3;
-													  costval = 1;
+													  costval = 0; // change this back to 1
 													  break;
 	// Shrine of Destiny
 	 case  8:	case "destiny": on_interact  = destiny_interact;
 														sprite_index = sprThroneStatue;
-														sprite_broke = sprYVStatueDead;
+														sprite_broke = sprThroneStatueDead;
 														cost    = 3;
-														costval = 2;
+														costval = 0; // change this back to 2
 														break;
 	// Shrine of Luck
 	case 10: case "luck":     on_interact  = luck_interact;
 														sprite_index = sprThroneStatue;
-														sprite_broke = sprYVStatueDead;
+														sprite_broke = sprThroneStatueDead;
 														cost    = 3;
 														costval = 1;
 														break;
 	// Shrine of Risk
 	case 12: case "risk":     on_interact  = risk_interact;
 														sprite_index = sprThroneStatue;
-														sprite_broke = sprYVStatueDead;
+														sprite_broke = sprThroneStatueDead;
 														cost    = 2;
 														costval = 1;
 														break;
 	// Printer
 	case 14: case "printer":  on_interact  = destiny_interact;
 												    sprite_index = sprThroneStatue;
-														sprite_broke = sprYVStatueDead;
+														sprite_broke = sprThroneStatueDead;
 												    cost    = -1;
 												    costval = 1;
 												    break;
@@ -129,44 +130,71 @@ if near = true
 	}
 }
 
+#define shrine_destroy
+with instance_create(x, y, ChestOpen){sprite_index = other.sprite_broke}
+view_shake_at(x, y, 16);
+sleep(15);
+
 #define hatred_interact // 6: Shrine of Hatred
-for(var _i = 0, _amount = 5, _ang = random(360); _i < _amount; _i++)
+var _chest_index = -1, // 0 = rad can, 1 = ammo chest, 2 = weapon chest, 3 = item_chest
+						  _i = 0,
+					_timer = 0,
+		 	 _maxtimer = 5 / current_time_scale,
+				 _amount = 5,
+				 	 _dist = 36,
+					  _ang = random(360)
+do
 {
-	instance_create(x + lengthdir_x(40, _ang), y + lengthdir_y(40, _ang), choose(RadChest, AmmoChest, WeaponChest))
-	_ang += 360 / _amount;
-}
+	if _timer <= 0
+	{
+		_i++
+		_chest_index = choose("RadChest", "AmmoChest", "WeaponChest?", "ItemChest");
+		with obj_create(x + lengthdir_x(_dist, _ang), y + lengthdir_y(_dist, _ang), _chest_index)
+		{
+			image_index = 1;
+			repeat(12){with instance_create(x + random_range(-4, 4), y + random_range(-4, 4), Dust){motion_add(random(360), random_range(5, 8))}}
+			do
+			{
+				with instance_nearest(x, y, Wall) if distance_to_object(other) <= 8
+				{
+					instance_create(x, y, FloorExplo);
+					instance_destroy();
+				}
+			}until(distance_to_object(instance_nearest(x, y, Wall)) > 8)
+		}
+		view_shake_max_at(x, y, 10)
+		wait(6)
+		sleep(20)
+		_ang += (360 / (_amount)) * 7;
+		_timer = _maxtimer;
+	}
+	else
+	{
+		_timer--;
+	}
+} until (_i >= _amount)
 
 #define destiny_interact // 8: Shrine of Destiny
-reorder();
-sound_play_pitch(sndLilHunterAppear, 0.5)
-with instance_create(Player.x, Player.y, PopupText)
+if reorder() = false
 {
-	 text = "@qIT @qIS @qDONE"
-	 time = 20
+	with instance_create(Player.x, Player.y, PopupText)
+	{
+		 text = "NOTHING TO BE REORDERED"
+		 time = 20
+	}
 }
-instance_destroy()
+else
+{
+	sound_play_pitch(sndLilHunterAppear, 0.5)
+	with instance_create(Player.x, Player.y, PopupText)
+	{
+		 text = "@qIT @qIS @qDONE"
+		 time = 20
+	}
+}
 
 #define luck_interact // 10: Shrine of Luck
-var _roll          = irandom(99),
-    _reward        = -4,
-		_reward_amount = -1;
 
-if _roll <= 29							 { _reward        = item[? "currency"];
-															 _reward_amount = choose(1, 2, 2, 2, 2, 3, 3, 4);
-		  											 } // 30 % Chance at cursed coin
-if _roll <= 49 && _roll > 29 { _reward 			  = CommonItems[irandom_range(0, array_length(CommonItems) - 1)];
-															 _reward_amount = choose(1, 1, 1, 2, 2, 2, 3, 3, 4);
-														 } // 20 % Chance at common item
-if _roll <= 57 && _roll > 49 { _reward 			  = UncommonItems[irandom_range(0, array_length(UncommonItems) - 1)];
-															 _reward_amount = choose(1, 1, 1, 1, 2, 2, 2, 3, 3);
-														 } // 8 % Chance at uncommon item
-if _roll <= 59 && _roll > 57 { _reward 			  = RareItems[irandom_range(0, array_length(RareItems) - 1)];
-															 _reward_amount = choose(1, 1, 1, 1, 1, 2, 2, 2, 3);
-														 } // 2 % Chance at rare item
-if _roll <= 99 && _roll > 59 { _reward 			  = choose(AmmoPickup)
-															 _reward_amount = choose(1, 1, 1, 2, 2, 2, 2, 3, 3);
-														 } // 40 % Chance at pickup
-repeat(_reward_amount){instance_create(x, y, _reward)}
 
 #define risk_interact // 12: Shrine of Risk
 with instance_create(Player.x, Player.y, PopupText) {text = "-" + string(carnage) + " MAX HP"; target = Player}
