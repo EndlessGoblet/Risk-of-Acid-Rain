@@ -6,9 +6,10 @@ global.sprHealthSplat = sprite_add("sprites/other/sprHealthSplat.png" , 1, 0, 0)
 
 global.sprShrineHatred = sprThroneStatue //sprite_add("sprites/shrines/sprShrineHatred.png", 1, 16, 50);
 
-#macro CommonItems   mod_variable_get("mod", "items", "CommonItems" );
-#macro UncommonItems mod_variable_get("mod", "items", "UncmmonItems");
-#macro RareItems     mod_variable_get("mod", "items", "RareItems"   );
+#macro item 				 mod_variable_get("mod", "itemlib", "ItemDirectory");
+#macro CommonItems   mod_variable_get("mod", "items", "CommonItems"    );
+#macro UncommonItems mod_variable_get("mod", "items", "UncommonItems"  );
+#macro RareItems     mod_variable_get("mod", "items", "RareItems"      );
 
 #define shrine_create(X, Y)
 var _s = instance_create(X, Y, CustomObject);
@@ -76,7 +77,7 @@ switch index
 														sprite_index = sprThroneStatue;
 														sprite_broke = sprThroneStatueDead;
 														cost    = 2;
-														costval = 1;
+														costval = 2;
 														break;
 	// Printer
 	case 14: case "printer":  on_interact  = destiny_interact;
@@ -125,7 +126,7 @@ if near = true
 	if canuse = true
 	{
 		script_execute(on_interact);
-		if cost = 2{get_item(item[? "injury"])}
+		if cost = 2{get_item(item[? "injury"], 2)}
 		instance_destroy();
 	}
 }
@@ -197,18 +198,15 @@ else
 
 
 #define risk_interact // 12: Shrine of Risk
-with instance_create(Player.x, Player.y, PopupText) {text = "-" + string(carnage) + " MAX HP"; target = Player}
+with instance_create(Player.x, Player.y, PopupText) {text = string(other.costval * -1) + " MAX HP"; target = Player}
 sound_play_pitch(sndFreakDead,0.8)
 sound_play_pitch(sndBloodLauncherExplo, 1)
-var _ang = random(360),
+var _ang = point_direction(Player.x, Player.y, x, y),
 		_i   = 0;
-with obj_create(Player.x + lengthdir_x(26, _ang + _i * 180), Player.y + lengthdir_y(26, _ang + _i * 180), "ItemChest")
+with obj_create(Player.x + lengthdir_x(26, _ang), Player.y + lengthdir_y(26, _ang), "Item")
 {
-	tag = "item"
-	item_index = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]
-	chest_setup(tag)
+	item_index = UncommonItems[round(random_range(0, array_length_1d(UncommonItems) - 1))]
 }
-get_item(item[? "injury"])
 
 #define shrine_interact
 
@@ -254,6 +252,7 @@ with instances_matching(CustomObject, "name", "shrine")
 
 #define reorder() 										return mod_script_call("mod", "items", "reorder");
 #define save_save()                   return mod_script_call("mod", "main" , "save_save");
-#define get_item(ITEM)								return mod_script_call("mod", "items", "get_item", ITEM);
+#define get_item(ITEM, AMOUNT)				return mod_script_call("mod", "items", "get_item", ITEM, AMOUNT);
+#define add_item(ITEM, AMOUNT)				return mod_script_call("mod", "items", "add_item", ITEM, AMOUNT);
 #define chest_setup() 								return mod_script_call("mod", "items", "chest_setup");
 #define obj_create(X, Y, OBJECT_NAME) return mod_script_call("mod", "items", "obj_create", X, Y, OBJECT_NAME);
