@@ -1034,7 +1034,7 @@ with (Player)
 	{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 		{
-			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "paragon"]}
+			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "key"]}
 			with shrine_create(mouse_x, mouse_y)
 			{
 				index = crwn_destiny;
@@ -1863,7 +1863,7 @@ if amount >= 1 && instance_exists(Player)
 //Sharp CD
 
 //Dark Pearl
-var amount = item_get_count("Dpearl") * pearls
+var amount = item_get_power("Dpearl")
 if amount >= 1 && instance_exists(Player)
 {
 with (enemy) {
@@ -1902,7 +1902,7 @@ with instances_matching(projectile, "team", 2){
 //Dark Pearl
 
 //Prismatic Key
-var amount = item_get_count("key") * pearls
+var amount = item_get_power("key")
 if amount >= 1 && instance_exists(Player)
 {
 	with (Player) {

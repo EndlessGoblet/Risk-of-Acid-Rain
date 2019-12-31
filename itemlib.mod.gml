@@ -655,7 +655,7 @@ item_pearl = {
   name              : "Prismatic Pearl",
 	description_small : "@p+@r5@y0@g% @bI@pT@rE@yM @gP@bO@pW@rE@yR@g, @rINCREASED DIFFICULTY",
 	description_large : "-",
-	spr_index         : 59,
+	spr_index         : 62,
 	tier              : 4
 };
 
@@ -665,17 +665,17 @@ item_Dpearl = {
   name              : "Dark Pearl",
 	description_small : "@rOne stack items do nothing     #@gDark Bullets",
 	description_large : "-",
-	spr_index         : 60,
+	spr_index         : 63,
 	tier              : 4
 };
 
-// ITEM 60: Prismatic Key
+// ITEM 61`: Prismatic Key
 #macro item_key item[? "key"]
 item_key = {
   name              : "Prismatic Key",
 	description_small : "@sFragile",
 	description_large : "-",
-	spr_index         : 61,
+	spr_index         : 64,
 	tier              : 5
 };
 
@@ -685,7 +685,7 @@ item_keyB = {
   name              : "Broken Key",
 	description_small : "@dBroken, useless",
 	description_large : "-",
-	spr_index         : 62,
+	spr_index         : 65,
 	tier              : 5
 };
 
