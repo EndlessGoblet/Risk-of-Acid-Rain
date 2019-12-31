@@ -593,6 +593,22 @@ switch(obj_name)
 				return _obj;
 	case "RadChest":
 				_obj  =instance_create(_x, _y, RadChest)
+	case "BigRadChest":
+				_obj  = obj_create(_x, _y, "RadChest");
+				with _obj
+				{
+					maxhealth = 20;
+					my_health = maxhealth;
+				  spr_idle = sprRadChestBig;
+			    spr_hurt = sprRadChestBigHurt;
+			    spr_dead = sprRadChestBigDead;
+			  }
+				return _obj;
+	case "RadChest?":
+				if roll_luck(7) = true{_obj  = obj_create(_x, _y, "RadChest")}
+												  else{_obj  = obj_create(_x, _y, "BigRadChest")}
+	case "HealthChest":
+				_obj  =instance_create(_x, _y, HealthChest)
 				return _obj;
 	case "WeaponChest":
 				_obj  =instance_create(_x, _y, WeaponChest)
@@ -1017,12 +1033,12 @@ with (Player)
 	{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 		{
-			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "chopper"]}
-			/*with shrine_create(mouse_x, mouse_y)
+			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "paragon"]}
+			with shrine_create(mouse_x, mouse_y)
 			{
-				index = crwn_risk;
+				index = crwn_destiny;
 				shrine_setup();
-			}*/
+			}
 		}
 	}
 }

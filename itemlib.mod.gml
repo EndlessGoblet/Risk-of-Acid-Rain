@@ -674,7 +674,7 @@ item_radi_gumdrop = {
 #macro item_idol_paragon item[? "paragon"]
 item_idol_paragon = {
   name              : "Idol Paragon",
-	description_small : "@wShrines @sare more @wpowerful"
+	description_small : "@wShrines @sare more @wpowerful",
 	description_large : "-",
 	spr_index         : 61,
 	tier              : 2
