@@ -25,6 +25,8 @@ global.sprRustyItemChestOpen  = sprite_add("sprites/chests/sprRustyItemChestOpen
 global.sprLargeItemChestOpen  = sprite_add("sprites/chests/sprLargeItemChestOpen.png"     , 1, 12, 8);
 global.sprCursedItemChestOpen = sprite_add("sprites/chests/sprCursedItemChestOpen.png"    , 1, 11, 8);
 
+global.sprCD = sprite_add("sprites/other/sprCD.png", 2, 12, 12);
+
 global.sprDeathCauseInjury = sprite_add("sprites/items/sprDeathCauseInjury.png", 1, 9, 6);
 global.sprDeathCauseHeater = sprite_add("sprites/items/sprDeathCauseHeater.png", 1, 9, 6);
 
@@ -73,7 +75,7 @@ global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]
 global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: Fern
 global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"], item[? "CD"]] // Todo: brooch
-global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "currency"], item[? "Fcurrency"], item[? "pearl"]]
+global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "currency"], item[? "Fcurrency"], item[? "pearl"], item[? "Dpearl"], item[? "key"]]
 
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
@@ -809,7 +811,7 @@ with (Player) if my_health < lsthealth
 	damageTaken = clamp(damageTaken - perma_armor, 1, damageTaken)
 	damageTaken = clamp(damageTaken - armor, 0, damageTaken)
 	Player.my_health += (_ord - damageTaken)
-	lsthealth = my_health
+	//lsthealth = my_health
   if !roll_luck(((4 * item_get_count("celesteel")) / (item_get_count("celesteel") / 30 + 1))) && Player.armor > 0
 	{
 		Player.fx_steel = 1
@@ -826,7 +828,6 @@ with (Player) if my_health < lsthealth
 	Player.shakeText += (room_speed / 10)
 	}
 }
-
 // Eyes Custom Pickup Attraction: (big yokin thanks)
  with(instances_matching(Player, "race", "eyes"))
  {
@@ -978,7 +979,7 @@ with (Player)
 			with obj_create(mouse_x, mouse_y, "ItemChest")
 			{
 				tag = "item";
-				item_index = item[? "pearl"]
+				item_index = item[? "CD"]
 				chest_setup(tag)
 			}
 			/*with shrine_create(mouse_x, mouse_y)
@@ -1754,7 +1755,7 @@ if amount >= 1 && instance_exists(Player)
 }
 //Diamond Bullets
 
-//Death's Scythe   /!\ NOT FINISHED /!\
+//Death's Scythe
 var amount = item_get_count("scythe") * pearls
 if amount >= 1 && instance_exists(Player)
 {
@@ -1772,28 +1773,104 @@ if amount >= 1 && instance_exists(Player)
 	}
 }
 
-//Death's Scythe /!\ NOT FINISHED /!\
+//Death's Scythe
 
 //Sharp CD
 var amount = item_get_count("CD") * pearls
 if amount >= 1 && instance_exists(Player)
 {
+	chance = round(random_range(1,5))
+	if chance = (1) {
 	with instances_matching_le(enemy,"my_health",0)
-	{
-		var chance = round(random_range(1, (1 / amount)))
-		if (chance == 1) with instance_create(x, y, Disc)
+	{	
+		if instance_exists(self) _x = x
+		if instance_exists(self) _y = y
+		wait(1)
+		repeat(amount) with instance_create(_x, _y, Disc)
 		{
-			n = instance_nearest(x, y, enemy)
-			direction = point_direction(x, y, n.x, n.y)
+			n = instance_nearest(_x, _y, enemy)
+			direction = point_direction(_x, _y, n.x, n.y)
 			speed = 10
+			if (amount > 1) speed = random_range(8, 12)
+			if (amount > 1) direction += random_range(-5*amount, 5*amount)
+			sprite_index = global.sprCD
 		  image_xscale = 1
 		  image_yscale = 1
 		  team = 3;
 		}
 	}
+	}
 }
 //Sharp CD
 
+//Dark Pearl
+var amount = item_get_count("Dpearl") * pearls
+if amount >= 1 && instance_exists(Player)
+{
+with (enemy) {
+	if place_meeting(x, y, Curse) 
+	{
+	my_health -= 1 / (room_speed / 30)
+	image_blend = merge_color(c_purple, c_white, 0.5);
+	touchingCurse = true;
+	} else {
+	if "touchingCurse" in self && touchingCurse == true {
+	image_blend = merge_color(c_purple, c_white, 1);
+	touchingCurse = false;
+	}
+	}
+}
+with instances_matching(projectile, "team", 2){
+	image_blend = merge_color(c_purple, c_white, 0.3);
+	if place_meeting(x + hspeed, y + vspeed, enemy){
+		with instance_nearest(x, y, enemy) cursed = 1;
+			with instances_matching_ge(hitme, "cursed", 1)
+{
+		repeat(4) with instance_create(x+random_range(-10, 10), y+random_range(-10, 10), Curse) {
+			direction = (random_range(0, 360))
+			speed = random_range(1, 5)
+		}
+		//sound_play_pitch(sndExplosion, 2)
+		}
+	}
+	//instance_create(x+random_range(-5, 5), y+random_range(-5, 5), Curse)
+	with instance_create(x+random_range(-5, 5), y+random_range(-5, 5), Curse) {
+	direction = (random_range(0, 360))
+	speed = random_range(1, 1.2)	
+	}
+	}
+}
+//Dark Pearl
+
+//Prismatic Key
+var amount = item_get_count("key") * pearls
+if amount >= 1 && instance_exists(Player)
+{
+	with (Player) {
+if "KeyHealth" not in self {
+	KeyHealth = 3
+}
+
+if Player.my_health < Player.lsthealth {
+	KeyHealth--
+	with instance_create(x, y, PopupText) {
+		time = 10
+		chance = round(random_range(1, 2))
+		if (Player.KeyHealth > 0) {
+		if (chance = 1) { text = "*CRACK*"; sound_play_pitch(sndPlantPotBreak, 1)}
+		if (chance = 2) {text = "*SNAP*"; sound_play_pitch(sndIcicleBreak, 1)}
+		} else {
+		if (chance = 1) { text = "@r@q*CRACK*"; sound_play_pitch(sndPlantPotBreak, 0.8)}
+		if (chance = 2) {text = "@r@q*SNAP*"; sound_play_pitch(sndIcicleBreak, 0.8)}	
+		remove_item(item[? "key"])
+		add_item(item[? "keyB"], 1)
+		Player.KeyHealth = 3;
+		}
+	}
+}
+}
+
+}
 //Scale health with level
 if (GameCont.level >= 2) { extra_health += 3} // 4
 if (GameCont.level >= 3) { extra_health += 3} // 4
@@ -1822,6 +1899,7 @@ if instance_exists(Player)
 
 with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction + 1 instance_destroy()}
 
+if instance_exists(Player) Player.lsthealth = Player.my_health
 #define draw_gui
 
 //Drawing Red flash from blood god's blood armor

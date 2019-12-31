@@ -603,7 +603,7 @@ item_death_scythe = {
 #macro item_CD item[? "CD"]
 item_CD = {
   name              : "Sharp CD",
-	description_small : "@sEnemies have a chance to @wshoot discs",
+	description_small : "@sEnemies have a chance to @wshoot discs@s on death",
 	description_large : "-",
 	spr_index         : 54,
 	tier              : 3
@@ -649,13 +649,43 @@ item_Fcoin = {
 	tier              : 5
 };
 
-// ITEM 59: Fake Cursed Coin 
+// ITEM 59: Lost Pearl
 #macro item_pearl item[? "pearl"]
 item_pearl = {
-  name              : "Lost Pearl",
+  name              : "Prismatic Pearl",
 	description_small : "@p+@r5@y0@g% @bI@pT@rE@yM @gP@bO@pW@rE@yR@g, @rINCREASED DIFFICULTY",
 	description_large : "-",
 	spr_index         : 59,
+	tier              : 4
+};
+
+// ITEM 60: Dark Pearl
+#macro item_Dpearl item[? "Dpearl"]
+item_Dpearl = {
+  name              : "Dark Pearl",
+	description_small : "@rOne stack items do nothing     #@gDark Bullets",
+	description_large : "-",
+	spr_index         : 60,
+	tier              : 4
+};
+
+// ITEM 60: Prismatic Key
+#macro item_key item[? "key"]
+item_key = {
+  name              : "Prismatic Key",
+	description_small : "@sFragile",
+	description_large : "-",
+	spr_index         : 61,
+	tier              : 5
+};
+
+// ITEM 60: Prismatic Key (Broken)
+#macro item_keyB item[? "keyB"]
+item_keyB = {
+  name              : "Broken Key",
+	description_small : "@dBroken, useless",
+	description_large : "-",
+	spr_index         : 62,
 	tier              : 5
 };
 #define items_finalize()

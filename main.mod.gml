@@ -792,7 +792,7 @@ global.AnomalyGet  = false;
 global.HardmodeGet = false;
 Player.debug1 = 0;
 
-if irandom_range(1, 3) = 1 && Gamemode != 2
+if irandom_range(1, 3) = 1 && global.Gamemode != 2
 {
 	GameCont.area        = 101;
 	global.areaChoice    = 101;
