@@ -90,10 +90,10 @@ item_pre_war_light_bulb = {
 
 };
 
-// ITEM 7: RADI GUMDROP
-#macro item_radi_gumdrop item[? "gumdrop"]
-item_radi_gumdrop = {
-  name              : "Radi Gumdrop",
+// ITEM 7: OLD BANDAGES, FORMERLY RADI GUMDROP
+#macro item_old_bandages item[? "bandages"]
+item_old_bandages = {
+  name              : "Old Banages",
 	description_small : "@gHeal @sover time",
 	description_large : "@severy minute you have a chance of @w3,6% @d(+0.6% per stack) @gheal @sfor @w1 HP#@schance of @ghealing @sincreases by @w3,6% @d(+0.6% per stack) @swhen not @ghealed",
 	spr_index         : 7,
@@ -145,11 +145,11 @@ item_r_wing = {
 
 };
 
-// ITEM 12: RADIATED SNACK
-#macro item_radiated_snack item[? "snack"]
-item_radiated_snack = {
-  name              : "Radiated Snack",
-	description_small : "@gRads @gheal",
+// ITEM 12: RADIATED FRUIT
+#macro item_radiated_fruit item[? "fruit"]
+item_radiated_fruit = {
+  name              : "Radiated Fruit",
+	description_small : "@gRads @smay @gheal @syou",
 	description_large : "-",
 	spr_index         : 12,
 	tier              : 0
@@ -426,7 +426,7 @@ item_glowing_fern = {
 	description_small : "@wEnemies @smay drop @wStealth Packs",
 	description_large : "-",
 	spr_index         : 37,
-	tier              : 2
+	tier              : 1
 
 };
 
@@ -501,7 +501,7 @@ item_mercenary_canteen = {
 #macro item_injury item[? "injury"]
 item_injury = {
   name              : "INJURY",
-	description_small : "@s-@w2 @rMax HP",
+	description_small : "@s-@w1 @rMax HP",
 	description_large : "-",
 	spr_index         : 44,
 	tier              : 4
@@ -603,7 +603,7 @@ item_death_scythe = {
 #macro item_CD item[? "CD"]
 item_CD = {
   name              : "Sharp CD",
-	description_small : "@sEnemies have a chance to @wshoot discs@s on death",
+	description_small : "@wEnemies @sshoot @wdiscs @son @wdeath",
 	description_large : "-",
 	spr_index         : 54,
 	tier              : 3
@@ -639,17 +639,17 @@ item_sarkora = {
 	tier              : 4
 };
 
-// ITEM 58: Fake Cursed Coin 
-#macro item_Fcoin item[? "Fcoin"]
-item_Fcoin = {
-  name              : "Fake Coin",
-	description_small : "@dCheaters get @sfake coins",
+// ITEM 58: FALSE COIN
+#macro item_Fcurrency item[? "Fcurrency"]
+item_Fcurrency = {
+  name              : "Faux Coin",
+	description_small : "@dCheaters@s get @wfake coins",
 	description_large : "-",
 	spr_index         : 58,
 	tier              : 5
 };
 
-// ITEM 59: Lost Pearl
+// ITEM 59: + ITEM POWER, + Difficulty
 #macro item_pearl item[? "pearl"]
 item_pearl = {
   name              : "Prismatic Pearl",
@@ -688,6 +688,29 @@ item_keyB = {
 	spr_index         : 62,
 	tier              : 5
 };
+
+// ITEM 60: RADI GUMDROP
+#macro item_radi_gumdrop item[? "gumdrop"]
+item_radi_gumdrop = {
+  name              : "Radi Gumdrop",
+	description_small : "@sChance for @grads @sto turn into @gchunks",
+	description_large : "-",
+	spr_index         : 60,
+	tier              : 0
+
+};
+
+// ITEM 61: IDOL PARAGON
+#macro item_idol_paragon item[? "paragon"]
+item_idol_paragon = {
+  name              : "Idol Paragon",
+	description_small : "@wShrines @sare more @wpowerful",
+	description_large : "-",
+	spr_index         : 61,
+	tier              : 2
+
+};
+
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),

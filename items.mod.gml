@@ -71,10 +71,10 @@ global.hurtFloor = false;
 global.PlusItems = 0;
 global.hideDes = 0;
 global.popoChance = 0;
-global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "snack"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
-global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]   , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
-global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"] , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: Fern
-global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]    , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"], item[? "CD"]] // Todo: brooch
+global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "bandages"], item[? "fruit"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
+global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]    , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
+global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"]  , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: Fern
+global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]     , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"], item[? "CD"]] // Todo: brooch
 global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "currency"], item[? "Fcurrency"], item[? "pearl"], item[? "Dpearl"], item[? "key"]]
 
 //set new level function
@@ -104,6 +104,7 @@ while(true){
 #macro doubleChests    mod_variable_get("mod", "main", "doubleChests");
 #macro doubleShrines   mod_variable_get("mod", "main", "doubleShrines");
 #macro forceSupport    mod_variable_get("mod", "main", "forceSupport");
+
 #define game_start
 Player.lunarDrops = 1;
 global.PlayerItems = [item[? "none"]]
@@ -139,10 +140,10 @@ Player.fx_celesteel = 0;
 Player.shakeText    = 0;
 
 #define level_start
-var amount = item_get_count("metal") * pearls
+var amount = item_get_power("metal")
 if amount >= 1{Player.armor += 2 * amount}
 
-var amount = item_get_count("brooch") * pearls
+var amount = item_get_count("brooch")
 if amount >= 1{reorder()}
 
 Player.s_Combat = 0;
@@ -166,7 +167,7 @@ with instance_create(Player.x, Player.y, PopupText) {
 //Perfect Prize
 
 //Bandit Mask
-var amount = item_get_count("mask") * pearls
+var amount = item_get_power("mask")
 if (amount >= 1) global.MaskCounter = (room_speed * (1 + 4 *  amount))
 //Bandit Mask
 
@@ -176,7 +177,7 @@ global.descriptionTimer = 0;
 // CHESTS:
 var  _area_amount = 0,
 	  _chest_amount = 3 + skill_get(28),
-    _prize_amount = item_get_count("prize") * (global.hurtFloor = false ? 0 : 1),
+    _prize_amount = item_get_power("prize") * (global.hurtFloor = false ? 0 : 1),
 		_curse_amount = (GameCont.area = 104 ? 1 : 0) + irandom(99) > (crown_current != 1 ? (crown_current = 11 ? 66 : 14) : 0) ? 1 : 0,
           _floorq = ds_list_create(), // put all available floor tiles into a list
 	             _i = 0;
@@ -323,7 +324,7 @@ if hpBars = true
 	}
 }
 
-var amount = item_get_count("nitrogen") * pearls //LIQUID NITROGEN
+var amount = item_get_power("nitrogen") //LIQUID NITROGEN
 if amount >= 1 && instance_exists(Player){
 var light = (45 + (amount * 7))
 if (preformanceMode == true) draw_set_alpha(1); draw_set_color(c_blue)
@@ -338,7 +339,7 @@ if (speed <= 0.1) instance_destroy()
 draw_set_alpha(1)
 }
 
-var amount = item_get_count("bulb") * pearls //PRE WAR LIGHT BULBS
+var amount = item_get_power("bulb") //PRE WAR LIGHT BULBS
 var _light = 30 + random(2);
 if amount >= 1 && instance_exists(Player)
 {
@@ -541,7 +542,7 @@ if (type == "Printing")
 		else
 		{
 			remove_item(global.PlayerItems[_roll])
-			get_item(itemPrint)
+			get_item(itemPrint, 1)
 		}
 		sound_play_pitch(sndCrownProtection, 1)
 		global.popoChance = 10
@@ -575,51 +576,110 @@ draw_sprite(global.shrineIcons, sprite, x + 6, y-20)
 
 #define obj_create(_x, _y, obj_name)
 var _obj = -4
-switch(obj_name) {
-	case "ItemChest":
-		_obj = instance_create(_x, _y, chestprop)
-		with(_obj)
-		{
-			name = "ItemChest";
-			spr_shadow = shd24;
-			spr_open = global.sprItemChestOpen;
-			sprite_index = global.sprItemChest;
-			if roll_luck(1) tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
-			if tag = "none" && roll_luck(4) tag = "large"  // 5% chance to turn into a large chest if gold chest roll failed
-			chest_setup(tag)
-			if (tag != "cursed") on_open = itemchest_open;
-		}
-		return _obj;
-	case "CustomPickup":
-		_obj = instance_create(_x, _y, Pickup);
-		with _obj
-		{
-			name = "CustomPickup";
-			sprite_index = global.sprFernPickup
-			mask_index   = mskPickup
-			image_speed  = 0
-			friction = .2
-			num = 1 + (crown_current = 4 ? room_speed * 1 : 0)
-			tag  = "none"
-			anim = 20 + irandom(30)
-			if (irandom(9) + 1) <= skill_get(mut_rabbit_paw) * 4 instance_create(x, y, RabbitPaw)
-			lifetime = room_speed * 10 - (crown_current = 4 ? room_speed * 5 : 0) + irandom(15)
-			on_pickup = ror_pickup
-		}
-		return _obj;
+switch(obj_name)
+{
+	case "Coin":
+				_obj = obj_create(_x, _y, "ItemChest");
+				with _obj
+				{
+					tag = "coin";
+					item_index = item[? choose("currency")];
+					chest_setup(tag);
+				}
+				return _obj;
 	case "Shrine":
-		_obj = instance_create(_x, _y, CustomObject)
-		with _obj
-		{
-			image_speed = 0.2;
-      name = "Shrine"
-      sprite_index = sprThroneStatue;
-	    itemPrint = global.CommonItems[irandom(array_length(global.CommonItems) - 1)]
-		}
-		return _obj;
+				_obj = shrine_create(_x, _y);
+				return _obj;
+	case "AmmoChest":
+				_obj  =instance_create(_x, _y, AmmoChest)
+				return _obj;
+	case "RadChest":
+				_obj  =instance_create(_x, _y, RadChest)
+	case "BigRadChest":
+				_obj  = obj_create(_x, _y, "RadChest");
+				with _obj
+				{
+					maxhealth = 20;
+					my_health = maxhealth;
+				  spr_idle = sprRadChestBig;
+			    spr_hurt = sprRadChestBigHurt;
+			    spr_dead = sprRadChestBigDead;
+			  }
+				return _obj;
+	case "RadChest?":
+				if roll_luck(7) = true{_obj  = obj_create(_x, _y, "RadChest")}
+												  else{_obj  = obj_create(_x, _y, "BigRadChest")}
+	case "HealthChest":
+				_obj  =instance_create(_x, _y, HealthChest)
+				return _obj;
+	case "WeaponChest":
+				_obj  =instance_create(_x, _y, WeaponChest)
+				return _obj;
+	case "BigWeaponChest":
+				_obj  =instance_create(_x, _y, BigWeaponChest)
+				return _obj;
+	case "WeaponChest?":
+				if roll_luck(5) = true{_obj  =instance_create(_x, _y, BigWeaponChest)}
+													else{_obj  =instance_create(_x, _y, WeaponChest)}
+				return _obj;
+	case "ItemChest":
+				_obj = instance_create(_x, _y, chestprop)
+				with _obj
+				{
+					name = "ItemChest";
+					amount = 1;
+					spr_shadow = shd24;
+					spr_open = global.sprItemChestOpen;
+					sprite_index = global.sprItemChest;
+					if roll_luck(1) tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
+					if tag = "none" && roll_luck(4) tag = "large"  // 5% chance to turn into a large chest if gold chest roll failed
+					chest_setup(tag)
+					if (tag != "cursed") on_open = itemchest_open;
+				}
+				return _obj;
+	case "LargeItemChest":
+				_obj = obj_create(_x, _y, "ItemChest")
+				with _obj
+				{
+					name = "LargeItemChest";
+					tag = "large"
+					chest_setup(tag)
+					on_open = itemchest_open;
+				}
+				return _obj;
+	case "ItemChest?":
+				if roll_luck(5) = true{_obj  =obj_create(_x, _y, "ItemChest")}
+													else{_obj  =obj_create(_x, _y, "LargeItemChest")}
+				return _obj;
+	case "Item":
+				_obj = obj_create(_x, _y, "ItemChest");
+				with _obj
+				{
+					tag = "item";
+					item_index = item[? "boots"];
+					chest_setup(tag);
+				}
+				return _obj;
+	case "CustomPickup":
+				_obj = instance_create(_x, _y, Pickup);
+				with _obj
+				{
+					name = "CustomPickup";
+					sprite_index = global.sprFernPickup
+					mask_index   = mskPickup
+					image_speed  = 0
+					friction = .2
+					num = 1 + (crown_current = 4 ? room_speed * 1 : 0)
+					tag  = "none"
+					anim = 20 + irandom(30)
+					if (irandom(9) + 1) <= skill_get(mut_rabbit_paw) * 4 instance_create(x, y, RabbitPaw)
+					lifetime = room_speed * 10 - (crown_current = 4 ? room_speed * 5 : 0) + irandom(15)
+					on_pickup = ror_pickup
+				}
+				return _obj;
 }
 
-#define get_item(ITEM)
+#define get_item(ITEM ,AMOUNT)
 global.itemGet = ITEM
 if (ITEM != item[? "currency"] && ITEM != item[? "Fcurrency"]) global.descriptionTimer = room_speed * 4
 if (ITEM = item[? "currency"]) {
@@ -652,9 +712,9 @@ else
 }
 
 // Molding clay
-var _amount = 0;
-if roll_luck(100 / (item_get_count("clay") + 1)) _amount = item_get_count("clay") + 1
-global.ItemGetAmount = item_get_count("clay") > 0 ? _amount : 1
+var _clay_amount = 0;
+if roll_luck(100 / (item_get_power("clay") + 1)) _clay_amount = AMOUNT * item_get_power("clay");
+global.ItemGetAmount = item_get_power("clay") > 0 ? _clay_amount: AMOUNT;
 if global.ItemGetAmount = 0
 {
 	ITEM = item[? "nothing"]
@@ -713,6 +773,7 @@ if ITEM = item[? "heater"] && global.ItemGetAmount > 0
 if ITEM = item[? "injury"] && global.ItemGetAmount > 0
 {
 	Player.lasthit = [global.sprDeathCauseInjury, "INJURY"]
+	Player.my_health--;
 }
 if ITEM = item[? "plate"] && global.ItemGetAmount > 0
 {
@@ -758,26 +819,23 @@ if (dc_ == true || ds_ == true) global.cheats = true;
 if (dc_ == false && ds_ == false) global.cheats = false;
 //Cursed Chest Opening
 with (Player) if distance_to_object(CustomObject)
-if instance_exists(Player) {
-with instances_matching_le(enemy,"my_health",0){
-g = mod_variable_get("mod", "main", "Gamemode")
-if (g == 0) chance = round(random_range(1, 500 * Player.lunarDrops))
-if (g == 1) chance = round(random_range(1, 250 * Player.lunarDrops))
-if (g == 2) chance = round(random_range(1, 500))
-
-if (chance == 1) 
+if instance_exists(Player)
 {
-	Player.lunarDrops++
-	with obj_create(x, y, "ItemChest")
-			{
-				tag = "coin"
-				if (global.cheats == false) item_index = item[? choose("currency")]
-				if (global.cheats == true) item_index = item[? choose("Fcurrency")]
-				chest_setup(tag)
-			}
-		}
+	with instances_matching_le(enemy,"my_health",0)
+	{
+		var      _g = mod_variable_get("mod", "main", "Gamemode"),
+				_chance = 0;
+		if (_g == 0) _chance = round(random_range(1, 500 * Player.lunarDrops))
+		if (_g == 1) _chance = round(random_range(1, 250 * Player.lunarDrops))
+		if (_g == 2) _chance = round(random_range(1, 500))
+	}
+	if _chance = 1
+	{
+		Player.lunarDrops++
+		obj_create(x, y, "Coin")
 	}
 }
+
 //Invincibility
 with (Player)
 {
@@ -976,22 +1034,12 @@ with (Player)
 	{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 		{
-			with obj_create(mouse_x, mouse_y, "ItemChest")
+			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "paragon"]}
+			with shrine_create(mouse_x, mouse_y)
 			{
-				tag = "item";
-				item_index = item[? "CD"]
-				chest_setup(tag)
-			}
-			/*with shrine_create(mouse_x, mouse_y)
-			{
-				index = crwn_hatred;
+				index = crwn_destiny;
 				shrine_setup();
 			}
-			with obj_create(mouse_x, mouse_y, "ItemChest")
-			{
-				tag = "none";
-				chest_setup(tag)
-			}*/
 		}
 	}
 }
@@ -1004,11 +1052,9 @@ var extra_reload    = 0,
 		extra_health    = 0,
 		extra_accuracy  = 0,
 		extra_damage    = 0;
-pearls = 1;
-if (item_get_count("pearl") >= 1) pearls = item_get_count("pearl") + .5
 
 //inside information (more damage to IDPD and they drop more stuff)
-var amount = item_get_count("info") * pearls
+var amount = item_get_power("info")
 var IDPD = [Grunt, Shielder, Inspector, EliteGrunt, EliteShielder, EliteInspector, Van, Last]
 for (var i = 0, iLen = array_length_1d(IDPD); i < iLen; i++) {
 var choice = IDPD[i]
@@ -1024,8 +1070,8 @@ with instances_matching_le(choice,"my_health",0){
 }
 //inside information (more damage to IDPD and they drop more stuff)
 
-//radi gumdrop (heal overtime)
-var amount = item_get_count("gumdrop") * pearls
+//radi bandages (heal overtime)
+var amount = item_get_power("bandages")
 if amount >= 1 {
     with (Player) {
         var _x = (amount * 2); if (_x >= 15) _x = 15;
@@ -1035,10 +1081,10 @@ if (my_health < maxhealth) my_health += round(global.RadiGumdropTimer)
 if (my_health > maxhealth) my_health = maxhealth
  global.RadiGumdropTimer = 0;
 }}}
-//radi gumdrop (heal overtime)
+//radi bandages (heal overtime)
 
 //Mechanical Lens (Homing)
-var amount = item_get_count("lens") * pearls
+var amount = item_get_power("lens")
 if amount >= 1
 {
 	with instances_matching(projectile, "team", 2)
@@ -1070,7 +1116,7 @@ if amount >= 1
 //Mechanical Lens (Homing)
 
 //Golden Shots (random crits)
-var amount = item_get_count("golden") * pearls
+var amount = item_get_power("golden")
 if amount >= 1
 {
 	with instances_matching(projectile, "team", 2)
@@ -1090,7 +1136,7 @@ if amount >= 1
 //Golden Shots (random crits)
 
 //Radiated Snack
-var amount = item_get_count("snack") * pearls
+var amount = item_get_power("fruit")
 if amount >= 1 {
 with (Rad) {
 if "Touched" not in self {
@@ -1106,7 +1152,7 @@ sound_play_pitch(sndHPPickup, 1.3)
 //Radiated Snack
 
 //Rubber Projectile
-var amount = item_get_count("rubber") * pearls  //Doesn't increase per rubber projectile
+var amount = item_get_power("rubber")
 if amount >= 1
 {
 	with instances_matching(projectile, "team", 2)
@@ -1117,7 +1163,7 @@ if amount >= 1
 //Rubber Projectile
 
 //Bandit Mask
-var amount = item_get_count("mask") * pearls
+var amount = item_get_power("mask")
 with (Player)
 {
   if global.MaskCounter > 0
@@ -1137,7 +1183,7 @@ with (Player)
 //Bandit Mask
 
 //Ancient Armor Plate
-var amount = item_get_count("plate") * pearls
+var amount = item_get_power("plate")
 if amount >= 1
 {
   with (enemy)
@@ -1156,7 +1202,7 @@ if amount >= 1
 //Pre-War Light Bulb
 
 //Cryo Rounds
-var amount = item_get_count("cryo") * pearls
+var amount = item_get_power("cryo")
 if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).freezeTime = 25 * amount}}}
 
 with instances_matching_ge(enemy, "freezeTime", 1)
@@ -1175,7 +1221,7 @@ with instances_matching_ge(enemy, "freezeTime", 1)
 //Cryo Rounds
 
 //Incendiary Rounds
-var amount = item_get_count("incendiary") * pearls
+var amount = item_get_power("incendiary")
 if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFire = (4 + amount * 2) * (GameCont.area = 101 ? 0 : 1)}}}
 
 with instances_matching_ge(enemy, "OnFire", 1)
@@ -1224,7 +1270,7 @@ with instances_matching_ge(enemy, "OnFire", 1)
 //Incendiary Rounds
 
 //Fel Rounds
-var amount = item_get_count("fel") * pearls
+var amount = item_get_power("fel")
 if amount >= 1 && roll_luck(4 + amount * 2) {with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFel = true}}}
 {with instances_matching(projectile, "isFel", true){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFel = true}}}
 
@@ -1307,7 +1353,7 @@ with instances_matching_ge(hitme, "OnFel", 1)
 //Fel Rounds
 
 //Occult Artifact
-var amount = item_get_count("artifact") * pearls
+var amount = item_get_power("artifact")
 if amount >= 1
 {
 	with instances_matching_le(enemy,"my_health",0)
@@ -1319,7 +1365,7 @@ if amount >= 1
 
 
 //Slosher
-var amount = item_get_count("slosher") * pearls
+var amount = item_get_power("slosher")
 if amount >= 1 {
     with instances_matching(projectile, "team", 2) {
         if "sloshed" not in self {
@@ -1346,7 +1392,7 @@ if amount >= 1 {
 
 
 //Growth Fungus
-var amount = item_get_count("fungus") * pearls
+var amount = item_get_power("fungus")
 if amount >= 1 {
     with instances_matching(projectile, "team", 2) {
         if "growth" not in self && object_index != Lightning {
@@ -1360,7 +1406,7 @@ if amount >= 1 {
 //Growth Fungus
 
 //R-Wing
-var amount = item_get_count("wing") * pearls
+var amount = item_get_power("wing")
 if amount >= 1 {
 with (projectile) {
     if team != 2 && "RWING" not in self {
@@ -1373,7 +1419,7 @@ with (projectile) {
 //R-Wing
 
 //Sabotage Tools
-var amount = item_get_count("tools") * pearls
+var amount = item_get_power("tools")
 if amount >= 1
 {
 	with (projectile)
@@ -1387,7 +1433,7 @@ if amount >= 1
 //Sabotage Tools
 
 //Metafillings
-var amount = item_get_count("fillings") * pearls
+var amount = item_get_power("fillings")
 if amount >= 1
 {
 	with(Pickup)
@@ -1402,7 +1448,7 @@ if amount >= 1
 //Metafillings
 
 //Bloody Lust
-var amount = item_get_count("lust") * pearls
+var amount = item_get_power("lust")
 if amount >= 1 {
 with (Player) if nexthurt == current_frame + 5 && !instance_exists(Portal){sleep(20); global.BloodCounter = (room_speed * 3 + room_speed * amount)}
 if global.BloodCounter > 0 {
@@ -1430,7 +1476,7 @@ if (global.BloodCounter = 1) with (Player){
 //Liquid Nitrogen
 
 //Focus
-var amount = item_get_count("focus") * pearls
+var amount = item_get_power("focus")
 if amount >= 1 {
     with (projectile) { if team != 2 && "Focus" not in self{
     image_xscale = clamp(image_xscale - (amount * 0.05), .6, image_xscale - (amount * 0.05))
@@ -1441,7 +1487,7 @@ if amount >= 1 {
 //Focus
 
 //Binky
-var amount = item_get_count("binky") * pearls
+var amount = item_get_power("binky")
 if amount >= 1
 {
 	with (enemy) if "Shrink" not in self
@@ -1460,7 +1506,7 @@ if amount >= 1
 //Binky
 
 //Bullet Grease
-var amount = item_get_count("grease") * pearls
+var amount = item_get_power("grease")
 if amount >= 1
 {
 	if instance_exists(Player) with instances_matching(projectile, "team", Player.team)
@@ -1475,12 +1521,31 @@ if amount >= 1
 }
 //Bullet Grease
 
+var amount = item_get_power("gumdrop")
+if amount >= 1
+{
+	with Rad
+	{
+		if !instance_is(self, BigRad) && "gumdrop_flag" not in self
+		{
+			gumdrop_flag = true;
+			if roll_luck(amount) = true
+			{
+				sound_play_pitchvol(sndRadPickup, random_range(.7, .85), .4)
+				repeat(8) with instance_create(x + random_range(-3, 3), y + random_range(-3, 3), EatRad){image_speed = random_range(.35, .5); sprite_index = choose(sprEatRad, sprEatBigRad,sprEatRad, sprEatBigRad, sprEatRadPlut, sprEatBigRadPlut)}
+				instance_create(x, y, BigRad)
+				instance_delete(self);
+			}
+		}
+	}
+}
+
 //Forgotten Gift
     //Check get_item()
 //Forgotten Gift
 
 //Mini-Mush
-var amount = item_get_count("mush") * pearls
+var amount = item_get_power("mush")
 if amount >= 1
 {
 	with (Player)
@@ -1495,7 +1560,7 @@ if amount >= 1
 //Mini-Mush
 
 //Gun God's Blessing
-var amount = item_get_count("blessing") * pearls
+var amount = item_get_power("blessing")
 if amount >= 1
 {
   with (projectile) if "blessed" not in self && "sacred" not in self && team = 2
@@ -1516,7 +1581,7 @@ if amount >= 1
 //Gun God's Blessing
 
 //Gun Boots
-var amount = item_get_count("boots") * pearls
+var amount = item_get_power("boots")
 if amount >= 1 && instance_exists(Player)
 {
 	with Player
@@ -1551,7 +1616,7 @@ if amount >= 1 && instance_exists(Player)
 //Gun Boots
 
 //Teleporter Siphon
-var amount = item_get_count("siphon") * pearls
+var amount = item_get_power("siphon")
 if amount >= 1 && instance_exists(Player)
 {
 	if point_in_teleporter(Player) = true extra_reload += .1 + (.2 * amount)
@@ -1559,7 +1624,7 @@ if amount >= 1 && instance_exists(Player)
 //Teleporter Siphon
 
 //Firewood
-var amount = item_get_count("firewood") * pearls
+var amount = item_get_power("firewood")
 if amount >= 1 && instance_exists(Player){
     with (Player) if "firewoodCharge" not in self { Player.firewoodCharge = 0 }
     with (Player) if "firewoodKills" not in self { Player.firewoodKills = 0 }
@@ -1589,7 +1654,7 @@ Player.firewoodCharge = 0;
 //Firewood
 
 //Ammo Extractor
-var amount = item_get_count("extractor") * pearls
+var amount = item_get_power("extractor")
 if amount >= 1
 {
 	with instances_matching_le(enemy, "my_health", 0) if size > 0
@@ -1605,7 +1670,7 @@ if amount >= 1
 //Ammo Extractor
 
 //Glowing Fern
-var amount = item_get_count("fern") * pearls
+var amount = item_get_power("fern")
 if amount >= 1
 {
 	with instances_matching_le(enemy, "my_health", 0) if size > 0
@@ -1621,7 +1686,7 @@ if amount >= 1
 //Glowing Fern
 
 //Chopper
-var amount = item_get_count("chopper") * pearls
+var amount = item_get_power("chopper")
 if amount >= 1
 {
   with (Player)
@@ -1642,7 +1707,7 @@ if amount >= 1
 //Chopper
 
 //Broken Locket
-var amount = item_get_count("locket") * pearls
+var amount = item_get_power("locket")
 if amount >= 1
 {
 	with instances_matching_le(enemy, "my_health", 0)
@@ -1660,7 +1725,7 @@ if amount >= 1
 //Broken Locket
 
 // Merc Canteen
-var amount = item_get_count("canteen") * pearls
+var amount = item_get_power("canteen")
 if amount >= 1
 {
 	with instances_matching_le(enemy, "my_health", 0)
@@ -1680,12 +1745,12 @@ if amount >= 1
 // Merc Canteen
 
 //Scrap Missile
-var amount = item_get_count("missile") * pearls
+var amount = item_get_power("missile")
 if amount >= 1 && instance_exists(Player){extra_damage += (Player.armor + Player.perma_armor) * (.05 + .025 * amount)}
 //Scrap Missile
 
 //backup Heart
-var amount = item_get_count("heart") * pearls
+var amount = item_get_power("heart")
 if amount >= 1 && instance_exists(Player)
 {
 	if Player.my_health <= 0
@@ -1705,7 +1770,7 @@ if amount >= 1 && instance_exists(Player)
 //backup heart
 
 //Explosive Rounds
-var amount = item_get_count("explo") * pearls
+var amount = item_get_power("explo")
 if amount >= 1 && instance_exists(Player)
 {
 	with (Effect)
@@ -1724,7 +1789,7 @@ if amount >= 1 && instance_exists(Player)
 //Molding Clay
 
 //Collider
-var amount = item_get_count("collider") * pearls
+var amount = item_get_power("collider")
 if amount >= 1 && instance_exists(Player)
 {
 	with (projectile)
@@ -1739,7 +1804,7 @@ if amount >= 1 && instance_exists(Player)
 //Collider
 
 //Diamond Bullets
-var amount = item_get_count("diamond") * pearls
+var amount = item_get_power("diamond")
 if amount >= 1 && instance_exists(Player)
 {
 	Player.reloadspeed += (0.5 * amount)
@@ -1755,8 +1820,8 @@ if amount >= 1 && instance_exists(Player)
 }
 //Diamond Bullets
 
-//Death's Scythe
-var amount = item_get_count("scythe") * pearls
+//Death's Scythe   /!\ NOT FINISHED /!\
+var amount = item_get_power("scythe")
 if amount >= 1 && instance_exists(Player)
 {
 		Player.deathCounter += (1 * amount)
@@ -1776,27 +1841,21 @@ if amount >= 1 && instance_exists(Player)
 //Death's Scythe
 
 //Sharp CD
-var amount = item_get_count("CD") * pearls
+var amount = item_get_power("CD")
 if amount >= 1 && instance_exists(Player)
 {
 	chance = round(random_range(1,5))
 	if chance = (1) {
 	with instances_matching_le(enemy,"my_health",0)
-	{	
-		if instance_exists(self) _x = x
-		if instance_exists(self) _y = y
-		wait(1)
-		repeat(amount) with instance_create(_x, _y, Disc)
+	{
+		repeat(round(amount))with instance_create(x, y, Disc)
 		{
-			n = instance_nearest(_x, _y, enemy)
-			direction = point_direction(_x, _y, n.x, n.y)
-			speed = 10
-			if (amount > 1) speed = random_range(8, 12)
-			if (amount > 1) direction += random_range(-5*amount, 5*amount)
-			sprite_index = global.sprCD
+			direction = random(360)
+			speed = 6
+			dist = 10 + irandom(15)
 		  image_xscale = 1
 		  image_yscale = 1
-		  team = 3;
+		  team = -100;
 		}
 	}
 	}
@@ -1886,7 +1945,7 @@ if instance_exists(Player)
 {
 	Player.reloadspeed =  Player.reloadspeed_base  + extra_reload + (skill_get(mut_stress) * (1 - Player.my_health/Player.maxhealth)) + ultra_get(char_venuz, 1)   * .4
 	Player.maxspeed    =  Player.speed_base        + extra_speed  + (skill_get(mut_extra_feet) * .5)
-	Player.maxhealth   = round((Player.health_base + extra_health + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6) - item_get_count("injury") * 2)
+	Player.maxhealth   = round((Player.health_base + extra_health + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6) - item_get_count("injury"))
 	with instances_matching(projectile, "team", Player.team)
 	{
 		if "damage_boost" not in self
@@ -2112,9 +2171,15 @@ with _itemarray
 }
 
 #define item_get_count(ITEM)
-var amount
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM {amount = global.PlayerItems[i].count; break}}
-return amount
+var _amount = 0;
+for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM {_amount = global.PlayerItems[i].count; break}}
+return _amount;
+
+#define item_get_power(ITEM)
+var _amount = 0;
+_amount += item_get_count(ITEM);
+if item_get_count("pearl") > 0 _amount *= item_get_count("pearl") * .5
+return _amount;
 
 #define draw_backdrop(STARTX, STARTY, ENDX, ENDY, TITLE)
 
@@ -2164,8 +2229,8 @@ if "tag" in self
 										break;
 		case "test"   : tem = item[? "brooch"] // this is for testing
 								    break;
-		case "coin"   : if (global.cheats == false) tem = item[? "currency"] // coin time
-						if (global.cheats == true) tem = item[? "Fcurrency"]
+		case "coin"   : if (global.cheats == false) tem = item[? "currency" ] // coin time
+										if (global.cheats == true)  tem = item[? "Fcurrency"]
 								    break;
 		case "none"   :
 		default       : if _roll <= 92 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
@@ -2176,7 +2241,7 @@ if "tag" in self
 	if tag == "item" || tag == "coin" with instance_create(x, y, CustomObject){on_step = antifx_step}
 }
 
-get_item(tem)
+get_item(tem, amount)
 
 // crown of hatred
 if crown_current = 6 && place_meeting(x, y, Player) && tag != "item" && tag != "coin"
@@ -2233,20 +2298,26 @@ switch TAG
 }
 
 #define reorder()
-var amount_common   = 0,
-		amount_uncommon = 0,
-		amount_rare     = 0;
-inherited_items[0,0] = -4
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 0{amount_common   += global.PlayerItems[i].count}};
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 1{amount_uncommon += global.PlayerItems[i].count}};
-for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 2{amount_rare     += global.PlayerItems[i].count}};
-for (var i = 0, j = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier > 2{inherited_items[j,0] = global.PlayerItems[i];inherited_items[j,1] = global.PlayerItems[i].count; j++}};
-global.PlayerItems = []
-global.PlayerItems[0] = item[? "none"]
-if amount_common   > 0 {global.PlayerItems[1] = global.CommonItems[random_range(0, array_length(global.CommonItems))]     ;global.PlayerItems[1].count = amount_common  }
-if amount_uncommon > 0 {global.PlayerItems[2] = global.UncommonItems[random_range(0, array_length(global.UncommonItems))] ;global.PlayerItems[2].count = amount_uncommon}
-if amount_rare     > 0 {global.PlayerItems[3] = global.RareItems[random_range(0, array_length(global.RareItems))]         ;global.PlayerItems[3].count = amount_rare    }
-for (var i = 0, iLen = array_length_1d(inherited_items); i < iLen; i++){global.PlayerItems[4 + i] = inherited_items[i,0]; add_item(inherited_items[i,0], inherited_items[i,1])}
+if array_length_1d(global.PlayerItems) > 1
+{
+	var amount_common   = 0,
+			amount_uncommon = 0,
+			amount_rare     = 0;
+	inherited_items[0] = -4
+	inherited_count[0]  =0
+	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 0{amount_common   += global.PlayerItems[i].count}};
+	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 1{amount_uncommon += global.PlayerItems[i].count}};
+	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier = 2{amount_rare     += global.PlayerItems[i].count}};
+	for (var i = 0, j = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].tier > 2{inherited_items[j] = global.PlayerItems[i];inherited_count[j] = global.PlayerItems[i].count; j++}};
+	global.PlayerItems = []
+	global.PlayerItems[0] = item[? "none"]
+	if amount_common   > 0 {add_item(global.CommonItems[random_range(0, array_length(global.CommonItems))]    , amount_common  )}
+	if amount_uncommon > 0 {add_item(global.UncommonItems[random_range(0, array_length(global.UncommonItems))], amount_uncommon)}
+	if amount_rare     > 0 {add_item(global.RareItems[random_range(0, array_length(global.RareItems))]        , amount_rare    )}
+	if array_length_1d(inherited_items) >= 1 for (var i = 0, iLen = array_length_1d(inherited_items); i < iLen; i++){add_item(inherited_items[i], inherited_count[i])}
+	return true;
+}
+else return false;
 
 #define roll(VALUE)
 var _chance = irandom_range(1,100);
@@ -2254,7 +2325,7 @@ if _chance <= (frac(VALUE) * 100) return (VALUE - frac(VALUE) + 1) else return (
 
 #define roll_luck(VALUE)
 var _chance = irandom_range(1,100),
-    _luck   = item_get_count("coin") + ((item_get_count("gem") > 0 ? 3 : 0) + item_get_count("gem") * 2) * global.GemCoeff + (crown_current = 10 ? 7 : 0); // lucky coin + cracked gem + crown of luck
+    _luck   = item_get_power("coin") + ((item_get_power("gem") > 0 ? 3 : 0) + item_get_power("gem") * 2) * global.GemCoeff + (crown_current = 10 ? 7 : 0); // lucky coin + cracked gem + crown of luck
 if _luck != 0
 {
 	for (i = 0; i < abs(_luck); i++ )
