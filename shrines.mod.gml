@@ -68,7 +68,7 @@ switch index
 														upgrade[2] = -4;
 														has_purchased = false;
 
-														uses = 1 + round(1 + item_get_power("paragon")) / 2;
+														uses = 1 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") + 1 : 0);
 														break;
 	// Shrine of Hatred
 	case   6: case "hatred":  on_interact  = hatred_interact;
@@ -84,7 +84,7 @@ switch index
 														cost    = 3;
 														costval = 0; // change this back to 1
 
-														uses = 3 + round(1 + item_get_power("paragon")) / 2;
+														uses = 1 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") + 1 : 0);
 														break;
 	// Shrine of Luck
 	case 10: case "luck":     on_interact  = luck_interact;
@@ -170,9 +170,15 @@ else
 {
 	var _wep = Player.wep;
 	script_execute(draw);
+	with instance_create(x, y, PopupText)
+	{
+		target = Player;
+		mytext = string(weapon_get_name(Player.wep)) + "!";
+	}
 	if _wep != Player.wep
 	{
 		uses--;
+		trace(uses)
 	}
 	else
 	{
@@ -326,6 +332,7 @@ with instances_matching(CustomObject, "name", "shrine")
 					if has_purchased = true
 					{
 						Player.wep = upgrade[_i]
+						has_purchased = false;
 					}
 				}
 				_i++;

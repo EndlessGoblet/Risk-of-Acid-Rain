@@ -713,7 +713,7 @@ else
 
 // Molding clay
 var _clay_amount = 0;
-if roll_luck(100 / (item_get_power("clay") + 1)) _clay_amount = AMOUNT * item_get_power("clay");
+if roll_luck(100 / (item_get_power("clay") + 1)) _clay_amount = AMOUNT * (item_get_power("clay") + 1);
 global.ItemGetAmount = item_get_power("clay") > 0 ? _clay_amount: AMOUNT;
 if global.ItemGetAmount = 0
 {
@@ -1032,14 +1032,16 @@ with (Player)
 {
 	if(button_pressed(index, "horn"))
 	{
-		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
+
+	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 		{
-			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "key"]}
 			with shrine_create(mouse_x, mouse_y)
 			{
-				index = crwn_destiny;
+				index = crwn_guns
+				;
 				shrine_setup();
 			}
+			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "paragon"]}
 		}
 	}
 }
@@ -1529,7 +1531,7 @@ if amount >= 1
 		if !instance_is(self, BigRad) && "gumdrop_flag" not in self
 		{
 			gumdrop_flag = true;
-			if roll_luck(amount) = true
+			if roll_luck(amount) = true && irandom(2) = 0
 			{
 				sound_play_pitchvol(sndRadPickup, random_range(.7, .85), .4)
 				repeat(8) with instance_create(x + random_range(-3, 3), y + random_range(-3, 3), EatRad){image_speed = random_range(.35, .5); sprite_index = choose(sprEatRad, sprEatBigRad,sprEatRad, sprEatBigRad, sprEatRadPlut, sprEatBigRadPlut)}
@@ -1867,7 +1869,7 @@ var amount = item_get_power("Dpearl")
 if amount >= 1 && instance_exists(Player)
 {
 with (enemy) {
-	if place_meeting(x, y, Curse) 
+	if place_meeting(x, y, Curse)
 	{
 	my_health -= 1 / (room_speed / 30)
 	image_blend = merge_color(c_purple, c_white, 0.5);
@@ -1895,7 +1897,7 @@ with instances_matching(projectile, "team", 2){
 	//instance_create(x+random_range(-5, 5), y+random_range(-5, 5), Curse)
 	with instance_create(x+random_range(-5, 5), y+random_range(-5, 5), Curse) {
 	direction = (random_range(0, 360))
-	speed = random_range(1, 1.2)	
+	speed = random_range(1, 1.2)
 	}
 	}
 }
@@ -1920,7 +1922,7 @@ if Player.my_health < Player.lsthealth {
 		if (chance = 2) {text = "*SNAP*"; sound_play_pitch(sndIcicleBreak, 1)}
 		} else {
 		if (chance = 1) { text = "@r@q*CRACK*"; sound_play_pitch(sndPlantPotBreak, 0.8)}
-		if (chance = 2) {text = "@r@q*SNAP*"; sound_play_pitch(sndIcicleBreak, 0.8)}	
+		if (chance = 2) {text = "@r@q*SNAP*"; sound_play_pitch(sndIcicleBreak, 0.8)}
 		remove_item(item[? "key"])
 		add_item(item[? "keyB"], 1)
 		Player.KeyHealth = 3;
@@ -2178,7 +2180,7 @@ return _amount;
 #define item_get_power(ITEM)
 var _amount = 0;
 _amount += item_get_count(ITEM);
-if item_get_count("pearl") > 0 _amount *= item_get_count("pearl") * .5
+if item_get_count("pearl") > 0 _amount *= (1 + item_get_count("pearl") * .5)
 return _amount;
 
 #define draw_backdrop(STARTX, STARTY, ENDX, ENDY, TITLE)

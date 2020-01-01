@@ -132,20 +132,20 @@ for(i = 1; i < 48; i++) {instance_create(9808 + i*8, 10048, Top) //Top of Bottom
 instance_create(9808 + i*8, 9824, Top)} //Top of Bottom Wall
 //Creating extra walls
 var _x
-var _y 
+var _y
 var DWall = 3;
 if (GameCont.area == 1) DWall = 6
 if (GameCont.area == 101) DWall = 12
 if (GameCont.area == 2) DWall = 8
 for(i = 1; i < DWall; i++) {
-_x = round(random_range(9867, 10132)) 
+_x = round(random_range(9867, 10132))
 _y = round(random_range(9883, 10002)) //Draw random walls
 instance_create(_x, _y, Wall)
 if (GameCont.area = 3) instance_create(_x, _y, Trap)
 }
 
 //Spawning Boss
-with (Player) var w = instance_furthest(x, y, Wall) 
+with (Player) var w = instance_furthest(x, y, Wall)
 var _boss_amount = 1;
 switch GameCont.area
 				{
@@ -547,7 +547,7 @@ if instance_exists(Portal) && global.crownVault == true
 				tag = "item"
 				item_index = mod_variable_get("mod", "items", "UncommonItems")[random_range(0, array_length(mod_variable_get("mod", "items", "UncommonItems")) - 1)]
 				} else {
-				tag = "large"	
+				tag = "large"
 				Player.portalTimer = (room_speed * 16)
 				}
 				chest_setup(tag)
@@ -815,6 +815,11 @@ global.MenuIndex = -1;
 //global.Gamemode  = 0;
 
 #define draw_gui
+
+//Coin Count
+if !instance_exists(Player) draw_money(10, 34)
+if instance_exists(Player) draw_money(15, 48)
+
 // Black backdrop
 if global.MenuIndex > -1 // If any menu is open
 {
@@ -857,10 +862,6 @@ if instance_exists(CharSelect)
 			_string_h = string_height("M") / 2,
 			_active = false;
 			_strbutton = "";
-
-	//Coin Count
-	draw_sprite(global.sprCoinSplatMain, 1, _draw_x - 14, 34)
-	draw_text_nt(_draw_x, 37, "@w" + string(global.coins))
 
 	// Button backdrop
 	var _i = 0;
@@ -1662,6 +1663,9 @@ with instances_matching(CustomProp, "name", "Teleporter")
 }
 return false;
 
+#define draw_money(X, Y)
+draw_sprite(global.sprCoinSplatMain, 1, X - 14, Y)
+draw_text_nt(X, Y + 3, "@w" + string(global.coins))
 
 #define chest_setup(TAG)																 return mod_script_call("mod", "items","chest_setup"   , TAG)
 #define obj_create(X, Y, OBJ_NAME)											 return mod_script_call("mod", "items","obj_create"    , X, Y, OBJ_NAME)

@@ -649,46 +649,6 @@ item_Fcurrency = {
 	tier              : 5
 };
 
-// ITEM 59: + ITEM POWER, + Difficulty
-#macro item_pearl item[? "pearl"]
-item_pearl = {
-  name              : "Prismatic Pearl",
-	description_small : "@p+@r5@y0@g% @bI@pT@rE@yM @gP@bO@pW@rE@yR@g, @rINCREASED DIFFICULTY",
-	description_large : "-",
-	spr_index         : 62,
-	tier              : 4
-};
-
-// ITEM 60: Dark Pearl
-#macro item_Dpearl item[? "Dpearl"]
-item_Dpearl = {
-  name              : "Dark Pearl",
-	description_small : "@rOne stack items do nothing     #@gDark Bullets",
-	description_large : "-",
-	spr_index         : 63,
-	tier              : 4
-};
-
-// ITEM 61`: Prismatic Key
-#macro item_key item[? "key"]
-item_key = {
-  name              : "Prismatic Key",
-	description_small : "@sFragile",
-	description_large : "-",
-	spr_index         : 64,
-	tier              : 5
-};
-
-// ITEM 60: Prismatic Key (Broken)
-#macro item_keyB item[? "keyB"]
-item_keyB = {
-  name              : "Broken Key",
-	description_small : "@dBroken, useless",
-	description_large : "-",
-	spr_index         : 65,
-	tier              : 5
-};
-
 // ITEM 60: RADI GUMDROP
 #macro item_radi_gumdrop item[? "gumdrop"]
 item_radi_gumdrop = {
@@ -709,6 +669,46 @@ item_idol_paragon = {
 	spr_index         : 61,
 	tier              : 2
 
+};
+
+// ITEM 62: PRISMATIC PEARL
+#macro item_pearl item[? "pearl"]
+item_pearl = {
+  name              : "Prismatic Pearl",
+	description_small : "@p+@r5@y0@g% @bI@pT@rE@yM @gP@bO@pW@rE@yR@g, @rINCREASED DIFFICULTY",
+	description_large : "-",
+	spr_index         : 62,
+	tier              : 4
+};
+
+// ITEM 63: DARK PEARL
+#macro item_Dpearl item[? "Dpearl"]
+item_Dpearl = {
+  name              : "Dark Pearl",
+	description_small : "@rOne stack items do nothing     #@gDark Bullets",
+	description_large : "-",
+	spr_index         : 63,
+	tier              : 4
+};
+
+// ITEM 64: PRISMATIC KEY
+#macro item_key item[? "key"]
+item_key = {
+  name              : "Prismatic Key",
+	description_small : "@sFragile",
+	description_large : "-",
+	spr_index         : 64,
+	tier              : 5
+};
+
+// ITEM 65: PRISMATIC KEY (BROKEN)
+#macro item_keyB item[? "keyB"]
+item_keyB = {
+  name              : "Broken Key",
+	description_small : "@dBroken, useless",
+	description_large : "-",
+	spr_index         : 65,
+	tier              : 5
 };
 
 #define items_finalize()
