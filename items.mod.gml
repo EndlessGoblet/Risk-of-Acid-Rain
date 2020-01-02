@@ -71,11 +71,11 @@ global.hurtFloor = false;
 global.PlusItems = 0;
 global.hideDes = 0;
 global.popoChance = 0;
-global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "bandages"], item[? "fruit"]  , item[? "golden"] , item[? "rubber"]  , item[? "focus"] , item[? "mush"]    , item[? "grease"]     , item[? "boots"]  , item[? "chopper"], item[? "locket"]  , item[? "metal"], item[? "mask"]] //TO DO: None
-global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]    , item[? "lust"]   , item[? "nitrogen"], item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"] , item[? "celesteel"], item[? "canteen"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
-global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"]  , item[? "wing"]   , item[? "tools"]   , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: Fern
-global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]     , item[? "fel"]    , item[? "clay"],     item[? "diamond"],item[? "collider"], item[? "CD"]] // Todo: brooch
-global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"], item[? "currency"], item[? "Fcurrency"], item[? "pearl"], item[? "Dpearl"], item[? "key"]]
+global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "bandages"], item[? "fruit"]   , item[? "golden"]   , item[? "rubber"], item[? "focus"]   , item[? "mush"]       , item[? "grease"] , item[? "boots"]  , item[? "chopper"] , item[? "locket"], item[? "metal"]    , item[? "mask"]] //TO DO: Chopper
+global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]  , item[? "celesteel"], item[? "canteen"], item[? "paragon"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
+global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: None
+global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]     , item[? "fel"]     , item[? "clay"]     ,item[? "crystal"], item[? "CD"]] // Todo: brooch
+global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"] , item[? "currency"], item[? "Fcurrency"], item[? "pearl"] , item[? "Dpearl"]  , item[? "key"]]
 
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
@@ -681,7 +681,7 @@ switch(obj_name)
 
 #define get_item(ITEM ,AMOUNT)
 global.itemGet = ITEM
-if (ITEM != item[? "currency"] && ITEM != item[? "Fcurrency"]) global.descriptionTimer = room_speed * 4
+if (ITEM != item[? "currency"] && ITEM != item[? "Fcurrency"]) global.descriptionTimer = room_speed * 3.5
 if (ITEM = item[? "currency"]) {
 c = mod_variable_get("mod", "main", "coins");
 mod_variable_set("mod", "main", "coins", c + 1);
@@ -1037,11 +1037,11 @@ with (Player)
 		{
 			with shrine_create(mouse_x, mouse_y)
 			{
-				index = crwn_guns
+				index = crwn_protection
 				;
 				shrine_setup();
 			}
-			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "paragon"]}
+			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "fern"]}
 		}
 	}
 }
@@ -1790,21 +1790,6 @@ if amount >= 1 && instance_exists(Player)
 //Check opening chest script *
 //Molding Clay
 
-//Collider
-var amount = item_get_power("collider")
-if amount >= 1 && instance_exists(Player)
-{
-	with (projectile)
-	{
-		if (team = 2)
-		{
-			team = 3;
-			damage *= (1 + (amount * .5))
-		}
-	}
-}
-//Collider
-
 //Diamond Bullets
 var amount = item_get_power("diamond")
 if amount >= 1 && instance_exists(Player)
@@ -1846,8 +1831,6 @@ if amount >= 1 && instance_exists(Player)
 var amount = item_get_power("CD")
 if amount >= 1 && instance_exists(Player)
 {
-	chance = round(random_range(1,5))
-	if chance = (1) {
 	with instances_matching_le(enemy,"my_health",0)
 	{
 		repeat(round(amount))with instance_create(x, y, Disc)
@@ -1859,7 +1842,6 @@ if amount >= 1 && instance_exists(Player)
 		  image_yscale = 1
 		  team = -100;
 		}
-	}
 	}
 }
 //Sharp CD
@@ -2397,7 +2379,7 @@ var _pitch = random_range(.8, 1.2);
 switch tag
 {
 	case "fern":
-		global.MaskCounter += room_speed * (5 + round(num));
+		global.MaskCounter += room_speed * (4 + round(num)) - 15;
 		with instance_create(x, y, PopupText)
 		{
 			target = Player;

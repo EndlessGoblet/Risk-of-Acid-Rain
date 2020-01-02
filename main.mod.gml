@@ -1,6 +1,7 @@
 #macro item mod_variable_get("mod", "itemlib", "ItemDirectory");
 
 #define init
+global.sprInteractSplat = sprite_add("sprites/other/sprInteractSplat.png", 1, 0, 0);
 
 #macro savefile "RoAR_Settings.txt" //Remembering settings
 if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
@@ -100,6 +101,7 @@ while(true)
 }
 
 #macro c_fel $FF271C;
+#macro c_inv merge_colour(merge_colour(c_aqua, c_blue, .35), c_white, .3);
 
 #define level_start
 global.BossesLeft    = 0; // 0 at level start, after teleport activation = amount of boss enemies, at 0 again spawns an item
@@ -317,7 +319,7 @@ if instance_exists(Player)
 	with Floor // get a list of all "unoccupied" Floors
 	{
 		var _d = 0;
-		if instance_exists(Player) && distance_to_object(Player) > 92 && !place_meeting(x, y, hitme) && !instance_is(self, FloorExplo) &&  distance_to_object(instance_nearest(x, y, Wall)) > 16
+		if instance_exists(Player) && distance_to_object(Player) > 92 && !place_meeting(x, y, hitme) && !instance_is(self, FloorExplo) &&  distance_to_object(instance_nearest(x, y, Wall)) > 32
 		{
 			_floorq[| _i] = self; // add eligible floor tiles to the list
 			_i++;
@@ -327,8 +329,7 @@ if instance_exists(Player)
 
 
   var enemyChoice = _place[round(random_range(0, array_length(_place) - 1))]
-
-	with instance_create(_floorq[| 0].x, _floorq[| 0].y, enemyChoice)
+	if !is_undefined(_floorq[| 0]) with instance_create(_floorq[| 0].x, _floorq[| 0].y, enemyChoice)
 	{
 		if place_meeting(x, y, Wall) || place_meeting(x, y, FloorExplo) || !place_meeting(x, y, Floor) || distance_to_object(Player) <= 32
 		{
@@ -1314,7 +1315,7 @@ draw_set_halign(fa_left) //_draw x = 115
 	    _drawY   = 82,
 			y_offset = GameCont.level > 0 ? 20 : 0,
 			_mutY    = !is_undefined(skill_get_at(0)) ? 20 : 0;
-  draw_backdrop(_drawX-20, _drawY-60 - y_offset + _mutY, _drawX+68, _drawY-32 - y_offset + _mutY, ""); //drawing black box
+  draw_backdrop(_drawX-20, _drawY-60 - y_offset + _mutY, _drawX+68, _drawY-43 - y_offset + _mutY, ""); //drawing black box
 //DRAWING THE PROGRESS BAR
 var BarLength = (global.time * 83) / global.timeControl
 draw_X = game_width - 89
@@ -1338,9 +1339,9 @@ if (global.difficulty == 6) draw_set_color(Iseeyou)
 if (global.difficulty == 7) draw_set_color(c_black)
 
 draw_set_alpha(1);
-draw_rectangle(0 + draw_X, 11 + draw_Y - y_offset, (BarLength) + draw_X, 1 + draw_Y - y_offset, false)
+draw_rectangle(-1 + draw_X, -4 + draw_Y - y_offset, (BarLength) + draw_X + 1, 5 + draw_Y - y_offset, false)
 draw_set_alpha(0.4);
-draw_rectangle(0 + draw_X, 11 + draw_Y - y_offset, (83) + draw_X, 1 + draw_Y - y_offset, false)
+draw_rectangle(-1 + draw_X, -4 + draw_Y - y_offset, (83) + draw_X + 1       , 5 + draw_Y - y_offset, false)
 draw_set_alpha(1)
 
 var difficultyName
@@ -1356,25 +1357,35 @@ if (global.difficulty == 8) difficultyName = "HAHAHAHAHA"
 draw_set_color(c_white);
 draw_set_alpha(1);
 
-draw_text_nt(game_width - 87, 38 - y_offset + _mutY, string(difficultyName));
+draw_text_nt(game_width - 87, 32 - y_offset + _mutY, string(difficultyName));
 //DRAWING THE PROGRESS BAR END
 
 //DRAW TIME SYSTEM
 draw_set_halign(fa_left)
-draw_set_font(fntM)
-draw_x = 68
-draw_text_nt(game_width- 131 + draw_x, 28 - y_offset + _mutY, ":");
-draw_text_nt(game_width- 151 + draw_x, 28 - y_offset + _mutY, ":");
+draw_set_font(fntSmall)
+draw_x = 66
+draw_text_nt(game_width- 153 + draw_x, 25 - y_offset + _mutY, ":");
+draw_text_nt(game_width- 143 + draw_x, 25 - y_offset + _mutY, ":");
 draw_set_halign(fa_right)
-draw_text_nt(game_width - 110 + draw_x, 28 - y_offset + _mutY, string(global.seconds));
-draw_text_nt(game_width - 130 + draw_x, 28 - y_offset + _mutY, string(global.minutes));
-draw_text_nt(game_width - 149 + draw_x, 28 - y_offset + _mutY, string(global.hours));
+draw_text_nt(game_width - 132 + draw_x, 25 - y_offset + _mutY, string(global.seconds));
+draw_text_nt(game_width - 142 + draw_x, 25 - y_offset + _mutY, string(global.minutes));
+draw_text_nt(game_width - 152 + draw_x, 25 - y_offset + _mutY, string(global.hours));
+var _strdifficulty = "";
+switch global.Gamemode
+{
+	case 0: _strdifficulty = "NORMAL";		break;
+	case 1: _strdifficulty = "HARD"; 			break;
+	case 2: _strdifficulty = "BOSS RUSH"; break;
+}
+draw_set_halign(fa_right)
+draw_text_nt(game_width - 69 + draw_x, 25 - y_offset + _mutY, _strdifficulty)
 if global.seconds < 10 {
-    draw_text_nt(game_width - 118 + draw_x, 28 - y_offset + _mutY, " 0");
+    draw_text_nt(game_width - 136 + draw_x, 25 - y_offset + _mutY, "0");
 }
 if global.minutes < 10 {
-    draw_text_nt(game_width - 138 + draw_x, 28 - y_offset + _mutY, " 0");
+    draw_text_nt(game_width - 146 + draw_x, 25 - y_offset + _mutY, "0");
 }
+draw_set_font(fntM)
 //DRAW TIME SYSTEM END
 } else {
 //Draw splash screen
@@ -1501,10 +1512,10 @@ with instances_matching(CustomProp, "name", "Teleporter")
 
 
 		//DRAW ACTIVATE TEXT
-    draw_x = 1; draw_y = -17; draw_set_alpha(0.5); draw_set_color(c_black);
-    draw_rectangle(draw_x+x + 40 , draw_y+y - 9 , x+draw_x-43 ,y+draw_y , false)
+    draw_x = 1; draw_y = 30;
+    draw_sprite(global.sprInteractSplat, 1, x + draw_x - sprite_get_width(global.sprInteractSplat)/2, y + draw_y - 27);
     draw_set_color(c_white); draw_set_alpha(1)
-    draw_text_nt(x, y - 25, "@1(keysmall:pick) ACTIVATE");
+    draw_text_nt(x, y - 53 + draw_y, "@1(keysmall:pick)####CHARGE");
 	}
 	var _ang = random(360)
 	if global.teleporter = true && (current_frame mod (room_speed * 5)) = 0 && instance_number(_enemy) < 12
@@ -1543,8 +1554,8 @@ with TopCont
 			draw_y = 20
 			var _strTele      = string(global.charge) + "%",
 					_strTeleBlink = point_distance(_tele.x, _tele.y, Player.x, Player.y) <= global.radi ? "@w" : (current_frame mod 5 <= 2 ? "@w" : "@r"),
-					_x            = clamp(_tele.x + draw_x - 2, view_xview + string_width(_strTele)/2, view_xview + game_screen_get_width_nonsync() - string_width(_strTele)/2 + 2),
-					_y            = clamp(_tele.y + 12, view_yview, view_yview + game_screen_get_height_nonsync() - string_height(_strTele)),
+					_x            = clamp(_tele.x + draw_x - 2, view_xview + string_width(_strTele)/2, view_xview + game_width  + 2 - string_width(_strTele)/2),
+					_y            = clamp(_tele.y + 12        , view_yview                           , view_yview + game_height - string_height(_strTele)),
 					_portal       = _tele.portal = "vault" ? sprProtoPortal : sprPortal
 			draw_set_halign(1)
 			draw_text_nt(_x, _y, _strTeleBlink + _strTele);
@@ -1578,6 +1589,19 @@ surface_set_target(global.CircleSurf);
 draw_clear_alpha(c_white,0);
 surface_reset_target();
 
+with instances_matching(CustomObject, "name", "shrine")
+{
+	if instance_exists(Player)
+	{
+		var _x = x - view_xview,
+		    _y = y - view_yview;
+
+		if (global.fancy == 1) surface_set_target(global.CircleSurf)
+		draw_circle_colour(_x - 1, _y, radius, c_inv, c_inv, false);
+		if (global.fancy == 1) surface_reset_target();
+	}
+}
+
 with instances_matching(CustomProp, "name", "Teleporter")
 {
 	//DRAW TELEPORTER CIRCLE
@@ -1606,6 +1630,24 @@ with instances_matching(CustomSlash, "name", "Inv Area")
 	if (global.fancy == 1) surface_set_target(global.CircleSurf)
 	draw_circle_colour(_x, _y, image_xscale, c_fel, c_fel, false);
 	if (global.fancy == 1) surface_reset_target();
+}
+
+
+
+with instances_matching(CustomObject, "name", "shrine")
+{
+	var _x = x - view_xview,
+			_y = y - view_yview;
+
+	if (global.fancy == 1) surface_set_target(global.CircleSurf)
+	draw_set_blend_mode(bm_subtract)
+	draw_circle_colour(_x - 1, _y, radius - 2, c_white, c_white, false);
+	draw_set_blend_mode(bm_normal)
+	if (global.fancy == 1) surface_reset_target();
+
+	draw_set_alpha(.15)
+	draw_circle_colour(x - 1, y, radius, c_inv, c_inv, false)
+	draw_set_alpha(1)
 }
 
 with instances_matching(CustomProp, "name", "Teleporter")
@@ -1664,8 +1706,8 @@ with instances_matching(CustomProp, "name", "Teleporter")
 return false;
 
 #define draw_money(X, Y)
-draw_sprite(global.sprCoinSplatMain, 1, X - 14, Y)
-draw_text_nt(X, Y + 3, "@w" + string(global.coins))
+draw_sprite(global.sprCoinSplatMain, 1, X - 14, Y - 3)
+draw_text_nt(X - 1, Y + 3, "@w" + string(global.coins))
 
 #define chest_setup(TAG)																 return mod_script_call("mod", "items","chest_setup"   , TAG)
 #define obj_create(X, Y, OBJ_NAME)											 return mod_script_call("mod", "items","obj_create"    , X, Y, OBJ_NAME)

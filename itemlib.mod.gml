@@ -568,21 +568,20 @@ item_metafillings = {
 	tier              : 2
 };
 
-
-// ITEM 51: COLLIDER
-#macro item_collider item[? "collider"]
-item_collider = {
-  name              : "Collider",
-	description_small : "@sIncreased @wdamage, @sdon't @rhit yourself",
+// ITEM 51: SMALL ACCOLADE
+#macro item_small_accolade item[? "accolade"]
+item_small_accolade = {
+  name              : "Small Accolade",
+	description_small : "@gHeal @swhen using @wshrines",
 	description_large : "-",
 	spr_index         : 51,
-	tier              : 3
+	tier              : 1
 };
 
-// ITEM 52: DIAMOND ROUNDS
-#macro item_diamond_rounds item[? "diamond"]
-item_diamond_rounds = {
-  name              : "Diamond Rounds",
+// ITEM 52: CRYSTAL ROUNDS
+#macro item_crystal_rounds item[? "crystal"]
+item_crystal_rounds = {
+  name              : "Crystal Rounds",
 	description_small : "@wSharper, Faster, @bpricier @sbullets",
 	description_large : "-",
 	spr_index         : 52,
@@ -649,59 +648,69 @@ item_Fcurrency = {
 	tier              : 5
 };
 
-// ITEM 60: RADI GUMDROP
+// ITEM 59: RADI GUMDROP
 #macro item_radi_gumdrop item[? "gumdrop"]
 item_radi_gumdrop = {
   name              : "Radi Gumdrop",
 	description_small : "@sChance for @grads @sto turn into @gchunks",
 	description_large : "-",
-	spr_index         : 60,
+	spr_index         : 59,
 	tier              : 0
 
 };
 
-// ITEM 61: IDOL PARAGON
+// ITEM 60: IDOL PARAGON
 #macro item_idol_paragon item[? "paragon"]
 item_idol_paragon = {
   name              : "Idol Paragon",
 	description_small : "@wShrines @sare more @wpowerful",
 	description_large : "-",
-	spr_index         : 61,
-	tier              : 2
+	spr_index         : 60,
+	tier              : 1
 
 };
 
-// ITEM 62: PRISMATIC PEARL
+// ITEM 61: PRISMATIC PEARL
 #macro item_pearl item[? "pearl"]
 item_pearl = {
   name              : "Prismatic Pearl",
 	description_small : "@p+@r5@y0@g% @bI@pT@rE@yM @gP@bO@pW@rE@yR@g, @rINCREASED DIFFICULTY",
 	description_large : "-",
-	spr_index         : 62,
+	spr_index         : 61,
 	tier              : 4
 };
 
-// ITEM 63: DARK PEARL
+// ITEM 62: DARK PEARL
 #macro item_Dpearl item[? "Dpearl"]
 item_Dpearl = {
   name              : "Dark Pearl",
 	description_small : "@rOne stack items do nothing     #@gDark Bullets",
 	description_large : "-",
-	spr_index         : 63,
+	spr_index         : 62,
 	tier              : 4
 };
 
-// ITEM 64: PRISMATIC KEY
+// ITEM 63: PRISMATIC KEY
 #macro item_key item[? "key"]
 item_key = {
   name              : "Prismatic Key",
 	description_small : "@sFragile",
 	description_large : "-",
+	spr_index         : 63,
+	tier              : 5
+};
+
+// ITEM 64: PRISMATIC KEY (BROKEN)
+#macro item_keyB item[? "keyB"]
+item_keyB = {
+  name              : "Broken Key",
+	description_small : "@dBroken, useless",
+	description_large : "-",
 	spr_index         : 64,
 	tier              : 5
 };
 
-// ITEM 65: PRISMATIC KEY (BROKEN)
+// ITEM 64: PRISMATIC KEY (BROKEN)
 #macro item_keyB item[? "keyB"]
 item_keyB = {
   name              : "Broken Key",
