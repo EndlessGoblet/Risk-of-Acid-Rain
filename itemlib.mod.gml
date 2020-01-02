@@ -674,7 +674,7 @@ item_idol_paragon = {
 #macro item_pearl item[? "pearl"]
 item_pearl = {
   name              : "Prismatic Pearl",
-	description_small : "@p+@r5@y0@g% @bI@pT@rE@yM @gP@bO@pW@rE@yR@g, @rINCREASED DIFFICULTY",
+	description_small : "+@w50% Item power@s, -@w25% @gmutation @wpower",
 	description_large : "-",
 	spr_index         : 61,
 	tier              : 4
@@ -684,7 +684,7 @@ item_pearl = {
 #macro item_Dpearl item[? "Dpearl"]
 item_Dpearl = {
   name              : "Dark Pearl",
-	description_small : "@rOne stack items do nothing     #@gDark Bullets",
+	description_small : "+@w50% Item power",
 	description_large : "-",
 	spr_index         : 62,
 	tier              : 4
@@ -704,19 +704,39 @@ item_key = {
 #macro item_keyB item[? "keyB"]
 item_keyB = {
   name              : "Broken Key",
-	description_small : "@dBroken, useless",
+	description_small : "@sBroken, useless",
 	description_large : "-",
 	spr_index         : 64,
 	tier              : 5
 };
 
-// ITEM 64: PRISMATIC KEY (BROKEN)
-#macro item_keyB item[? "keyB"]
-item_keyB = {
-  name              : "Broken Key",
-	description_small : "@dBroken, useless",
+// ITEM 65: VILE FLASK
+#macro item_vile_flask item[? "flask"]
+item_vile_flask = {
+  name              : "Vile Flask",
+	description_small : "Apply @gpoison @swith @gToxic Gas",
 	description_large : "-",
 	spr_index         : 65,
+	tier              : 3
+};
+
+// ITEM 66: QUARTZ FLOWER
+#macro item_quartz_flower item[? "flower"]
+item_quartz_flower = {
+  name              : "Quartz Flower",
+	description_small : "@s+@wall stats@s, @wbreaks @son @whit",
+	description_large : "-",
+	spr_index         : 66,
+	tier              : 2
+};
+
+// ITEM 67: BROKEN QUARTZ FLOWER
+#macro item_broken_quartz_flower item[? "spent flower"]
+item_broken_quartz_flower = {
+  name              : "Quartz Flower",
+	description_small : "@sBroken, @wreturns @sfixed @wnext stage",
+	description_large : "-",
+	spr_index         : 67,
 	tier              : 5
 };
 

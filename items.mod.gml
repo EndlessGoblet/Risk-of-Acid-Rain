@@ -13,6 +13,7 @@ global.cheats = false;
 
 global.sprBerserkFX = sprite_add("sprites/other/sprBerserkFX.png", 3,  4, 4);
 global.mskLightBulb = sprite_add("sprites/other/mskLightBulb.png", 1, 32, 32);
+global.GlassShard   = sprite_add("sprites/other/sprGlassShard.png", 5, 4, 4);
 
 global.sprItemChest           = sprite_add_weapon("sprites/chests/sprItemChest.png"       ,     8, 8);
 global.sprGoldItemChest       = sprite_add_weapon("sprites/chests/sprGoldItemChest.png"   ,    13, 8);
@@ -24,8 +25,6 @@ global.sprGoldItemChestOpen   = sprite_add("sprites/chests/sprGoldItemChestOpen.
 global.sprRustyItemChestOpen  = sprite_add("sprites/chests/sprRustyItemChestOpen.png"     , 1,  8, 8);
 global.sprLargeItemChestOpen  = sprite_add("sprites/chests/sprLargeItemChestOpen.png"     , 1, 12, 8);
 global.sprCursedItemChestOpen = sprite_add("sprites/chests/sprCursedItemChestOpen.png"    , 1, 11, 8);
-
-global.sprCD = sprite_add("sprites/other/sprCD.png", 2, 12, 12);
 
 global.sprDeathCauseInjury = sprite_add("sprites/items/sprDeathCauseInjury.png", 1, 9, 6);
 global.sprDeathCauseHeater = sprite_add("sprites/items/sprDeathCauseHeater.png", 1, 9, 6);
@@ -71,11 +70,11 @@ global.hurtFloor = false;
 global.PlusItems = 0;
 global.hideDes = 0;
 global.popoChance = 0;
-global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "bandages"], item[? "fruit"]   , item[? "golden"]   , item[? "rubber"], item[? "focus"]   , item[? "mush"]       , item[? "grease"] , item[? "boots"]  , item[? "chopper"] , item[? "locket"], item[? "metal"]    , item[? "mask"]] //TO DO: Chopper
-global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"] , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]  , item[? "celesteel"], item[? "canteen"], item[? "paragon"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
-global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"] , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"]] //To-Do: None
-global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]     , item[? "fel"]     , item[? "clay"]     ,item[? "crystal"], item[? "CD"]] // Todo: brooch
-global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"] , item[? "currency"], item[? "Fcurrency"], item[? "pearl"] , item[? "Dpearl"]  , item[? "key"]]
+global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "bandages"], item[? "fruit"]   , item[? "golden"]   , item[? "rubber"] , item[? "focus"]   , item[? "mush"]       , item[? "grease"] , item[? "boots"]  , item[? "chopper"] , item[? "locket"], item[? "metal"]    , item[? "mask"]] //TO DO: Chopper
+global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]  , item[? "celesteel"], item[? "canteen"], item[? "paragon"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
+global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]] //To-Do: None
+global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]     , item[? "flask"]   , item[? "clay"]     , item[? "crystal"], item[? "CD"]] // Todo: None
+global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"] , item[? "currency"], item[? "Fcurrency"], item[? "pearl"]  , item[? "Dpearl"]  , item[? "key"]]
 
 //set new level function
 if instance_exists(CharSelect) CharSelect.debugSet = false;
@@ -541,7 +540,7 @@ if (type == "Printing")
 		}
 		else
 		{
-			remove_item(global.PlayerItems[_roll])
+			remove_item(global.PlayerItems[_roll], 1)
 			get_item(itemPrint, 1)
 		}
 		sound_play_pitch(sndCrownProtection, 1)
@@ -578,6 +577,15 @@ draw_sprite(global.shrineIcons, sprite, x + 6, y-20)
 var _obj = -4
 switch(obj_name)
 {
+	case "Cursed Disc":
+				_obj = create_disc(_x, _y);
+				return _obj;
+	case "Small Cursed Disc":
+				_obj = create_disc_small(_x, _y);
+				return _obj;
+	case "Large Cursed Disc":
+				_obj = create_disc_large(_x, _y);
+				return _obj;
 	case "Coin":
 				_obj = obj_create(_x, _y, "ItemChest");
 				with _obj
@@ -1041,7 +1049,7 @@ with (Player)
 				;
 				shrine_setup();
 			}
-			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "fern"]}
+			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "flower"]}
 		}
 	}
 }
@@ -1221,6 +1229,40 @@ with instances_matching_ge(enemy, "freezeTime", 1)
 	}
 }
 //Cryo Rounds
+
+//Vile Flask
+var amount = item_get_power("flask")
+if amount >= 1{with instances_matching(ToxicGas, "sprite_index", sprToxicGas){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnPoison = min(9 ,2 + amount)}}}
+
+with instances_matching_ge(enemy, "OnPoison", 1)
+{
+  image_blend = merge_color(c_lime, c_white, .45)
+	if (current_frame + id) mod 20 <= 1 && self != BigMaggotBurrow && self != RavenFly && self != LilHunterFly
+	{
+		projectile_hit(self, maxhealth / 10, 0, 0)
+		with instance_create(x + random_range(-10, 10), y + random_range(-8, 8), AcidStreak){image_angle = 90; image_xscale = .5; image_yscale = .5;}
+		OnPoison--
+		if OnPoison = 0{image_blend = merge_color(c_lime, c_white, 1)}
+		if my_health <= 0
+		{
+			repeat(size + 2 + amount)
+			{
+				with instance_create(x, y, ToxicGas)
+				{
+					friction *= 3;
+					motion_add(random(360),random_range(1, 1.5));
+				}
+			}
+		}
+	}
+
+	//fx
+	if irandom(4) = 0
+	{
+		with instance_create(x + random_range(-10, 10), y + random_range(-8, 8), AcidStreak){image_angle = 90; image_xscale = .5; image_yscale = .5;}
+	}
+}
+//Vile Flask
 
 //Incendiary Rounds
 var amount = item_get_power("incendiary")
@@ -1765,7 +1807,8 @@ if amount >= 1 && instance_exists(Player)
 		sound_play_pitch(sndCrownBlood, 1.2)
 		sound_play_pitch(sndLevelUltra, 0.8)
 		with instance_create(Player.x, Player.y, PopupText) {text = "@q@rREVIVED"}
-		remove_item(item[? "heart"])
+
+		remove_item(item[? "heart"], 1)
 		add_item(item[? "spent heart"], 1)
 	}
 }
@@ -1829,19 +1872,50 @@ if amount >= 1 && instance_exists(Player)
 
 //Sharp CD
 var amount = item_get_power("CD")
-if amount >= 1 && instance_exists(Player)
+if amount >= 1 && instance_exists(Player) repeat(roll(amount))
 {
 	with instances_matching_le(enemy,"my_health",0)
 	{
-		repeat(round(amount))with instance_create(x, y, Disc)
+		var _size = max(size, 1);
+		do
 		{
-			direction = random(360)
-			speed = 6
-			dist = 10 + irandom(15)
-		  image_xscale = 1
-		  image_yscale = 1
-		  team = -100;
+			if _size >= 4
+			{
+				with obj_create(x, y, "Large Cursed Disc")
+				{
+					direction = random(360)
+					speed = 4;
+					image_angle = direction
+				}
+				_size -= 4;
+				continue;
+			}
+			if _size >= 2
+			{
+				with obj_create(x, y, "Cursed Disc")
+				{
+					direction = random(360)
+					speed = 5;
+					dist = 10 + irandom(15)
+					image_angle = direction
+				}
+				_size -= 2;
+				continue;
+			}
+			if _size >= 1
+			{
+				with obj_create(x, y, "Small Cursed Disc")
+				{
+					direction = random(360)
+					speed = 6;
+					dist = 190 + irandom(15)
+					image_angle = direction
+				}
+				_size -= 1;
+				continue;
+			}
 		}
+		until(_size <= 0)
 	}
 }
 //Sharp CD
@@ -1885,35 +1959,73 @@ with instances_matching(projectile, "team", 2){
 }
 //Dark Pearl
 
-//Prismatic Key
-var amount = item_get_power("key")
+// Quartz Flower
+var amount = item_get_power("flower")
 if amount >= 1 && instance_exists(Player)
 {
-	with (Player) {
-if "KeyHealth" not in self {
-	KeyHealth = 3
-}
+	extra_speed    += .15
+	extra_damage   += amount * 3
+	extra_reload   += amount * .25
+	extra_accuracy += amount * .5
 
-if Player.my_health < Player.lsthealth {
-	KeyHealth--
-	with instance_create(x, y, PopupText) {
-		time = 10
-		chance = round(random_range(1, 2))
-		if (Player.KeyHealth > 0) {
-		if (chance = 1) { text = "*CRACK*"; sound_play_pitch(sndPlantPotBreak, 1)}
-		if (chance = 2) {text = "*SNAP*"; sound_play_pitch(sndIcicleBreak, 1)}
-		} else {
-		if (chance = 1) { text = "@r@q*CRACK*"; sound_play_pitch(sndPlantPotBreak, 0.8)}
-		if (chance = 2) {text = "@r@q*SNAP*"; sound_play_pitch(sndIcicleBreak, 0.8)}
-		remove_item(item[? "key"])
-		add_item(item[? "keyB"], 1)
-		Player.KeyHealth = 3;
+	with (Player) if nexthurt == current_frame + 5 && !instance_exists(Portal)
+	{
+	  with instance_create(x+random_range(-8,8),y+random_range(-8,8),WepSwap)
+		{
+	    image_xscale = .75
+	    image_yscale = .75
+	    image_speed = choose(.7,.7,.7,.45)
+	  }
+		var _pitch = random_range(.9,1.1)
+		sound_play_pitch(sndHyperCrystalHurt,.8*_pitch)
+		sound_play_pitch(sndLaserCrystalHit,.7*_pitch)
+		sound_play_pitchvol(sndHyperCrystalHalfHP,2*_pitch,.4)
+		sound_play_gun(sndLaserCrystalDeath,.1,.0001)//mute action
+
+		get_item(item[? "spent flower"], item_get_count("flower"));
+		remove_item(item[? "flower"]   , item_get_count("flower"));
+
+		sleep(400)
+		view_shake_at(x,y,45)
+		repeat(14) with instance_create(x,y,Feather)
+		{
+		  motion_add(random(360),random_range(3,6))
+		  sprite_index = global.GlassShard
+		  image_speed = random_range(.4,.7)
+		  image_index = irandom(5)
 		}
 	}
 }
+
+//P rismatic Key
+var amount = item_get_power("key")
+if amount >= 1 && instance_exists(Player)
+{
+	with (Player)
+	{
+		if "KeyHealth" not in self{KeyHealth = 3}
+		if Player.my_health < Player.lsthealth
+		{
+			KeyHealth--
+			with instance_create(x, y, PopupText)
+			{
+				time = 10
+				chance = round(random_range(1, 2))
+				if (Player.KeyHealth > 0) {
+				if (chance = 1) { text = "*CRACK*"; sound_play_pitch(sndPlantPotBreak, 1)}
+				if (chance = 2) {text = "*SNAP*"; sound_play_pitch(sndIcicleBreak, 1)}
+				} else {
+				if (chance = 1) { text = "@r@q*CRACK*"; sound_play_pitch(sndPlantPotBreak, 0.8)}
+				if (chance = 2) {text = "@r@q*SNAP*"; sound_play_pitch(sndIcicleBreak, 0.8)}
+				remove_item(item[? "key"], 1)
+				add_item(item[? "keyB"], 1)
+				Player.KeyHealth = 3;
+				}
+			}
+		}
+	}
 }
 
-}
 //Scale health with level
 if (GameCont.level >= 2) { extra_health += 3} // 4
 if (GameCont.level >= 3) { extra_health += 3} // 4
@@ -1927,9 +2039,11 @@ if (GameCont.level >= 9) { extra_health += 5} // 100
 
 if instance_exists(Player)
 {
-	Player.reloadspeed =  Player.reloadspeed_base  + extra_reload + (skill_get(mut_stress) * (1 - Player.my_health/Player.maxhealth)) + ultra_get(char_venuz, 1)   * .4
-	Player.maxspeed    =  Player.speed_base        + extra_speed  + (skill_get(mut_extra_feet) * .5)
-	Player.maxhealth   = round((Player.health_base + extra_health + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6) - item_get_count("injury"))
+	Player.reloadspeed = Player.reloadspeed_base   + extra_reload 	 + (skill_get(mut_stress) * (1 - Player.my_health/Player.maxhealth)) + ultra_get(char_venuz, 1)   * .4
+	Player.maxspeed    = Player.speed_base         + extra_speed  	 + (skill_get(mut_extra_feet) * .5)
+	Player.maxhealth   = round((Player.health_base + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6) - item_get_count("injury"))
+	Player.accuracy    = Player.accuracy_base      / (extra_accuracy + skill_get(mut_eagle_eyes) * 5 / 3 + 1)
+
 	with instances_matching(projectile, "team", Player.team)
 	{
 		if "damage_boost" not in self
@@ -2138,14 +2252,14 @@ if AMOUNT > 0
 	}
 }
 
-#define remove_item(ITEM)
+#define remove_item(ITEM, AMOUNT)
 var _itemarray = global.PlayerItems;
 
 with _itemarray
 {
 	if self.key == ITEM.key
 	{
-		self.count--
+		self.count -= AMOUNT
 		if self.count <= 0
 		{
 			for (var i = 0,  j = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM.key {j = i;}}
@@ -2454,6 +2568,9 @@ if projectile_canhit(other) with other
 
 #define void
 
-#define shrine_setup()              return mod_script_call("mod", "shrines", "shrine_setup");
-#define shrine_create(X, Y)         return mod_script_call("mod", "shrines", "shrine_create", X, Y);
-#define point_in_teleporter(OBJECT) return mod_script_call("mod", "main"   , "point_in_teleporter", OBJECT);
+#define shrine_setup()              return mod_script_call("mod", "shrines"		 , "shrine_setup");
+#define shrine_create(X, Y)         return mod_script_call("mod", "shrines"		 , "shrine_create", X, Y);
+#define point_in_teleporter(OBJECT) return mod_script_call("mod", "main"       , "point_in_teleporter", OBJECT);
+#define create_disc(X, Y)						return mod_script_call("mod", "projectiles", "create_disc", X, Y);
+#define create_disc_small(X, Y)			return mod_script_call("mod", "projectiles", "create_disc_small", X, Y);
+#define create_disc_large(X, Y)			return mod_script_call("mod", "projectiles", "create_disc_large", X, Y);

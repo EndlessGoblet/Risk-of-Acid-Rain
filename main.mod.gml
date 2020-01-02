@@ -94,6 +94,7 @@ while(true)
 	{
 		global.newLevel = 0;
 		level_start();
+				if item_get_count("spent flower") > 0 {get_item(item[? "flower"], item_get_count("spent flower")); remove_item(item[? "spent flower"], item_get_count("spent flower"))}
 	}
 	var hadGenCont = global.hasGenCont;
 	global.hasGenCont = instance_exists(GenCont);

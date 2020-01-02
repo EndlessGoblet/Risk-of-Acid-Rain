@@ -4,3 +4,4 @@
 /loadmod items
 /loadmod bounce
 /loadmod shrines
+/loadmod projectiles
