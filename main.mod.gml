@@ -22,6 +22,8 @@ global.teleporter = false;
 global.reset = 5;
 global.BossesLeft = 0;
 
+global.NitrogenCountdown = 0;
+
 global.CircleSurf = -1;
 //Garbo Variables
 global.radi = 0;
@@ -1635,6 +1637,7 @@ with instances_matching(CustomSlash, "name", "Inv Area")
 
 
 
+
 with instances_matching(CustomObject, "name", "shrine")
 {
 	var _x = x - view_xview,
@@ -1693,6 +1696,44 @@ with instances_matching(CustomSlash, "name", "Inv Area")
 	draw_set_alpha(1)
 }
 
+
+
+
+
+with Player
+{
+	if global.NitrogenCountdown > 0
+	{
+		var _x = x - view_xview,
+		    _y = y - view_yview;
+
+		if (global.fancy == 1) surface_set_target(global.CircleSurf)
+		draw_set_alpha(global.NitrogenCountdown / 10)
+		draw_circle_colour(_x - 1, _y, 46, c_blue, c_blue, false);
+		draw_set_alpha(1)
+		if (global.fancy == 1) surface_reset_target();
+		global.NitrogenCountdown--;
+
+		draw_set_alpha((global.NitrogenCountdown / 10) * .45)
+		draw_circle_colour(_x - 1, _y, 46, c_blue, c_blue, false);
+		draw_set_alpha(1)
+	}
+}
+with Player
+{
+	if global.NitrogenCountdown > 0
+	{
+		var _x = x - view_xview,
+		    _y = y - view_yview;
+
+		if (global.fancy == 1) surface_set_target(global.CircleSurf)
+		draw_set_blend_mode(bm_subtract)
+		draw_circle_colour(_x - 1, _y, 44, c_white, c_white, false);
+		draw_set_blend_mode(bm_normal)
+		if (global.fancy == 1) surface_reset_target();
+	}
+}
+
 if surface_exists(global.CircleSurf)
 {
 	if (global.fancy == 1) draw_surface_ext(global.CircleSurf, view_xview, view_yview, 1, 1, 0, c_white, .8)
@@ -1713,6 +1754,7 @@ draw_text_nt(X - 1, Y + 3, "@w" + string(global.coins))
 #define chest_setup(TAG)																 return mod_script_call("mod", "items","chest_setup"   , TAG)
 #define obj_create(X, Y, OBJ_NAME)											 return mod_script_call("mod", "items","obj_create"    , X, Y, OBJ_NAME)
 #define add_item(ITEM)																	 return mod_script_call("mod", "items","add_item"      , ITEM)
+#define remove_item(ITEM, AMOUNT)     			             return mod_script_call("mod", "items","remove_item"   , ITEM, AMOUNT)
 #define get_item(ITEM, AMOUNT)     			                 return mod_script_call("mod", "items","get_item"      , ITEM, AMOUNT)
 #define item_get_count(ITEM)                             return mod_script_call("mod", "items","item_get_count", ITEM)
 #define draw_backdrop(XSTART, YSTART, XEND, YEND, TITLE) return mod_script_call("mod", "items", "draw_backdrop", XSTART, YSTART, XEND, YEND, TITLE)

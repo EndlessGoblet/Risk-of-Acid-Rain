@@ -109,7 +109,7 @@ switch index
 
 															maxradius   = 79 + irandom(6);
 															radius      = 0;
-															shrinkspeed = .12;
+															shrinkspeed = .22;
 															maxinv      = room_speed * 3  * current_time_scale;
 															addframes   = 12;
 															currad      = 0;

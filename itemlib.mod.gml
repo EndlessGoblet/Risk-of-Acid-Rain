@@ -215,7 +215,7 @@ item_rubber_rounds = {
 #macro item_liquid_nitrogen item[? "nitrogen"]
 item_liquid_nitrogen = {
   name              : "Liquid Nitrogen",
-	description_small : "@sGain an @waura @sthat @wslows @senemy @wbullets",
+	description_small : "@sGain an @waura @sthat deletes @wbullets",
 	description_large : "-",
 	spr_index         : 18,
 	tier              : 1
@@ -357,7 +357,7 @@ item_firewood = {
 #macro item_chopper item[? "chopper"]
 item_chopper = {
   name              : "Chopper",
-	description_small : "@sAuto @wshank @snearby enemies",
+	description_small : "@wEnemies @sthrow @wChoppers @son @wdeath",
 	description_large : "-",
 	spr_index         : 31,
 	tier              : 0
@@ -562,7 +562,7 @@ item_nothing = {
 #macro item_metafillings item[? "fillings"]
 item_metafillings = {
   name              : "Metafillings",
-	description_small : "@yPickups @sare @wworth @smore",
+	description_small : "@yPickups @sare @yworth @w50% @smore",
 	description_large : "-",
 	spr_index         : 50,
 	tier              : 2
@@ -622,20 +622,20 @@ item_currency = {
 #macro item_sarkora item[? "sarkora"]
 item_sarkora = {
   name              : "Sarkora",
-	description_small : "@s+@w25% @pThrone Butt @sStrength",
+	description_small : "@s+@w50% Item power@s, -@w25% @gmutation @wpower",
 	description_large : "-",
 	spr_index         : 56,
-	tier              : 4
+	tier              : 3
 };
 
 // ITEM 57: PAPORA
 #macro item_papora item[? "papora"]
 item_sarkora = {
   name              : "papora",
-	description_small : "@s+@w10% @gMutation @sStrength",
+	description_small : "@s+@w50% @gmutation @wpower@s, -@w25% Item power",
 	description_large : "-",
 	spr_index         : 57,
-	tier              : 4
+	tier              : 3
 };
 
 // ITEM 58: FALSE COIN
@@ -670,21 +670,21 @@ item_idol_paragon = {
 
 };
 
-// ITEM 61: PRISMATIC PEARL
-#macro item_pearl item[? "pearl"]
-item_pearl = {
-  name              : "Prismatic Pearl",
-	description_small : "+@w50% Item power@s, -@w25% @gmutation @wpower",
+// ITEM 61: KALIDOS
+#macro item_kalidos item[? "kalidos"]
+item_kalidos = {
+  name              : "Kalidos",
+	description_small : "@s+@w50% Item power",
 	description_large : "-",
 	spr_index         : 61,
 	tier              : 4
 };
 
-// ITEM 62: DARK PEARL
-#macro item_Dpearl item[? "Dpearl"]
-item_Dpearl = {
-  name              : "Dark Pearl",
-	description_small : "+@w50% Item power",
+// ITEM 62: KALIAXI
+#macro item_kaliaxi item[? "kaliaxi"]
+item_kaliaxi = {
+  name              : "Kaliaxi",
+	description_small : "@s+@w50% @gmutation @wpower",
 	description_large : "-",
 	spr_index         : 62,
 	tier              : 4
@@ -733,7 +733,7 @@ item_quartz_flower = {
 // ITEM 67: BROKEN QUARTZ FLOWER
 #macro item_broken_quartz_flower item[? "spent flower"]
 item_broken_quartz_flower = {
-  name              : "Quartz Flower",
+  name              : "Spent Flower",
 	description_small : "@sBroken, @wreturns @sfixed @wnext stage",
 	description_large : "-",
 	spr_index         : 67,

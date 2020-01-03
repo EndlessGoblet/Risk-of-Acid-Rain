@@ -325,17 +325,20 @@ if hpBars = true
 
 var amount = item_get_power("nitrogen") //LIQUID NITROGEN
 if amount >= 1 && instance_exists(Player){
-var light = (45 + (amount * 7))
-if (preformanceMode == true) draw_set_alpha(1); draw_set_color(c_blue)
-if (preformanceMode == false) draw_set_alpha(0.15); draw_set_color(c_blue)
-if (preformanceMode == true) draw_circle(Player.x, Player.y, light, 1);
-if (preformanceMode == false) draw_circle(Player.x, Player.y, light, 0);
+var light = 46
 
-with (projectile) { if distance_to_object(Player) <= (light) && point_in_circle(x, y, Player.x, Player.y, light) && team != 2 {
-speed *= 0.975;
-if (speed <= 0.1) instance_destroy()
-}}
-draw_set_alpha(1)
+	with (projectile)
+	{
+		if distance_to_object(Player) <= (light) && point_in_circle(x, y, Player.x, Player.y, light) && team != Player.team
+		{
+			if "nitrogened" not in self nitrogened = ((12 * amount)/(1 + amount*.013)) < irandom(99) ? 0 : 1
+			if nitrogened = true
+			{
+				mod_variable_set("mod", "main", "NitrogenCountdown", 10)
+				instance_destroy()
+			}
+		}
+	}
 }
 
 var amount = item_get_power("bulb") //PRE WAR LIGHT BULBS
@@ -575,18 +578,21 @@ draw_sprite(global.shrineIcons, sprite, x + 6, y-20)
 
 #define obj_create(_x, _y, obj_name)
 var _obj = -4
-switch(obj_name)
+switch string_lower(obj_name)
 {
-	case "Cursed Disc":
+	case "chopper":
+				_obj = create_chopper(_x, _y);
+				return _obj;
+	case "cursed disc":
 				_obj = create_disc(_x, _y);
 				return _obj;
-	case "Small Cursed Disc":
+	case "small cursed disc":
 				_obj = create_disc_small(_x, _y);
 				return _obj;
-	case "Large Cursed Disc":
+	case "large cursed disc":
 				_obj = create_disc_large(_x, _y);
 				return _obj;
-	case "Coin":
+	case "coin":
 				_obj = obj_create(_x, _y, "ItemChest");
 				with _obj
 				{
@@ -595,15 +601,15 @@ switch(obj_name)
 					chest_setup(tag);
 				}
 				return _obj;
-	case "Shrine":
+	case "shrine":
 				_obj = shrine_create(_x, _y);
 				return _obj;
-	case "AmmoChest":
+	case "ammochest":
 				_obj  =instance_create(_x, _y, AmmoChest)
 				return _obj;
-	case "RadChest":
+	case "radchest":
 				_obj  =instance_create(_x, _y, RadChest)
-	case "BigRadChest":
+	case "bigradchest":
 				_obj  = obj_create(_x, _y, "RadChest");
 				with _obj
 				{
@@ -614,23 +620,23 @@ switch(obj_name)
 			    spr_dead = sprRadChestBigDead;
 			  }
 				return _obj;
-	case "RadChest?":
+	case "radchest?":
 				if roll_luck(7) = true{_obj  = obj_create(_x, _y, "RadChest")}
 												  else{_obj  = obj_create(_x, _y, "BigRadChest")}
-	case "HealthChest":
+	case "healthchest":
 				_obj  =instance_create(_x, _y, HealthChest)
 				return _obj;
-	case "WeaponChest":
+	case "weaponchest":
 				_obj  =instance_create(_x, _y, WeaponChest)
 				return _obj;
-	case "BigWeaponChest":
+	case "bigweaponchest":
 				_obj  =instance_create(_x, _y, BigWeaponChest)
 				return _obj;
-	case "WeaponChest?":
+	case "weaponchest?":
 				if roll_luck(5) = true{_obj  =instance_create(_x, _y, BigWeaponChest)}
 													else{_obj  =instance_create(_x, _y, WeaponChest)}
 				return _obj;
-	case "ItemChest":
+	case "itemchest":
 				_obj = instance_create(_x, _y, chestprop)
 				with _obj
 				{
@@ -645,7 +651,7 @@ switch(obj_name)
 					if (tag != "cursed") on_open = itemchest_open;
 				}
 				return _obj;
-	case "LargeItemChest":
+	case "largeitemchest":
 				_obj = obj_create(_x, _y, "ItemChest")
 				with _obj
 				{
@@ -655,11 +661,11 @@ switch(obj_name)
 					on_open = itemchest_open;
 				}
 				return _obj;
-	case "ItemChest?":
+	case "itemchest?":
 				if roll_luck(5) = true{_obj  =obj_create(_x, _y, "ItemChest")}
 													else{_obj  =obj_create(_x, _y, "LargeItemChest")}
 				return _obj;
-	case "Item":
+	case "item":
 				_obj = obj_create(_x, _y, "ItemChest");
 				with _obj
 				{
@@ -668,7 +674,7 @@ switch(obj_name)
 					chest_setup(tag);
 				}
 				return _obj;
-	case "CustomPickup":
+	case "custompickup":
 				_obj = instance_create(_x, _y, Pickup);
 				with _obj
 				{
@@ -1043,12 +1049,12 @@ with (Player)
 
 	if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 		{
-			with shrine_create(mouse_x, mouse_y)
+			/*with shrine_create(mouse_x, mouse_y)
 			{
 				index = crwn_protection
 				;
 				shrine_setup();
-			}
+			}*/
 			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "flower"]}
 		}
 	}
@@ -1099,7 +1105,7 @@ if amount >= 1
 {
 	with instances_matching(projectile, "team", 2)
 	{
-    if object_index != Laser && object_index != Lightning && instance_exists(Player)
+    if object_index != Laser && object_index != Lightning && !instance_is(self, Slash) && instance_exists(Player)
 		{
     	if (forceSupport == true) || object_index != CustomProjectile
 			{
@@ -1108,15 +1114,20 @@ if amount >= 1
           speed /= (1 + .5 / amount);
           slowed = 1;
         }
-        if distance_to_object(enemy) <= (32 / speed)
+        if distance_to_object(instance_nearest(x, y, enemy)) <= (36 * (speed / 25))
 				{
         	near = instance_nearest(x, y, enemy);
-       		if(instance_exists(near))
+       		if instance_exists(near)
 					{
-	 					var _s = speed
-   					motion_add(point_direction(x, y, near.x, near.y), speed * .85);
-   					speed = _s;
-   					image_angle = direction;
+						if near.my_health > 0
+						{
+							var _dx  = hspeed,
+									_dy  = vspeed,
+									_dir = point_direction(x, y, near.x, near.y);
+   						x += lengthdir_x(-_dx, _dir);
+							y += lengthdir_y(-_dy, _dir);
+   						if near.my_health - damage <= 0 image_angle = direction else image_angle = _dir;
+						}
 					}
 				}
 			}
@@ -1167,7 +1178,7 @@ if amount >= 1
 {
 	with instances_matching(projectile, "team", 2)
 	{
-		if "extra_bounce" not in self extra_bounce = (amount)
+		if "extra_bounce" not in self extra_bounce = ceil(amount)
 	 }
 }
 //Rubber Projectile
@@ -1485,7 +1496,7 @@ if amount >= 1
 	  if "filling" not in self && mask_index = mskPickup
 		{
 	  	filling = true
-			num += roll(amount * .25)
+			num += roll(amount * .5)
 	  }
 	}
 }
@@ -1640,7 +1651,7 @@ if amount >= 1 && instance_exists(Player)
 		{
 			extra_speed += .4;
 			BootsTime--;
-			if BootsTime mod (max(round(12 - speed), 1) * current_time_scale) = 0 && speed > 1
+			if BootsTime mod (max(round(8 - speed), 1) * current_time_scale) = 0 && speed > 1
 			{
 				BootRight *= -1;
 				sound_play_pitchvol(sndPopgun, 1 + BootRight * .7, .7);
@@ -1733,18 +1744,17 @@ if amount >= 1
 var amount = item_get_power("chopper")
 if amount >= 1
 {
-  with (Player)
+  with instances_matching_le(enemy, "my_health", 0) if roll_luck(8) = true && size > 0
 	{
-		var Near = instance_nearest(x, y, enemy)
-		if distance_to_object(Near) <= (16 + amount)
+		for(var _i = 0, _amount = roll(amount) + 1, _ang = random(360), _dang = 360/_amount; _i < _amount; _i++)
 		{
-      if current_frame mod max(room_speed * 2 - amount * 2, 1) = 0 with instance_create(x, y, Shank)
+			with obj_create(x, y, "chopper")
 			{
-	        motion_add(point_direction(x, y, Near.x, Near.y) + random_range(-5, 5), 4 + skill_get(mut_long_arms) * 2);
-	        image_angle = direction
-	        team = 2;
-					damage =  6
-      }
+				creator = Player;
+				team 		= creator.team;
+				pierce += ceil(amount);
+				motion_add(_ang + _dang * _i, 18);
+			}
 		}
 	}
 }
@@ -1963,12 +1973,12 @@ with instances_matching(projectile, "team", 2){
 var amount = item_get_power("flower")
 if amount >= 1 && instance_exists(Player)
 {
-	extra_speed    += .15
+	extra_speed    += .2
 	extra_damage   += amount * 3
-	extra_reload   += amount * .25
-	extra_accuracy += amount * .5
+	extra_reload   += amount * .3
+	extra_accuracy += amount * .6
 
-	with (Player) if nexthurt == current_frame + 5 && !instance_exists(Portal)
+	with (Player) if my_health < lsthealth
 	{
 	  with instance_create(x+random_range(-8,8),y+random_range(-8,8),WepSwap)
 		{
@@ -2276,7 +2286,7 @@ return _amount;
 #define item_get_power(ITEM)
 var _amount = 0;
 _amount += item_get_count(ITEM);
-if item_get_count("pearl") > 0 _amount *= (1 + item_get_count("pearl") * .5)
+if item_get_count("pearl") > 0 _amount *= (1 + item_get_count("sarkora") * .5 + item_get_count("kalidos") * .5)
 return _amount;
 
 #define draw_backdrop(STARTX, STARTY, ENDX, ENDY, TITLE)
@@ -2493,11 +2503,11 @@ var _pitch = random_range(.8, 1.2);
 switch tag
 {
 	case "fern":
-		global.MaskCounter += room_speed * (4 + round(num)) - 15;
+		global.MaskCounter += room_speed * (5 + round(num)) - 15;
 		with instance_create(x, y, PopupText)
 		{
 			target = Player;
-			mytext = "+" + string(4 * round(other.num)) + " invisibility"
+			mytext = "+" + string(5 + round(other.num)) + " invisibility"
 		}
 		sound_play_pitch(sndAmmoPickup, _pitch)
 		sound_play_pitchvol(sndBigCursedChest, 12 * _pitch, .1)
@@ -2574,3 +2584,4 @@ if projectile_canhit(other) with other
 #define create_disc(X, Y)						return mod_script_call("mod", "projectiles", "create_disc", X, Y);
 #define create_disc_small(X, Y)			return mod_script_call("mod", "projectiles", "create_disc_small", X, Y);
 #define create_disc_large(X, Y)			return mod_script_call("mod", "projectiles", "create_disc_large", X, Y);
+#define create_chopper(X, Y)				return mod_script_call("mod", "projectiles", "create_chopper", X, Y);
