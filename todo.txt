@@ -47,3 +47,5 @@
      needs a resprite
 
 * Fix teleporter activation in scrapyards crashing the game sometimes
+
+* Add passive items/traits for each character

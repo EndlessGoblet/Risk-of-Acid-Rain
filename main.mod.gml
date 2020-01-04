@@ -119,8 +119,9 @@ with(enemy) instance_delete(self);
 with(prop) instance_delete(self);
 with(chestprop) instance_delete(self);
 //Creating the arenaaa
+//trace("MOUSE_X:" + string(mouse_x))
 for(o = 1; o < 14; o++) { // Creating Floor
-for(i = 1; i < 7; i++) {instance_create(Player.x - i * 32, 10032 - o * 16, Floor)}//Floor (X)
+for(i = 1; i < 7; i++) {instance_create(Player.x - i * 32, 10032 - o * 16, Floor);}//Floor (X)
 for(i = 1; i > -5; i--) {instance_create(Player.x - i * 32, 10032 - o * 16, Floor)}}//Floor (Y)
 for(i = 1; i < 15; i++) { instance_create(9808, 10048 - i * 16, Wall) //Left Wall
  instance_create(10176, 10048 - i * 16, Wall)}//Right Wall
@@ -134,12 +135,16 @@ instance_create(9808 + i*8, 9824, Top)} //Top of Bottom Wall
 var _x
 var _y 
 var DWall = 3;
-if (GameCont.area == 1) DWall = 6
+if (GameCont.area == 1) DWall = 12
 if (GameCont.area == 101) DWall = 12
 if (GameCont.area == 2) DWall = 8
 for(i = 1; i < DWall; i++) {
-_x = round(random_range(9867, 10132)) 
-_y = round(random_range(9883, 10002)) //Draw random walls
+//_x = round(random_range(9867, 10132)) 
+//_y = round(random_range(9883, 10002)) //Draw random walls
+var variety_y = round(random_range(1,15))
+var variety_x = round(random_range(1,24))
+_x = round(random_range(9808 + 16*variety_x,9808 + 16*variety_x)) 
+_y = round(random_range(9824 + 16*variety_y, 9824 + 16*variety_y)) //Draw random walls
 instance_create(_x, _y, Wall)
 if (GameCont.area = 3) instance_create(_x, _y, Trap)
 }
@@ -970,9 +975,9 @@ if instance_exists(CharSelect)
 			// Draw the gamemode menu
 	    if global.MenuIndex = 0
 			{
-				draw_x = 141
+				draw_x = 161
 				draw_y = 79
-				x_offset = 70
+				x_offset = 70 //space between each button
 				y_offset = 15
         draw_set_alpha(0.5)
         draw_sprite(global.sprModes, 0, draw_x + 1           , draw_y + y_offset + 1)

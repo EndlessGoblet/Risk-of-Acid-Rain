@@ -713,7 +713,7 @@ else
 
 // Molding clay
 var _clay_amount = 0;
-if roll_luck(100 / (item_get_power("clay") + 1)) _clay_amount = AMOUNT * item_get_power("clay");
+if roll_luck(100 / (item_get_power("clay") + 1)) _clay_amount = AMOUNT * (item_get_power("clay") + 1);
 global.ItemGetAmount = item_get_power("clay") > 0 ? _clay_amount: AMOUNT;
 if global.ItemGetAmount = 0
 {
@@ -1037,7 +1037,7 @@ with (Player)
 			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "key"]}
 			with shrine_create(mouse_x, mouse_y)
 			{
-				index = crwn_destiny;
+				index = crwn_guns;
 				shrine_setup();
 			}
 		}
