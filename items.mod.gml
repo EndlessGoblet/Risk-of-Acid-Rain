@@ -1,4 +1,4 @@
-#macro item mod_variable_get("mod", "itemlib", "ItemDirectory");
+	#macro item mod_variable_get("mod", "itemlib", "ItemDirectory");
 
 #define init
 global.fancy = true;
@@ -11,6 +11,7 @@ global.coinGet = 0;
 global.forceSave = 0;
 global.cheats = false;
 
+global.sprShieldBubble = sprite_add("sprites/other/sprShieldBubble.png", 3,  24, 24);
 global.sprBerserkFX = sprite_add("sprites/other/sprBerserkFX.png", 3,  4, 4);
 global.mskLightBulb = sprite_add("sprites/other/mskLightBulb.png", 1, 32, 32);
 global.GlassShard   = sprite_add("sprites/other/sprGlassShard.png", 5, 4, 4);
@@ -71,7 +72,7 @@ global.PlusItems = 0;
 global.hideDes = 0;
 global.popoChance = 0;
 global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "bandages"], item[? "fruit"]   , item[? "golden"]   , item[? "rubber"] , item[? "focus"]   , item[? "mush"]       , item[? "grease"] , item[? "boots"]  , item[? "chopper"] , item[? "locket"], item[? "metal"]    , item[? "mask"]] //TO DO: Chopper
-global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]  , item[? "celesteel"], item[? "canteen"], item[? "paragon"]] //To-Do: Horror In a Bottle --- REMEMBER ITS CURRENTLY NOT IN THE LIST!!!
+global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]  , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"]] //To-Do: Horror In a Bottle 
 global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]] //To-Do: None
 global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]     , item[? "flask"]   , item[? "clay"]     , item[? "crystal"], item[? "CD"]] // Todo: None
 global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"] , item[? "currency"], item[? "Fcurrency"], item[? "pearl"]  , item[? "Dpearl"]  , item[? "key"]]
@@ -279,6 +280,12 @@ for(i = 0; i < _roll; i++)
 }
 
 #define draw
+//drawing shield
+var amount = item_get_power("shield")
+if amount >= 1 && instance_exists(Player)
+{
+if (Player.shieldCount = 0) draw_sprite_ext(global.sprShieldBubble, current_frame / 5, Player.x + 12, Player.y + 12, 1, 1, 0, c_white, random_range(0.4, 1.6))
+}
 //near cursed chests text
 with instances_matching(chestprop, "name", "ItemChest")
 {
@@ -1055,7 +1062,7 @@ with (Player)
 				;
 				shrine_setup();
 			}*/
-			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "flower"]}
+			with obj_create(mouse_x, mouse_y, "Item"){item_index = item[? "shield"]}
 		}
 	}
 }
@@ -2007,7 +2014,7 @@ if amount >= 1 && instance_exists(Player)
 	}
 }
 
-//P rismatic Key
+//Prismatic Key
 var amount = item_get_power("key")
 if amount >= 1 && instance_exists(Player)
 {
@@ -2036,6 +2043,29 @@ if amount >= 1 && instance_exists(Player)
 	}
 }
 
+//Digital Shield
+var amount = item_get_power("shield")
+if amount >= 1 && instance_exists(Player)
+{
+with (Player) if (("shieldCount") not in self) shieldCount = 0
+if (Player.shieldCount = 1) sound_play_pitch(sndSnowTankAim, 1.2)
+if Player.shieldCount == 0 {
+with (Player) if my_health < lsthealth
+{
+	sound_play_pitch(sndLaserCrystalHit, 1.2 + random_range(-0.2, 0.2))
+var damageTaken = (Player.lsthealth - Player.my_health)
+	blockPercent = 0.6 - (amount * .2) //Base 40%, with +20% per stack, max 90%
+	if (blockPercent <= 0.1) blockPercent = 0.1;
+	block = round(((damageTaken) * blockPercent))
+	Player.my_health += damageTaken - block
+	temp = (room_speed)*(5-(amount * .5)) //Base 4 second recharge, -0.5 second per stack, minumum 1 second
+	if (temp <= 0) temp = (room_speed * 1);
+	Player.shieldCount = temp
+}
+} else {
+Player.shieldCount--
+}
+}
 //Scale health with level
 if (GameCont.level >= 2) { extra_health += 3} // 4
 if (GameCont.level >= 3) { extra_health += 3} // 4

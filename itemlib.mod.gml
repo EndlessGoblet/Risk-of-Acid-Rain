@@ -740,6 +740,16 @@ item_broken_quartz_flower = {
 	tier              : 5
 };
 
+// ITEM 68: BROKEN QUARTZ FLOWER
+#macro item_shield item[? "shield"]
+item_shield = {
+  name              : "Digital Shield",
+	description_small : "@sGain a rechargable @bshield",
+	description_large : "-",
+	spr_index         : 68,
+	tier              : 1
+};
+
 #define items_finalize()
 var keys = ds_map_keys(global.ItemDirectory),
     len  = array_length(keys),

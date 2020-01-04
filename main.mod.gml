@@ -1,6 +1,10 @@
 #macro item mod_variable_get("mod", "itemlib", "ItemDirectory");
 
 #define init
+// --- META DATA ---
+global.version = "1.7";
+global.released = false;
+
 global.sprInteractSplat = sprite_add("sprites/other/sprInteractSplat.png", 1, 0, 0);
 
 #macro savefile "RoAR_Settings.txt" //Remembering settings
@@ -1398,15 +1402,20 @@ draw_set_font(fntM)
 } else {
 //Draw splash screen
 if global.menu == true {
+	 draw_set_font(fntChat)
+	 draw_set_halign(1)
+	if (global.released = true) draw_text_nt(game_width - 5, game_height - 10, "@w" + string(global.version), )
+	if (global.released = false) draw_text_nt(game_width - 8, game_height - 10, "@w" + string(global.version) + "@rU" )
+	draw_set_font(fntM)
     draw_set_alpha(0.8)
     draw_set_color(c_black)
     draw_rectangle(0, 0, game_width, game_height, 0);
     draw_set_alpha(1)
     draw_set_color(c_white)
 draw_sprite(global.sprSplash, 1, game_width / 2 + 160, game_height);
-draw_set_halign(1)
 draw_text_nt(game_width / 2 - 10, game_height / 2 + 10, "Click to continue")
  draw_text_nt(game_width / 2 - 10, game_height / 2 + 10, (floor(current_frame/8)*30 % 20 ? "@wClick to continue" : "@sClick to continue"));
+
  // draw_text_nt(game_width / 2 - 10, game_height / 2 + 25, (floor(current_frame/8)*30 % 20 ? "@sPress 1 to run at 30 FPS" : "@dPress 1 to run at 30 FPS"));
 for(var i = 0; i < 0.5; i += 1) {  if button_pressed(i, "fire") {
 global.menu = false;
