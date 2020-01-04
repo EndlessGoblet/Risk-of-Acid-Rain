@@ -68,7 +68,7 @@ switch index
 														upgrade[2] = -4;
 														has_purchased = false;
 
-														uses = 1 + round(1 + item_get_power("paragon")) / 2;
+														uses = 1 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") + 1 : 0);
 														break;
 	// Shrine of Hatred
 	case   6: case "hatred":  on_interact  = hatred_interact;
@@ -84,7 +84,7 @@ switch index
 														cost    = 3;
 														costval = 0; // change this back to 1
 
-														uses = 3 + round(1 + item_get_power("paragon")) / 2;
+														uses = 1 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") + 1 : 0);
 														break;
 	// Shrine of Luck
 	case 10: case "luck":     on_interact  = luck_interact;
@@ -100,6 +100,21 @@ switch index
 														cost    = 2;
 														costval = 2;
 														break;
+	// Shrine of Protection
+	case 13: case "protection": on_interact  = protection_interact;
+															sprite_index = sprThroneStatue;
+															sprite_broke = sprThroneStatueDead;
+															cost    = 0;
+															costval = 30;
+
+															maxradius   = 79 + irandom(6);
+															radius      = 0;
+															shrinkspeed = .22;
+															maxinv      = room_speed * 3  * current_time_scale;
+															addframes   = 12;
+															currad      = 0;
+
+															break;
 	// Printer
 	case 14: case "printer":  on_interact  = destiny_interact;
 												    sprite_index = sprThroneStatue;
@@ -149,6 +164,33 @@ if near = true
 		script_execute(on_interact);
 		if cost = 2{get_item(item[? "injury"], 2)}
 		if uses <= 0 instance_destroy();
+
+		// Small Accolade
+		var _amount = item_get_power("accolade") > 0 ? .5 + item_get_power("accolade") *.5 : 0;
+		if _amount > 0
+		{
+			var _hp = roll(_amount);
+			Player.my_health += _hp;
+			sound_play(sndHealthChest);
+			instance_create(x, y, HealFX);
+			if Player.my_health >= Player.maxhealth
+			{
+				Player.my_health = Player.maxhealth
+				with instance_create(x, y, PopupText)
+				{
+					target = Player;
+					mytext = "MAX HP"
+				}
+			}
+			else
+			{
+				with instance_create(x, y, PopupText)
+				{
+					target = Player;
+					mytext = "+" + string(_hp) + " HP"
+				}
+			}
+		}
 	}
 }
 
@@ -170,6 +212,11 @@ else
 {
 	var _wep = Player.wep;
 	script_execute(draw);
+	with instance_create(x, y, PopupText)
+	{
+		target = Player;
+		mytext = string(weapon_get_name(Player.wep)) + "!";
+	}
 	if _wep != Player.wep
 	{
 		uses--;
@@ -258,21 +305,26 @@ repeat(roll(1 + item_get_power("paragon"))) with obj_create(Player.x + lengthdir
 }
 uses--;
 
+#define protection_interact // 13: Shrine of Protection
+currad = addframes;
+costval += 10;
+
 #define shrine_interact
 
 //  2: Shrine of Death
+// explosive grenades sewing from the shrine, dropping from the sky
 
 //  3: Shrine of Life
 
 //  4: Shrine of Haste
 
 //  7: Shrine of Blood
+// süawn strong, marked enemies with lowered rad gain, cost low rads, on all their death spawn item at altar, used once
 
 //  9: Shrine of Love
 
 // 11: Shrine of Curses
-
-// 13: Shrine of Protection
+// pay 1 lunar coin, spawn cursed item, used three times
 
 // Printer
 
@@ -292,7 +344,7 @@ with instances_matching(CustomObject, "name", "shrine")
 			case 3: _splat = global.sprCoinSplat	; break;
 		}
 		draw_sprite(_splat, 0, x - sprite_get_width(_splat)/2, y)
-		draw_text(x - sprite_get_width(_splat)/2 + 18, y + 3, string(costval))
+		draw_text(x - sprite_get_width(_splat)/2 + 20, y + 6, string(costval))
 
 		if index = crwn_guns
 		{
@@ -326,6 +378,7 @@ with instances_matching(CustomObject, "name", "shrine")
 					if has_purchased = true
 					{
 						Player.wep = upgrade[_i]
+						has_purchased = false;
 					}
 				}
 				_i++;
@@ -337,6 +390,37 @@ with instances_matching(CustomObject, "name", "shrine")
 				draw_text_nt(x, y - sprite_get_height(weapon_get_sprite(Player.wep)) + sprite_get_yoffset(weapon_get_sprite(Player.wep)) - _ymargin - 16, "CANNOT UPGRADE")
 			}
 		}
+	}
+	if index = crwn_protection
+	{
+		if currad > 0
+		{
+			currad--;
+			radius += (maxradius - radius) * (addframes - currad) / addframes
+		}
+		if radius > 0
+		{
+			with Player
+			{
+				if distance_to_object(other) < max(1, (other.radius - (sprite_get_width(sprite_index) + sprite_get_height(sprite_index))/2) + 6)
+				{
+					other.radius -= other.shrinkspeed * (item_get_power("paragon") > 0 ? 1 / (1 + item_get_power("paragon") * .1) : 1);
+					var _inv = mod_variable_get("mod", "items", "MaskCounter");
+					if _inv < (other.maxinv + item_get_power("paragon") * room_speed * current_time_scale * 2) mod_variable_set("mod", "items", "MaskCounter", mod_variable_get("mod", "items", "MaskCounter") + room_speed / 16 * current_time_scale)
+				}
+			}
+			if radius <= 8 radius = 0
+		}
+		else{radius = 0}
+	}
+}
+
+#define draw_shadows
+with instances_matching(CustomObject, "name", "shrine")
+{
+	if uses > 0
+	{
+		draw_sprite(shd16, 1, x, y + 7)
 	}
 }
 
@@ -400,7 +484,7 @@ switch WEAPON
 															 upgrade[1] = -4;
 															 upgrade[2] = -4;
 															 break;
-	case wep_golden_machinegun  : upgrade[0] = wep_golden_assault_rifle;
+	case wep_golden_machinegun : upgrade[0] = wep_golden_assault_rifle;
 													 		 upgrade[1] = -4;
 													 		 upgrade[2] = -4;
 													 		 break;
@@ -425,7 +509,7 @@ switch WEAPON
 												     	  upgrade[1] = wep_auto_flame_shotgun;
 												   	    upgrade[2] = -4;
 	case wep_auto_flame_shotgun : upgrade[0] = wep_incinerator;
-													 	    upgrade[1] = wep_auto_flame_shotgun;
+													 	    upgrade[1] = -4;
 													 	    upgrade[2] = -4;
 												  	 		break;
   case wep_slugger        		: upgrade[0] = wep_assault_slugger;
@@ -535,10 +619,18 @@ switch WEAPON
 																 upgrade[1] = -4;
 																 upgrade[2] = -4;
 																 break;
-	case wep_lightning_pistol 	 : upgrade[0] = wep_lightning_cannon;
+	case wep_lightning_pistol 	 : upgrade[0] = wep_lightning_smg;
 														  	 upgrade[1] = wep_lightning_rifle;
 														  	 upgrade[2] = wep_lightning_shotgun;
 														  	 break;
+  case wep_lightning_rifle 	   : upgrade[0] = wep_lightning_cannon;
+																 upgrade[1] = -4;
+																 upgrade[2] = -4;
+																 break;
+  case wep_lightning_shotgun 	 : upgrade[0] = wep_lightning_cannon;
+																 upgrade[1] = -4;
+																 upgrade[2] = -4;
+																 break;
 	case wep_golden_laser_pistol : upgrade[0] = wep_golden_plasma_gun;
 																 upgrade[1] = -4;
 																 upgrade[2] = -4;

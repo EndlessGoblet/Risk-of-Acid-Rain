@@ -215,7 +215,7 @@ item_rubber_rounds = {
 #macro item_liquid_nitrogen item[? "nitrogen"]
 item_liquid_nitrogen = {
   name              : "Liquid Nitrogen",
-	description_small : "@sGain an @waura @sthat @wslows @senemy @wbullets",
+	description_small : "@sGain an @waura @sthat deletes @wbullets",
 	description_large : "-",
 	spr_index         : 18,
 	tier              : 1
@@ -357,7 +357,7 @@ item_firewood = {
 #macro item_chopper item[? "chopper"]
 item_chopper = {
   name              : "Chopper",
-	description_small : "@sAuto @wshank @snearby enemies",
+	description_small : "@wEnemies @sthrow @wChoppers @son @wdeath",
 	description_large : "-",
 	spr_index         : 31,
 	tier              : 0
@@ -562,27 +562,26 @@ item_nothing = {
 #macro item_metafillings item[? "fillings"]
 item_metafillings = {
   name              : "Metafillings",
-	description_small : "@yPickups @sare @wworth @smore",
+	description_small : "@yPickups @sare @yworth @w50% @smore",
 	description_large : "-",
 	spr_index         : 50,
 	tier              : 2
 };
 
-
-// ITEM 51: COLLIDER
-#macro item_collider item[? "collider"]
-item_collider = {
-  name              : "Collider",
-	description_small : "@sIncreased @wdamage, @sdon't @rhit yourself",
+// ITEM 51: SMALL ACCOLADE
+#macro item_small_accolade item[? "accolade"]
+item_small_accolade = {
+  name              : "Small Accolade",
+	description_small : "@gHeal @swhen using @wshrines",
 	description_large : "-",
 	spr_index         : 51,
-	tier              : 3
+	tier              : 1
 };
 
-// ITEM 52: DIAMOND ROUNDS
-#macro item_diamond_rounds item[? "diamond"]
-item_diamond_rounds = {
-  name              : "Diamond Rounds",
+// ITEM 52: CRYSTAL ROUNDS
+#macro item_crystal_rounds item[? "crystal"]
+item_crystal_rounds = {
+  name              : "Crystal Rounds",
 	description_small : "@wSharper, Faster, @bpricier @sbullets",
 	description_large : "-",
 	spr_index         : 52,
@@ -623,20 +622,20 @@ item_currency = {
 #macro item_sarkora item[? "sarkora"]
 item_sarkora = {
   name              : "Sarkora",
-	description_small : "@s+@w25% @pThrone Butt @sStrength",
+	description_small : "@s+@w50% Item power@s, -@w25% @gmutation @wpower",
 	description_large : "-",
 	spr_index         : 56,
-	tier              : 4
+	tier              : 3
 };
 
 // ITEM 57: PAPORA
 #macro item_papora item[? "papora"]
 item_sarkora = {
   name              : "papora",
-	description_small : "@s+@w10% @gMutation @sStrength",
+	description_small : "@s+@w50% @gmutation @wpower@s, -@w25% Item power",
 	description_large : "-",
 	spr_index         : 57,
-	tier              : 4
+	tier              : 3
 };
 
 // ITEM 58: FALSE COIN
@@ -649,66 +648,96 @@ item_Fcurrency = {
 	tier              : 5
 };
 
-// ITEM 59: + ITEM POWER, + Difficulty
-#macro item_pearl item[? "pearl"]
-item_pearl = {
-  name              : "Prismatic Pearl",
-	description_small : "@p+@r5@y0@g% @bI@pT@rE@yM @gP@bO@pW@rE@yR@g, @rINCREASED DIFFICULTY",
-	description_large : "-",
-	spr_index         : 62,
-	tier              : 4
-};
-
-// ITEM 60: Dark Pearl
-#macro item_Dpearl item[? "Dpearl"]
-item_Dpearl = {
-  name              : "Dark Pearl",
-	description_small : "@rOne stack items do nothing     #@gDark Bullets",
-	description_large : "-",
-	spr_index         : 63,
-	tier              : 4
-};
-
-// ITEM 61`: Prismatic Key
-#macro item_key item[? "key"]
-item_key = {
-  name              : "Prismatic Key",
-	description_small : "@sFragile",
-	description_large : "-",
-	spr_index         : 64,
-	tier              : 5
-};
-
-// ITEM 60: Prismatic Key (Broken)
-#macro item_keyB item[? "keyB"]
-item_keyB = {
-  name              : "Broken Key",
-	description_small : "@dBroken, useless",
-	description_large : "-",
-	spr_index         : 65,
-	tier              : 5
-};
-
-// ITEM 60: RADI GUMDROP
+// ITEM 59: RADI GUMDROP
 #macro item_radi_gumdrop item[? "gumdrop"]
 item_radi_gumdrop = {
   name              : "Radi Gumdrop",
 	description_small : "@sChance for @grads @sto turn into @gchunks",
 	description_large : "-",
-	spr_index         : 60,
+	spr_index         : 59,
 	tier              : 0
 
 };
 
-// ITEM 61: IDOL PARAGON
+// ITEM 60: IDOL PARAGON
 #macro item_idol_paragon item[? "paragon"]
 item_idol_paragon = {
   name              : "Idol Paragon",
 	description_small : "@wShrines @sare more @wpowerful",
 	description_large : "-",
-	spr_index         : 61,
-	tier              : 2
+	spr_index         : 60,
+	tier              : 1
 
+};
+
+// ITEM 61: KALIDOS
+#macro item_kalidos item[? "kalidos"]
+item_kalidos = {
+  name              : "Kalidos",
+	description_small : "@s+@w50% Item power",
+	description_large : "-",
+	spr_index         : 61,
+	tier              : 4
+};
+
+// ITEM 62: KALIAXI
+#macro item_kaliaxi item[? "kaliaxi"]
+item_kaliaxi = {
+  name              : "Kaliaxi",
+	description_small : "@s+@w50% @gmutation @wpower",
+	description_large : "-",
+	spr_index         : 62,
+	tier              : 4
+};
+
+// ITEM 63: PRISMATIC KEY
+#macro item_key item[? "key"]
+item_key = {
+  name              : "Prismatic Key",
+	description_small : "@sFragile",
+	description_large : "-",
+	spr_index         : 63,
+	tier              : 5
+};
+
+// ITEM 64: PRISMATIC KEY (BROKEN)
+#macro item_keyB item[? "keyB"]
+item_keyB = {
+  name              : "Broken Key",
+	description_small : "@sBroken, useless",
+	description_large : "-",
+	spr_index         : 64,
+	tier              : 5
+};
+
+// ITEM 65: VILE FLASK
+#macro item_vile_flask item[? "flask"]
+item_vile_flask = {
+  name              : "Vile Flask",
+	description_small : "Apply @gpoison @swith @gToxic Gas",
+	description_large : "-",
+	spr_index         : 65,
+	tier              : 3
+};
+
+// ITEM 66: QUARTZ FLOWER
+#macro item_quartz_flower item[? "flower"]
+item_quartz_flower = {
+  name              : "Quartz Flower",
+	description_small : "@s+@wall stats@s, @wbreaks @son @whit",
+	description_large : "-",
+	spr_index         : 66,
+	tier              : 2
+};
+
+// ITEM 67: BROKEN QUARTZ FLOWER
+#macro item_broken_quartz_flower item[? "spent flower"]
+item_broken_quartz_flower = {
+  name              : "Spent Flower",
+	description_small : "@sBroken, @wreturns @sfixed @wnext stage",
+	description_large : "-",
+	spr_index         : 67,
+	tier              : 5
 };
 
 #define items_finalize()
