@@ -109,6 +109,7 @@
 
 #macro c_fel $FF271C;
 #macro c_inv merge_colour(merge_colour(c_aqua, c_blue, .35), c_white, .3);
+#macro c_fir merge_colour(c_orange, c_red, .5);
 
 #define level_start
 	global.BossesLeft    = 0; // 0 at level start, after teleport activation = amount of boss enemies, at 0 again spawns an item
@@ -1329,7 +1330,7 @@
 
 	draw_timehud(0,0);
 
-	if !instance_exists(CharSelect) {
+	if instance_exists(CharSelect) {
 	//Draw splash screen
 	if global.menu == true {
 		 draw_set_font(fntChat)

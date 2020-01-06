@@ -4,6 +4,10 @@
 	global.sprMaxHPSplat  = sprite_add("sprites/other/sprMaxHPSplat.png"  , 1, 0, 0);
 	global.sprHealthSplat = sprite_add("sprites/other/sprHealthSplat.png" , 1, 0, 0);
 
+	global.sprItems = sprite_add("sprites/items/sprItems.png", 101, 17, 17);
+
+	global.mskShrineGuns = sprite_add("sprites/other/mskShrineGuns.png", 1, 21, 16);
+
 	global.sprShrineHatred = sprThroneStatue //sprite_add("sprites/shrines/sprShrineHatred.png", 1, 16, 50);
 
 	global.sprNo = sprite_add("sprites/other/sprNo.png", 1, 6, 6);
@@ -29,6 +33,7 @@
 		costval = 0; // how much of the cost needs to be spent
 		canuse  = false; // whether or not the player has the currency for this shrine
 		uses = 1; // how many shrine uses are left before destruction
+		pause = room_speed * 1; // time buffer between successful uses
 
 		var _i = 0;
 		do
@@ -56,26 +61,27 @@
 													  	sprite_index = sprThroneStatue;
 															sprite_broke = sprThroneStatueDead;
 													  	cost    = 0;
-													  	costval = 50;
+													  	costval = 50 * GameCont.level;
 
+															subname 			= "DEATH"
 															uses 					= 4;
 															originaltimer = room_speed * 7;
 															timer 				= 0;
 															has_purchased = true
 															break;
-
 		// Shrine of Guns
 		case   5: case "guns":    on_interact  = guns_interact;
 															sprite_index = sprThroneStatue;
 															sprite_broke = sprThroneStatueDead;
 															cost    = 0;
-															costval = 40;
+															costval = 40 * GameCont.level;
 
+															mask_index = global.mskShrineGuns
+															subname 	 = "GUNS"
 															upgrade[0] = -4;
 															upgrade[1] = -4;
 															upgrade[2] = -4;
 															has_purchased = false;
-
 															uses = 1 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") + 1 : 0);
 															break;
 		// Shrine of Hatred
@@ -84,14 +90,17 @@
 															sprite_broke = sprThroneStatueDead;
 														  cost    = 3;
 														  costval = 1;
+
+															subname = "HATRED"
 														  break;
 		// Shrine of Destiny
-		 case  8:	case "destiny": on_interact  = destiny_interact;
+		case   8:	case "destiny": on_interact  = destiny_interact;
 															sprite_index = sprThroneStatue;
 															sprite_broke = sprThroneStatueDead;
 															cost    = 3;
 															costval = 1;
 
+															subname = "DESTINY"
 															uses = 1 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") + 1 : 0);
 															break;
 		// Shrine of Luck
@@ -100,6 +109,8 @@
 															sprite_broke = sprThroneStatueDead;
 															cost    = 3;
 															costval = 1;
+
+															subname = "LUCK"
 															break;
 		// Shrine of Curses
 		case 11: case "curses":   on_interact  = curses_interact;
@@ -108,6 +119,7 @@
 															cost    = 3;
 															costval = 1;
 
+															subname = "CURSES";
 															uses = 3;
 															break;
 		// Shrine of Risk
@@ -116,17 +128,20 @@
 															sprite_broke = sprThroneStatueDead;
 															cost    = 2;
 															costval = 2;
+
+															subname = "RISK"
 															break;
 		// Shrine of Protection
 		case 13: case "protection": on_interact  = protection_interact;
 																sprite_index = sprThroneStatue;
 																sprite_broke = sprThroneStatueDead;
 																cost    = 0;
-																costval = 30;
+																costval = 30 * GameCont.level;
 
+																subname 				= "PROTECTION"
 																maxradius   = 79 + irandom(6);
 																radius      = 0;
-																shrinkspeed = .22;
+																shrinkspeed = .14;
 																maxinv      = room_speed * 3  * current_time_scale;
 																addframes   = 12;
 																currad      = 0;
@@ -144,20 +159,25 @@
 															if !irandom( 			49) pool = RareItems;
 															if !irandom(99999999) pool = UniqueItems;
 															item_index = pool[round(random_range(0, array_length_1d(pool) - 1))]
+															subname = item_index.name + " PRINTER"
 													    break;
 		// Portal ultra energizer
 		case 15: case "energizer": on_interact  = energizer_interact;
-															sprite_index = sprThroneStatue;
-															sprite_broke = sprThroneStatueDead;
-															cost    =  0;
-															costval = 20;
-															break;
+															 sprite_index = sprThroneStatue;
+															 sprite_broke = sprThroneStatueDead;
+															 cost    =  0;
+															 costval = 20 * GameCont.level;
+
+															 subname = "VAULT KEY"
+															 break;
 		// Challenger
 		case 16: case "challenger": on_interact  = challenger_interact;
 																sprite_index = sprThroneStatue;
 																sprite_broke = sprThroneStatueDead;
 																cost    =  4;
 																costval =  0;
+
+																subname = "BOSS CHALLENGE"
 																break;
 	}
 	mask_index = mskBanditBoss;
@@ -166,7 +186,8 @@
 	if place_meeting(x, y, Player){near = true}else{near = false}
 	canuse = false;
 
-	if near = true
+	if pause > 0 {pause--}
+	if near = true && pause <= 0
 	{
 		// Determining if player needs something to give to use or not
 		var _costvar = -4;
@@ -193,12 +214,21 @@
 					canuse    = true;
 					if cost = 3{mod_variable_set("mod", "main", "coins", mod_variable_get("mod", "main", "coins") - costval); save_save()}
 				}
+				else{sound_play(sndCursedReminder)}
 			}
-			else{sound_play(sndCursedReminder)}
 		}
 		if canuse = true
 		{
+			var _p = random_range(.8, 1.2)
+			sound_play_pitchvol(sndPortalOpen, 1.4 * _p, 1.5)
+			sound_play_pitchvol(sndWallBreak, 2 * _p, 1)
+			sound_play_pitchvol(Player.snd_chst, 1, 1)
+			pause = room_speed * 1
+			sleep(10)
 			script_execute(on_interact);
+			if !instance_exists(self){exit}
+			view_shake_max_at(x, y, 8);
+			repeat(12) with instance_create(x, y, Dust) {motion_add(random(360), random_range(3, 6))}
 			if cost = 2{get_item(item[? "injury"], 2)}
 			if uses <= 0 instance_destroy();
 
@@ -240,7 +270,7 @@
 #define death_interact// 2: Shrine of Death
 	has_purchased = true;
 	uses--;
-	timer = originaltimer + item_get_power("paragon") * 2 * room_speed;
+	timer = originaltimer + item_get_power("paragon") * 4 * room_speed;
 
 #define guns_interact // 5: Shrine of Guns
 	has_purchased = true;
@@ -271,21 +301,20 @@
 		}
 	}
 
-	#define hatred_interact // 6: Shrine of Hatred
+#define hatred_interact // 6: Shrine of Hatred
 	var _chest_index = -1, // 0 = rad can, 1 = ammo chest, 2 = weapon chest, 3 = item_chest
 							  _i = 0,
 						_timer = 0,
 			 	 _maxtimer = (5 - round(1 + item_get_power("paragon"))) / current_time_scale,
-					 _amount = 5 + roll(1 + item_get_power("paragon")),
+					 _amount = 4 + roll(1 + item_get_power("paragon")),
 					 	 _dist = 28,
 						  _ang = random(360)
-	uses--;
 	do
 	{
 		if _timer <= 0
 		{
 			_i++
-			_chest_index = choose("RadChest?", "AmmoChest", "WeaponChest?","RadChest?", "AmmoChest", "WeaponChest?", "ItemChest");
+			_chest_index = choose("RadChest?", "AmmoChest", "WeaponChest?", "RadChest?", "AmmoChest", "WeaponChest?", "ItemChest");
 			var _extradist = round(1 + item_get_power("paragon")) / 2;
 			if crown_current = crwn_hatred && _i = _amount - 1 _chest_index = "HealthChest"
 			with obj_create(x + lengthdir_x(_dist + _extradist, _ang) * 2, y + lengthdir_y(_dist + _extradist, _ang) * 2, _chest_index)
@@ -294,12 +323,12 @@
 				repeat(12){with instance_create(x + random_range(-4, 4), y + random_range(-4, 4), Dust){motion_add(random(360), random_range(5, 8))}}
 				do
 				{
-					with instance_nearest(x, y, Wall) if distance_to_object(other) <= 10
+					with instance_nearest(x, y, Wall) if distance_to_object(other) <= 16
 					{
 						instance_create(x, y, FloorExplo);
 						instance_destroy();
 					}
-				}until(distance_to_object(instance_nearest(x, y, Wall)) > 10)
+				}until(distance_to_object(instance_nearest(x, y, Wall)) > 16)
 			}
 			view_shake_max_at(x, y, 10)
 			wait(6)
@@ -312,6 +341,8 @@
 			_timer--;
 		}
 	} until (_i >= _amount)
+	uses--;
+	instance_destroy()
 
 #define destiny_interact // 8: Shrine of Destiny
 	if reorder() = false
@@ -377,7 +408,6 @@
 	if array_length_1d(_tierarray) > 0
 	{
 		var _item = _tierarray[round(random_range(0, array_length_1d(_tierarray) - 1))]
-		trace(_item.name, array_length_1d(_tierarray))
 		remove_item(_item, 1);
 		get_item(item_index, 1);
 	}
@@ -427,22 +457,43 @@
 				case 2: _splat = global.sprMaxHPSplat ; break;
 				case 3: _splat = global.sprCoinSplat	; break;
 			}
-			draw_sprite(_splat, 0, x - sprite_get_width(_splat)/2, y)
-			if cost != 4 draw_text(x - sprite_get_width(_splat)/2 + 20, y + 6, string(costval))
-
-			if index = crwn_guns
+			if pause <= 0
+			{
+				draw_set_halign(fa_center)
+				draw_text_nt(x, y - 30, subname);
+				draw_sprite(sprEPickup, 0, x, y - 7)
+				draw_sprite(_splat, 0, x - sprite_get_width(_splat)/2, y)
+				if cost != 4 draw_text(x - sprite_get_width(_splat)/2 + 20, y + 6, string(costval))
+			}
+			else
+			{
+				d3d_set_fog(true, c_white, 0, 0)
+				draw_set_alpha((pause / room_speed))
+				draw_sprite(sprite_index, image_index, x, y)
+				draw_set_alpha(1)
+				d3d_set_fog(false, c_white, 0, 0)
+			}
+			if index = 14 && near = true
+			{
+				draw_set_alpha(.45)
+				draw_sprite(global.sprItems, item_index.spr_index, x + sprite_get_width(global.sprItems)/2, y -42)
+				draw_set_alpha(1)
+			}
+			if index = crwn_guns && near = true
 			{
 				weapon_upgrade(Player.wep)
 
 				var _branches = 0,
 									 _i = 0,
 						 _xmargin = 25,
-						 _ymargin = 20,
+						 _ymargin = 45,
 						  _bbox_x = 12,
 							_bbox_y = 15,
 							 _abs_l = 0,
 					 _sprmargin = 0,
-					     _texty = 0;
+					     _texty = 0,
+							    _px = (Player.bbox_left + Player.bbox_right) / 2,
+									_sx = bbox_right - bbox_left;
 
 				if upgrade[0] > -4 {_branches++; _abs_l += sprite_get_width(weapon_get_sprite(upgrade[0])); if sprite_get_width(weapon_get_sprite(upgrade[0])) > _sprmargin _sprmargin = sprite_get_width(weapon_get_sprite(upgrade[0])); if sprite_get_height(weapon_get_sprite(upgrade[0])) > _texty _texty = sprite_get_height(weapon_get_sprite(upgrade[0]))}
 				if upgrade[1] > -4 {_branches++; _abs_l += sprite_get_width(weapon_get_sprite(upgrade[1])); if sprite_get_width(weapon_get_sprite(upgrade[1])) > _sprmargin _sprmargin = sprite_get_width(weapon_get_sprite(upgrade[1])); if sprite_get_height(weapon_get_sprite(upgrade[1])) > _texty _texty = sprite_get_height(weapon_get_sprite(upgrade[1]))}
@@ -454,9 +505,9 @@
 					var _xpos = x + (sprite_get_xoffset(weapon_get_sprite(upgrade[_i])) - sprite_get_width(weapon_get_sprite(upgrade[_i])) / 2) + _sprmargin * _i - _sprmargin * (_branches - 1) / 2
 					_bbox_x = _sprmargin / 2;
 					_bbox_y = sprite_get_height(weapon_get_sprite(upgrade[_i]));
-					var _rect = point_in_rectangle(mouse_x, mouse_y, _xpos - _bbox_x + sprite_get_xoffset(weapon_get_sprite(upgrade[_i])), y - _ymargin - sprite_get_yoffset(weapon_get_sprite(upgrade[_i])), _xpos + sprite_get_xoffset(weapon_get_sprite(upgrade[_i])) + _bbox_x, y - _ymargin - sprite_get_yoffset(weapon_get_sprite(upgrade[_i])) + _bbox_y)
+					var _rect = point_in_rectangle(_px, Player.y, (x - _sx / 2) + (_sx / _branches * (_i)) - 2, bbox_top - 8, (x - _sx / 2) + (_sx / _branches * (_i + 1)) + 2, bbox_bottom + 8)
 					draw_weapon(weapon_get_sprite(upgrade[_i]), _xpos, y - _ymargin - _rect, _rect = true ? (weapon_get_gold(upgrade[_i]) ? c_gold : c_white) : (weapon_get_gold(upgrade[_i]) ? merge_color(c_gold, c_dkgray, .5) : c_ltgray))
-					if point_in_rectangle(mouse_x, mouse_y, _xpos - _bbox_x + sprite_get_xoffset(weapon_get_sprite(upgrade[_i])), y - _ymargin - sprite_get_yoffset(weapon_get_sprite(upgrade[_i])), _xpos + sprite_get_xoffset(weapon_get_sprite(upgrade[_i])) + _bbox_x, y - _ymargin - sprite_get_yoffset(weapon_get_sprite(upgrade[_i])) + _bbox_y)
+					if _rect
 					{
 						draw_text_nt(x, y - _ymargin - _texty, weapon_get_name(upgrade[_i]))
 						if has_purchased = true
@@ -469,6 +520,7 @@
 				}
 				else
 				{
+					_ymargin -= 10;
 					draw_weapon(weapon_get_sprite(Player.wep), x - sprite_get_width(weapon_get_sprite(Player.wep)) / 2 + sprite_get_xoffset(weapon_get_sprite(Player.wep)), y - sprite_get_height(weapon_get_sprite(Player.wep)) + sprite_get_yoffset(weapon_get_sprite(Player.wep)) - _ymargin, c_red);
 					draw_sprite(global.sprNo, 0, x, y - sprite_get_height(weapon_get_sprite(Player.wep)) + sprite_get_yoffset(weapon_get_sprite(Player.wep)) - _ymargin + 1);
 					draw_text_nt(x, y - sprite_get_height(weapon_get_sprite(Player.wep)) + sprite_get_yoffset(weapon_get_sprite(Player.wep)) - _ymargin - 16, "CANNOT UPGRADE")
@@ -502,7 +554,7 @@
 			if timer > 0
 			{
 				timer -= current_time_scale;
-				if current_frame mod (4 / current_time_scale) = 0
+				if current_frame mod (max(1, round(timer / 10)) / current_time_scale) = 0
 				repeat(choose(2, 2, 3)){
 					var _list = ds_list_create();
 					with hitme{ds_list_add(_list, id)}
@@ -510,7 +562,8 @@
 
 					with obj_create(x, y, "deathnade")
 					{
-						motion_add(point_direction(x, y, _list[| 1].x, _list[| 1].y), sqrt(sqrt(point_distance(_list[| 1].x ,_list[| 1].y ,x,y))))
+						motion_add(point_direction(x, y, _list[| 1].x + random_range(-16, 16), _list[| 1].y + random_range(-16, 16)), sqrt(point_distance(_list[| 1].x ,_list[| 1].y ,x,y)))
+						zspeed = 24 + irandom(12)
 					}
 					ds_list_clear(_list);
 				}

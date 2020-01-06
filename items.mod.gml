@@ -1,4 +1,3 @@
-
 #define init
 	global.fancy = true;
 	global.preformanceMode = false //Turn on to avoid lag (recommended)
@@ -65,6 +64,7 @@
 	global.MaskCounter 					= 0;
 	global.BloodCounter 				= 0;
 	global.GemCoeff 						= choose(-1, 1)
+	global.MinusRad             = 0;
 	global.hurtFloor 						= false;
 
 	global.PlusItems = 0;
@@ -74,7 +74,7 @@
 	global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "bandages"], item[? "fruit"]   , item[? "golden"]   , item[? "rubber"] , item[? "focus"]   , item[? "mush"]       , item[? "grease"] , item[? "boots"]  , item[? "chopper"] , item[? "locket"], item[? "metal"]    , item[? "mask"]] //TO DO: Chopper
 	global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]  , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"]] //To-Do: Horror In a Bottle
 	global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]] //To-Do: None
-	global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]     , item[? "flask"]   , item[? "clay"]     , item[? "crystal"], item[? "CD"]] // Todo: None
+	global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "crystal"], item[? "CD"]] // Todo: None
 	global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"] , item[? "currency"], item[? "Fcurrency"], item[? "pearl"]  , item[? "Dpearl"]  , item[? "key"]]
 	global.PlayerItems 	 = [item[? "none"]]
 	//set new level function
@@ -133,7 +133,7 @@
 	Player.s_Combat    = 0;
 	Player.s_Challenge = 0;
 
-
+	global.MinusRad         = 0;
 	global.descriptionTimer = 0;
 
 	//Visuals
@@ -179,9 +179,20 @@
 	var  _area_amount = 0,
 		  _chest_amount = 3 + skill_get(28),
 	    _prize_amount = item_get_power("prize") * (global.hurtFloor = false ? 0 : 1),
-			_curse_amount = (GameCont.area = 104 ? 1 : 0) + irandom(99) > (crown_current != 1 ? (crown_current = 11 ? 66 : 14) : 0) ? 1 : 0,
+			_curse_amount = (GameCont.area = 104 ? 1 : 0),
 	          _floorq = ds_list_create(), // put all available floor tiles into a list
-		             _i = 0;
+		             _i = 0,
+		  _curse_chance = 0;
+
+	if crown_current > 1
+	{
+		_curse_chance = 14;
+		if crown_current = 11
+		{
+			_curse_chance = 40;
+		}
+	}
+	if irandom(99) < _curse_chance{_curse_amount++}
 
 	switch GameCont.area // area specific extra chests
 	{
@@ -197,9 +208,9 @@
 	{
 		var _d = 0;
 		with Player _d = distance_to_object(instance_furthest(x, y, Floor)) * .4;
-		if ((styleb = true && instance_exists(Player) && distance_to_object(Player) > _d) || (styleb = false && instance_exists(Player) && distance_to_object(Player) > 350) || (distance_to_object(TopPot) < 64) || distance_to_object(Detail) < 64) && !place_meeting(x, y, prop) && !place_meeting(x, y, hitme) && self != FloorExplo
+		if instance_exists(Player) && distance_to_object(Player) > 128 && distance_to_object(instance_nearest(x, y, Wall)) > 32 && distance_to_object(instance_nearest(x, y, CustomObject)) > 64 && !place_meeting(x, y, prop) && !place_meeting(x, y, hitme) && self != FloorExplo
 		{
-			_floorq[| _i] = self; // add eligible floor tiles to the list
+			_floorq[| _i] = self; // add eligible floor tiles to the list ds_list_size
 			_i++;
 	  }
 	}
@@ -219,6 +230,7 @@
 		ds_list_delete(_floorq, 0)
 		ds_list_shuffle(_floorq)
 	}
+
 	if _prize_amount > 0 // 1/2 of perfect prize's effect. repeat(0) executes the the code inside the repeat once
 	{
 		repeat(_prize_amount)
@@ -236,6 +248,7 @@
 			ds_list_shuffle(_floorq)
 		}
 	}
+
 	if _curse_amount > 0 // guaranteed cursed chest spawn in caves + extra cursed chest from crowns
 	{
 		repeat(_curse_amount)
@@ -263,20 +276,27 @@
 	with WantBoss        instance_delete(self)
 	with BecomeScrapBoss instance_delete(self)
 
-	var floors = instances_matching(Floor, mod_current, undefined);
-	if doubleShrines != true {
-	var _roll = round(random_range(0, 2)) //SHRINE AMOUNTS-------------
-	} else {
-	var _roll = round(random_range(2, 4))
-	}
-	if (GameCont.area = 100) var _roll = 0;
-	for(i = 0; i < _roll; i++)
+	var floors        = instances_matching(Floor, mod_current, undefined),
+		_printer_amount = choose(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3) * (1 + mod_variable_get("mod", "main", "doubleShrines")) * (GameCont.area = 100)
+		  _other_amount = choose(2, 2, 2, 3, 3) * (1 + mod_variable_get("mod", "main", "doubleShrines"))
+
+	for(i = 0; i < _printer_amount; i++)
 	{
 		var my_floor = floors[irandom(array_length(floors) - 1)];
-	  with instance_create(my_floor.x, my_floor.y, CustomObject)
+	  with obj_create(my_floor.x, my_floor.y, "shrine")
 		{
+			index = 14
+			shrine_setup();
+		}
+	}
 
-
+	for(i = 0; i < _other_amount; i++)
+	{
+		var my_floor = floors[irandom(array_length(floors) - 1)];
+		with obj_create(my_floor.x, my_floor.y, "shrine")
+		{
+			index = choose(2, 5, 6, 8, 11, 12, 13, 15, 15, 16, 16)
+			shrine_setup()
 		}
 	}
 
@@ -505,13 +525,7 @@
 
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				/*with shrine_create(mouse_x, mouse_y)
-				{
-					index = 16
-					;
-					shrine_setup();
-				}*/
-				repeat(29)obj_create(mouse_x, mouse_y, "ItemChest")
+				get_item(item[? "edge"], 1)
 			}
 		}
 	}
@@ -611,11 +625,42 @@
 	}
 	//Golden Shots (random crits)
 
+	// Nuclear Exhaust
+	var amount = item_get_power("exhaust")
+	if amount >= 1 with Player {
+		var _dhealth = lsthealth - my_health,
+		    _radcost = 5 * GameCont.level,
+					    _i = 0;
+		if _dhealth > 0
+		{
+			repeat(_dhealth)
+			{
+				if (GameCont.rad - global.MinusRad) >= _radcost
+				{
+					global.MinusRad += _radcost;
+					repeat(_radcost / GameCont.level - 2)
+					{
+						var _dir = random(360)
+						with instance_create(x + lengthdir_x(hspeed + bbox_right - bbox_left, _dir), y + lengthdir_y(vspeed + bbox_bottom - bbox_top, _dir), Rad) motion_add(_dir, random_range(3, 5))
+					}
+					_i++
+				}
+			}
+			my_health = lsthealth - _dhealth + _i
+		}
+	}
+
+  if global.MinusRad > 0 && ((current_frame + 10 - GameCont.level) mod 1 = 0)
+	{
+		global.MinusRad--;
+		GameCont.rad--;
+		sound_play_pitch(sndRadPickup, 1 + 1 * (GameCont.rad/(60 * GameCont.level)))
+	}
+
 	//Radiated Snack
 	var amount = item_get_power("fruit")
 	if amount >= 1 {
-	with (Rad) {
-	if "Touched" not in self {
+	with instances_matching_ne(Rad, "Touched", true){
 	if distance_to_object(Player) <= 8 {
 	Touched = true;
 	with (Player) global.RadiatedSnackCounter += maxhealth / (250 / amount)
@@ -624,7 +669,7 @@
 	with (Player) if (my_health > maxhealth) my_health = maxhealth
 	global.RadiatedSnackCounter = 0;
 	sound_play_pitch(sndHPPickup, 1.3)
-	}}}}}
+	}}}}
 	//Radiated Snack
 
 	//Rubber Projectile
@@ -679,7 +724,7 @@
 
 	//Cryo Rounds
 	var amount = item_get_power("cryo")
-	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).freezeTime = 25 * amount}}}
+	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self {instance_nearest(x, y, enemy).freezeTime = 25 * amount}}}
 
 	with instances_matching_ge(enemy, "freezeTime", 1)
 	{
@@ -698,7 +743,7 @@
 
 	//Vile Flask
 	var amount = item_get_power("flask")
-	if amount >= 1{with instances_matching(ToxicGas, "sprite_index", sprToxicGas){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnPoison = min(9 ,2 + amount)}}}
+	if amount >= 1{with instances_matching(ToxicGas, "sprite_index", sprToxicGas){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self {instance_nearest(x, y, enemy).OnPoison = min(9 ,2 + amount)}}}
 
 	with instances_matching_ge(enemy, "OnPoison", 1)
 	{
@@ -732,7 +777,7 @@
 
 	//Incendiary Rounds
 	var amount = item_get_power("incendiary")
-	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFire = (4 + amount * 2) * (GameCont.area = 101 ? 0 : 1)}}}
+	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self {instance_nearest(x, y, enemy).OnFire = (7 + amount * 3) * (GameCont.area = 101 ? 0 : 1)}}}
 
 	with instances_matching_ge(enemy, "OnFire", 1)
 	{
@@ -741,6 +786,7 @@
 		{
 			with instance_create(x, y, Flame)
 			{
+				noproc = true
 				team = 2
 				damage = 1 + amount * .35
 				image_speed = 3
@@ -781,7 +827,7 @@
 
 	//Fel Rounds
 	var amount = item_get_power("fel")
-	if amount >= 1 && roll_luck(4 + amount * 2) {with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFel = true}}}
+	if amount >= 1 && roll_luck(4 + amount * 2) {with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self {instance_nearest(x, y, enemy).OnFel = true}}}
 	{with instances_matching(projectile, "isFel", true){if place_meeting(x + hspeed, y + vspeed, enemy){instance_nearest(x, y, enemy).OnFel = true}}}
 
 	with instances_matching_ge(hitme, "OnFel", 1)
@@ -873,7 +919,6 @@
 	}
 	//Occult Artifact
 
-
 	//Slosher
 	var amount = item_get_power("slosher")
 	if amount >= 1 {
@@ -899,7 +944,6 @@
 	    }
 	}
 	//Slosher
-
 
 	//Growth Fungus
 	var amount = item_get_power("fungus")
@@ -1244,7 +1288,7 @@
 				if irandom(99) < ((1 - 1/(.08 * amount / (1 + Player.armor * .1) * (1 + skill_get(mut_rabbit_paw) * .4) + 1))*100 * .6)
 				with obj_create(x, y, "CustomPickup")
 				{
-					tag = "armor"
+					tag = "exhaust"
 					sprite_index = global.sprArmorPickup
 
 				}
@@ -1539,6 +1583,17 @@
 				damage_boost = true
 				damage *= (Player.damage_base + extra_damage)
 			}
+		}
+	}
+
+	// Double-edge
+	var amount = item_get_power("edge")
+	if amount >= 1
+	{
+		with instances_matching_ne(projectile, "double_edge", true)
+		{
+			damage *= (1 + amount);
+			double_edge = true;
 		}
 	}
 
@@ -1849,12 +1904,15 @@
 			image_alpha  = 0;
 			lifetime     = 1;
 			damage       = .175 + amount * .05
+			noproc       = true
 
 			on_projectile = void;
 			on_step 			= bulb_step;
 			on_hit  			= bulb_hit;
 		}
 	}
+
+	with instances_matching_ne(TangleSeed, "noproc", true){noproc = true}
 
 	if global.MaskCounter >= 0 && instance_exists(Player)
 	{
@@ -2223,8 +2281,14 @@
 				draw_text_nt(_biglength + 2, cy + 64 + (20 * (maxline + 1)), string_upper(global.PlayerItems[i].description_small))
 			}
 			draw_sprite_ext(global.sprItems, global.PlayerItems[i].spr_index, cx + (itemx * 21) - 1, cy + 45 + (20 * (line + 1)) - _hover, 1, 1, 0, merge_colour(c_black, c_white, .9 + _hover * .1), 1) //sprUltraLevel
-			draw_set_font(fntChat)
-			if global.PlayerItems[i].count > 1 draw_text_nt(cx + (itemx * 21) - 10, cy + 45 + (20 * (line + 1)) - 8 - _hover,"x" + string(global.PlayerItems[i].count))
+			draw_set_font(fntSmall)
+			d3d_set_fog(true, c_black, 0, 0);
+			draw_set_alpha(.55)
+			if global.PlayerItems[i].count > 1 draw_text_nt(cx + (itemx * 21) - 12, cy + 45 + (20 * (line + 1)) - 5 - _hover,"x" + string(global.PlayerItems[i].count))
+			d3d_set_fog(false, c_white, 0, 0);
+			draw_set_alpha(1)
+			draw_set_color(c_white);
+			if global.PlayerItems[i].count > 1 draw_text_nt(cx + (itemx * 21) - 11, cy + 45 + (20 * (line + 1)) - 4 - _hover,"x" + string(global.PlayerItems[i].count))
 	}
 
 #define draw_armor(XOFFSET, YOFFSET)
@@ -2267,7 +2331,6 @@
 	draw_set_font(fntM)
 
 #define draw_backdrop(STARTX, STARTY, ENDX, ENDY, TITLE)
-
 	var _TopCornerHeight     = sprite_get_height(global.sprBackdropCornerTop),
 	    _TopCornerWidth      = sprite_get_width(global.sprBackdropCornerTop),
 	    _BottomCornerHeight  = sprite_get_height(global.sprBackdropCornerBottom) - 1,
@@ -2358,6 +2421,7 @@
 					return _obj;
 		case "radchest":
 					_obj  =instance_create(_x, _y, RadChest)
+					return _obj;
 		case "bigradchest":
 					_obj  = obj_create(_x, _y, "RadChest");
 					with _obj
@@ -2370,8 +2434,9 @@
 				  }
 					return _obj;
 		case "radchest?":
-					if roll_luck(7) = true{_obj  = obj_create(_x, _y, "RadChest")}
-													  else{_obj  = obj_create(_x, _y, "BigRadChest")}
+					if roll_luck(7) = true{_obj  = obj_create(_x, _y, "BigRadChest")}
+													  else{_obj  = obj_create(_x, _y, "RadChest")}
+					return _obj;
 		case "healthchest":
 					_obj  =instance_create(_x, _y, HealthChest)
 					return _obj;
@@ -2521,15 +2586,19 @@
 		switch tag
 		{
 			case "item"   : tem = item_index break;
-			case "gold"   : if _roll <= 99 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
+			case "gold"   : if _roll <= 99 {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]
+											sound_play(Player.snd_valt)}
 										  break;
 			case "rusty"  : if _roll <= 97 {tem = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]    }
 										  else           {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
 										  break;
-			case "large"  : if _roll <= 94 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]}
-										  else           {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]        }
+			case "large"  : if _roll <= 94 {tem = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]
+											sound_play(Player.snd_chst)}
+										  else           {tem = global.RareItems[round(random_range(0, array_length_1d(global.RareItems) - 1))]
+											sound_play(Player.snd_valt)}
 										  break;
-			case "cursed"	: if _roll <= 99 {tem = global.CursedItems[round(random_range(0, array_length_1d(global.CursedItems) - 1))]    }
+			case "cursed"	: if _roll <= 99 {tem = global.CursedItems[round(random_range(0, array_length_1d(global.CursedItems) - 1))]
+											sound_play(Player.snd_crwn)}
 											break;
 			case "test"   : tem = item[? "brooch"] // this is for testing
 									    break;

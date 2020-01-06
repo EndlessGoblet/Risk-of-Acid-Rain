@@ -681,7 +681,24 @@
   	spr_index         : 68,
   	tier              : 1
   };
-  
+
+#macro item_nuclear_exhaust item[? "exhaust"] // ITEM 69: NICE
+  item_nuclear_exhaust = {
+    name              : "NUCLEAR EXHAUST",
+    description_small : "@sLose @grads @sinstead of @rhealth",
+    description_large : "-",
+    spr_index         : 69,
+    tier              : 3
+  };
+
+#macro item_double_edge item[? "edge"] // ITEM 70: DOUBLE-EDGE
+  item_double_edge = {
+    name              : "DOUBLE-EDGE",
+    description_small : "@sDouble @wALL projectile @rdamage",
+    description_large : "-",
+    spr_index         : 70,
+    tier              : 3
+  };
 
 #define items_finalize()
   var keys = ds_map_keys(global.ItemDirectory),

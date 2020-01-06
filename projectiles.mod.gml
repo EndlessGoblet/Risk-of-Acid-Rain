@@ -38,6 +38,7 @@
     team   = -10000;
     damage = 0;
     force  = 0;
+    friction = .5;
 
     zspeed = 16 + irandom(8);
     zbase  = zspeed;
@@ -57,8 +58,7 @@
   {
     zspeed -= grav
     z += zspeed*current_time_scale
-    if zspeed < -6 zspeed = -6
-    trace(z)
+    if zspeed < -12 zspeed = -12
   }else instance_destroy()
 
   #define deathnade_destroy
