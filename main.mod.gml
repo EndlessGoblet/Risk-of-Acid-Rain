@@ -6,6 +6,7 @@ global.version = "1.7";
 global.released = false;
 
 global.sprInteractSplat = sprite_add("sprites/other/sprInteractSplat.png", 1, 0, 0);
+global.sprItemChestParty           = sprite_add_weapon("sprites/chests/sprItemChestParty.png"       ,     8, 8);
 
 #macro savefile "RoAR_Settings.txt" //Remembering settings
 if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
@@ -25,6 +26,7 @@ global.coins = 3;
 global.teleporter = false;
 global.reset = 5;
 global.BossesLeft = 0;
+global.perfected = false;
 
 global.NitrogenCountdown = 0;
 
@@ -111,11 +113,19 @@ while(true)
 #macro c_inv merge_colour(merge_colour(c_aqua, c_blue, .35), c_white, .3);
 
 #define level_start
+
 global.BossesLeft    = 0; // 0 at level start, after teleport activation = amount of boss enemies, at 0 again spawns an item
 
 if (global.Gamemode == 2) {
+	global.perfected = true
 //Arena mode setup
 wait(1);
+var template = "regular"
+_roll = round(random_range(1, 7))
+if (_roll = 1) template = "crowded"
+if (_roll = 2) template = "scarce"
+if (_roll = 3) template = "filler"
+
 //Deleting everything
 with(Floor) instance_delete(self)
 	with(Wall) instance_delete(self)
@@ -144,19 +154,87 @@ instance_create(9808 + i*8, 9824, Top)} //Top of Bottom Wall
 var _x
 var _y
 var DWall = 3;
-if (GameCont.area == 1) DWall = 12
+var m = 1
+if template == "crowded" m = 1.5
+if template == "scarce" m = 0.4
+if template == "filler" m = 0.2
+if (GameCont.area == 1) DWall = 24
 if (GameCont.area == 101) DWall = 12
 if (GameCont.area == 2) DWall = 8
+DWall = round(DWall*m)
+
 for(i = 1; i < DWall; i++) {
-//_x = round(random_range(9867, 10132)) 
-//_y = round(random_range(9883, 10002)) //Draw random walls
-var variety_y = round(random_range(1,15))
+var variety_y = round(random_range(1,13))
 var variety_x = round(random_range(1,24))
 _x = round(random_range(9808 + 16*variety_x,9808 + 16*variety_x)) 
 _y = round(random_range(9824 + 16*variety_y, 9824 + 16*variety_y)) //Draw random walls
 instance_create(_x, _y, Wall)
 if (GameCont.area = 3) instance_create(_x, _y, Trap)
 }
+//creating props
+var DProp = 3;
+var _prop = Cactus
+if template == "filler" m = 3
+
+
+for(i = 1; i < DProp; i++) {
+	if (GameCont.area == 1) { 
+		_roll = round(random_range(1, 16))
+		DProp = 24;
+_prop = Cactus
+if _roll = 1 _prop = BonePile//Barrel
+if _roll = 2 _prop = Barrel
+}
+	if (GameCont.area == 2) { 
+		DProp = 8;
+_prop = Pipe
+}
+	if (GameCont.area == 3) { 
+		DProp = 24;
+_prop = Car
+}
+	if (GameCont.area == 4) { 
+		DProp = 24;
+_prop = Cactus
+}
+	if (GameCont.area == 5) { 
+		DProp = 24;
+_prop = Cactus
+}
+	if (GameCont.area == 6) { 
+		DProp = 24;
+_prop = Cactus
+}
+	if (GameCont.area == 7) { 
+		DProp = 24;
+_prop = Cactus
+}
+
+DProp = round(DProp*m)
+var variety_y = round(random_range(1,13))
+var variety_x = round(random_range(1,24))
+_x = round(random_range(9808 + 16*variety_x,9808 + 16*variety_x)) 
+_y = round(random_range(9824 + 16*variety_y, 9824 + 16*variety_y)) //Draw random walls
+instance_create(_x, _y, _prop)
+}
+
+with (prop) {
+if distance_to_object(Wall) <= 5 {
+	instance_delete(self);
+}}
+
+with (prop) {
+if distance_to_object(prop) <= 5 {
+	instance_delete(self);
+}}
+
+//removing dangerous props near player
+with (Barrel) {
+if distance_to_object(Player) <= 35 {
+	x += 10000
+	y += 10000
+	instance_delete(self);
+}}
 
 //Spawning Boss
 with (Player) var w = instance_furthest(x, y, Wall)
@@ -481,10 +559,13 @@ with (Player)
 #define step
 //Boss Rush stuff
 if global.Gamemode == 2 && instance_exists(Player) {
+with (Player) if my_health < lsthealth && global.perfected = true
+{
+global.perfected = false;
+}
 with instances_matching_le(enemy,"my_health",0) {
 	chance = round(random_range(1, (18)))
 	if (global.doubleChests == true) chance = round(random_range(1, 9))
-	trace(chance)
 	if chance == 1 && global.BossesLeft >= 1 {
 		with obj_create(x, y, "ItemChest")
 			{
@@ -554,6 +635,22 @@ if instance_exists(Portal) && global.crownVault == true
 		global.BossesLeft--
 		if global.BossesLeft = 0
 		{
+			if global.Gamemode == 2 && global.perfected == true {
+				with instance_create(Player.x, Player.y, PopupText) {
+					time = 20;
+					text = "@yPERFECT!"
+				}
+				repeat(50) with instance_create(Player.x, Player.y, Confetti) {
+				direction = random_range(0, 360)
+				speed = random_range(1, 10)
+				}
+				sound_play_pitch(sndConfetti1, 1)
+				with obj_create(x, y, "ItemChest")
+			{
+			tag = "none"
+			sprite_index = global.sprItemChestParty
+			}
+			}
 			repeat(Player.s_Challenge) with obj_create(x, y, "ItemChest")
 			{
 				if (global.Gamemode != 2) {
@@ -1507,9 +1604,10 @@ with instances_matching(CustomProp, "name", "Teleporter")
 				}
 				if other.portal = "vault" other._enemy = Guardian;
 				_boss_amount *= Player.s_Challenge + 1
-
+		instance_create(other.x, other.y, PortalClear)
         repeat(_boss_amount)
 				{
+
 					with instance_create(other.x, other.y, _boss)
 					{
 						global.BossesLeft++
@@ -1577,7 +1675,7 @@ with TopCont
 			draw_set_halign(1)
 			draw_text_nt(_x, _y, _strTeleBlink + _strTele);
 			draw_text_nt(_x, _y, _strTeleBlink + _strTele);
-			draw_sprite_ext(_portal, (current_frame * .5) mod 4, _tele.x, _tele.y, .4 * (Player.x < _tele.x ? -1 : 1), .4, 0, c_white, 1)
+			with (TopCont) draw_sprite_ext(_portal, (current_frame * .5) mod 4, _tele.x, _tele.y, .4 * (Player.x < _tele.x ? -1 : 1), .4, 0, c_white, 1)
 		}
 		else
 		{
