@@ -6,6 +6,7 @@
 	global.released = false;
 
 	global.sprInteractSplat = sprite_add("sprites/other/sprInteractSplat.png", 1, 0, 0);
+		global.sprItemChestParty      = sprite_add_weapon("sprites/chests/sprItemChestParty.png"  ,     8, 8)
 
 	#macro savefile "RoAR_Settings.txt" //Remembering settings
 	if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
@@ -161,11 +162,12 @@ if template == "filler" m = 0.2
 if (GameCont.area == 1) DWall = 24
 if (GameCont.area == 101) DWall = 12
 if (GameCont.area == 2) DWall = 8
+if (GameCont.area == 3) DWall = 4
 DWall = round(DWall*m)
-
+if (GameCont.area == 2) && DWall < 2 DWall = 2 //Scrapyard always has at least 2 traps
 for(i = 1; i < DWall; i++) {
 var variety_y = round(random_range(1,13))
-var variety_x = round(random_range(1,24))
+var variety_x = round(random_range(1,23))
 _x = round(random_range(9808 + 16*variety_x,9808 + 16*variety_x)) 
 _y = round(random_range(9824 + 16*variety_y, 9824 + 16*variety_y)) //Draw random walls
 instance_create(_x, _y, Wall)
@@ -184,14 +186,25 @@ for(i = 1; i < DProp; i++) {
 _prop = Cactus
 if _roll = 1 _prop = BonePile//Barrel
 if _roll = 2 _prop = Barrel
+if _roll = 3 _prop = WeaponChest
+if _roll = 4 _prop = AmmoChest
 }
 	if (GameCont.area == 2) { 
 		DProp = 8;
+		_roll = round(random_range(1, 8))
 _prop = Pipe
+if _roll = 1 _prop = ToxicBarrel
+if _roll = 2 || _roll = 3 _prop = RadChest
+if _roll = 4 _prop = WeaponChest
 }
 	if (GameCont.area == 3) { 
-		DProp = 24;
-_prop = Car
+		DProp = 8;
+		_roll = round(random_range(1, 8))
+_prop = Tires
+if _roll = 1 _prop = Car
+if _roll = 2 = _prop = RadChest
+if _roll = 3 = _prop = AmmoChest
+if _roll = 4 _prop = WeaponChest
 }
 	if (GameCont.area == 4) { 
 		DProp = 24;
@@ -218,18 +231,28 @@ _y = round(random_range(9824 + 16*variety_y, 9824 + 16*variety_y)) //Draw random
 instance_create(_x, _y, _prop)
 }
 
-with (prop) {
+with (prop) { //Delete props too close to each other or walls
 if distance_to_object(Wall) <= 5 {
 	instance_delete(self);
 }}
 
 with (prop) {
-if distance_to_object(prop) <= 5 {
+if distance_to_object(prop) <= 5 || distance_to_object(chestprop) <= 5{
+	instance_delete(self);
+}}
+
+with (chestprop) {
+if distance_to_object(Wall) <= 5 {
+	instance_delete(self);
+}}
+
+with (chestprop) {
+if distance_to_object(prop) <= 5 || distance_to_object(chestprop) <= 5{
 	instance_delete(self);
 }}
 
 //removing dangerous props near player
-with (Barrel) {
+with (Barrel) || (ToxicBarrel) {
 if distance_to_object(Player) <= 35 {
 	x += 10000
 	y += 10000
@@ -259,7 +282,7 @@ switch GameCont.area
 					case 	 6: _boss  = TechnoMancer;
 										sound_play_music( musBoss7);
 										break;
-					case	 7: _boss  = Nothing2;
+					case	 7: _boss  = Guardian;
 										sound_play_music(musBoss4B);
 										break;
 					case   0: _boss  = Nothing2;
@@ -283,17 +306,17 @@ switch GameCont.area
 global.BossesLeft++
 if (GameCont.area == 1) GameCont.subarea = 1;
 }
-
-
+/*
 if (Player.fancy == 1) global.fancy = 1
 if (Player.fancy == 0) global.fancy = 0
+
 with instance_create(0, 0, CustomObject)
 {
 	name = "RoRSurfaceHandler"
 	depth = -1.9
 	on_draw = circlesurface_draw
 }
-
+*/
 global.crownVault = false;
 //Reset vars
 global.subareaChoice = 0;
@@ -311,6 +334,7 @@ if (GameCont.area != 100) with instance_create(Player.x-500, Player.y-500, Maggo
     my_health = 999999999;
     tag = "god"
 }
+
 if (global.Gamemode = 1)
 {
 	with (WeaponChest)
@@ -367,7 +391,11 @@ if (global.Gamemode = 1)
 						    			_boss_amount += 4;
 											break;
 					}
-					repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
+					if (GameCont.area != 7) repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
+						tag = "boss"
+					}
+
+					if (GameCont.area = 7) && (GameCont.subarea = 1) repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
 						tag = "boss"
 					}
 	global.BossesLeft++
@@ -491,6 +519,8 @@ if (global.Gamemode = 1)
 			case 105: _place = global.spwJungle; break;
 			default:  _place =  global.spwNight; break;
 		}
+	
+	
 
 		// Chests
 		var  _floorq = ds_list_create(), // put all available floor tiles into a list
@@ -522,11 +552,41 @@ if (global.Gamemode = 1)
 #define step
 //Boss Rush stuff
 if global.Gamemode == 2 && instance_exists(Player) {
+	//Guardian Boss
+	with (Guardian) {
+		if ("tag" in self) && (tag == "boss") {
+			if ('GuardianBuff' not in self) {
+				GuardianBuff = true;
+				team = 2;
+				maxhealth = 1000;
+				image_blend = merge_color(c_blue, c_white, 0.5)
+			}
+			//my_health = maxhealth
+			for(i = 0; i < 5; i++){
+					alarm_set(i, 1000);
+			}
+			with instances_matching_le(enemy,"my_health",0) {
+			with (Guardian) if ("tag" in self) && (tag == "boss") my_health -= 50;
+			}
+			_roll = round(random_range(1,5))
+			if (_roll = 1)with instance_create(x + random_range(-25, 25), y+random_range(-25,25), Smoke) {
+			image_blend = merge_color(c_blue, c_white, 0.5)
+			}
+		}
+	}
+	//BOSSES GAINS WALL DESTRUCTION MEGA POWERS
+	with (enemy) {
+		if "tag" in self && tag = "boss" {
+		if place_meeting(x, y, Wall)
+		instance_create(x, y, Explosion)
+		}
+	}
 with (Player) if my_health < lsthealth && global.perfected = true
 {
 global.perfected = false;
 }
 with instances_matching_le(enemy,"my_health",0) {
+	if ("tag" in self && tag = "boss") global.BossesLeft--
 	chance = round(random_range(1, (18)))
 	if (global.doubleChests == true) chance = round(random_range(1, 9))
 	if chance == 1 && global.BossesLeft >= 1 {
@@ -548,12 +608,11 @@ with instances_matching_le(enemy,"my_health",0) {
 		chance = round(random_range(1, (room_speed * 200)))
 		if (chance = 1) instance_create(x + 16, y + 16, AmmoPickup)
 		}
-
 	if (Player.portalTimer > 0) Player.portalTimer--
-	if (Player.portalTimer = 0) && global.BossesLeft == 0 {
+	wait(1) if (Player.portalTimer = 0) && global.BossesLeft == 0 {
 	var f_ = instance_find(Floor, irandom(instance_number(Floor) - 1));
-	instance_create(f_.x, f_.y, Portal)
 	GameCont.subarea = 3;
+	instance_create(f_.x, f_.y, Portal)
 	}
 	if instance_exists(Portal) || instance_exists(SpiralCont)Player.portalTimer = (room_speed * 10)
 	}
@@ -580,6 +639,7 @@ with instances_matching_le(enemy,"my_health",0) {
 	}
 	var BossRushModifier = 0;
 	if (global.Gamemode == 2) BossRushModifier = 10
+	if (global.Gamemode == 2) && (GameCont.area == 7) && (GameCont.subarea = 1) BossRushModifier = 0.5
 	if irandom(instance_number(enemy) + (BossRushModifier * 20) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
 
 	//Crown Vault Fix
@@ -1816,6 +1876,7 @@ with instances_matching_le(enemy,"my_health",0) {
 			draw_set_alpha(1)
 		}
 	}
+	
 	with instances_matching(CustomSlash, "name", "Inv Area")
 	{
 		var _x = x - view_xview,
@@ -1869,13 +1930,13 @@ with instances_matching_le(enemy,"my_health",0) {
 			if (global.fancy == 1) surface_reset_target();
 		}
 	}
-
+/*
 	if surface_exists(global.CircleSurf)
 	{
 		if (global.fancy == 1) draw_surface_ext(global.CircleSurf, view_xview, view_yview, 1, 1, 0, c_white, .8)
 		if (global.fancy == 1) surface_free(global.CircleSurf)
 	}
-
+*/
 #define point_in_teleporter(OBJECT)
 	with instances_matching(CustomProp, "name", "Teleporter")
 	{

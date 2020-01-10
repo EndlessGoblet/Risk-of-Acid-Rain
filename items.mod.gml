@@ -525,7 +525,7 @@
 
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				get_item(item[? "edge"], 1)
+				get_item(item[? "rubber"], 1)
 			}
 		}
 	}
@@ -678,7 +678,7 @@
 	{
 		with instances_matching(projectile, "team", 2)
 		{
-			if "extra_bounce" not in self extra_bounce = ceil(amount)
+			if "extra_bounce" not in self extra_bounce = ceil(amount)+1
 		 }
 	}
 	//Rubber Projectile
