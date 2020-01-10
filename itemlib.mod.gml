@@ -649,10 +649,10 @@
 #macro item_vile_flask item[? "flask"] // ITEM 65: VILE FLASK
   item_vile_flask = {
     name              : "VILE FLASK",
-  	description_small : "Apply @gpoison @swith @gToxic Gas",
+  	description_small : "@sApply @gblight @swith @gToxic Gas",
   	description_large : "-",
   	spr_index         : 65,
-  	tier              : 3
+  	tier              : 4
   };
 
 #macro item_quartz_flower item[? "flower"] // ITEM 66: QUARTZ FLOWER

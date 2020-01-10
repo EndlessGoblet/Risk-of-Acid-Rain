@@ -14,6 +14,8 @@
 	//Create important initial variables
 	global.AnomalyGet  = 0;
 	global.HardmodeGet = 0;
+	global.FlaskGet    = 0;
+
 	global.difficulty = 0;
 	global.fancy = true;
 	global.time = 0;
@@ -109,7 +111,6 @@
 
 #macro c_fel $FF271C;
 #macro c_inv merge_colour(merge_colour(c_aqua, c_blue, .35), c_white, .3);
-#macro c_fir merge_colour(c_orange, c_red, .5);
 
 #define level_start
 	global.BossesLeft    = 0; // 0 at level start, after teleport activation = amount of boss enemies, at 0 again spawns an item
@@ -520,6 +521,15 @@
 		{
 			global.AnomalyGet = true
 			get_item(item[? "energy"], 2)
+		}
+	}
+
+	if global.FlaskGet = false && instance_exists(Player) && Player.race = "frog"
+	{
+		if ultra_get("frog", 1) = true || ultra_get("frog", 2) = true
+		{
+			global.FlaskGet = true
+			get_item(item[? "flask"], 1)
 		}
 	}
 
@@ -1463,9 +1473,10 @@
 
 			//DRAW ACTIVATE TEXT
 	    draw_x = 1; draw_y = 30;
-	    draw_sprite(global.sprInteractSplat, 1, x + draw_x - sprite_get_width(global.sprInteractSplat)/2, y + draw_y - 27);
-	    draw_set_color(c_white); draw_set_alpha(1)
-	    draw_text_nt(x, y - 53 + draw_y, "@1(keysmall:pick)####CHARGE");
+			draw_set_halign(fa_middle)
+			draw_text_nt(x, y - 60 + draw_y, "ACTIVATE");
+			draw_sprite(sprEPickup, 0, x, y - 7)
+			draw_set_halign(fa_left)
 		}
 		var _ang = random(360)
 		if global.teleporter = true && (current_frame mod (room_speed * 5)) = 0 && instance_number(_enemy) < 12

@@ -74,8 +74,8 @@
 	global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "bandages"], item[? "fruit"]   , item[? "golden"]   , item[? "rubber"] , item[? "focus"]   , item[? "mush"]       , item[? "grease"] , item[? "boots"]  , item[? "chopper"] , item[? "locket"], item[? "metal"]    , item[? "mask"]] //TO DO: Chopper
 	global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]  , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"]] //To-Do: Horror In a Bottle
 	global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]] //To-Do: None
-	global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "crystal"], item[? "CD"]] // Todo: None
-	global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"] , item[? "currency"], item[? "Fcurrency"], item[? "pearl"]  , item[? "Dpearl"]  , item[? "key"]]
+	global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]] // Todo: None
+	global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"] , item[? "currency"], item[? "Fcurrency"], item[? "pearl"]  , item[? "Dpearl"]  , item[? "key"]        , item[? "flask"]]
 	global.PlayerItems 	 = [item[? "none"]]
 	//set new level function
 	if instance_exists(CharSelect) CharSelect.debugSet  = false;
@@ -98,13 +98,15 @@
 		wait 1;
 	}
 
-#macro item mod_variable_get("mod", "itemlib", "ItemDirectory");
+#macro item 					 mod_variable_get("mod", "itemlib", "ItemDirectory");
 #macro preformanceMode mod_variable_get("mod", "main", "preformanceMode");
 #macro hpBars					 mod_variable_get("mod", "main", "hpBars");
 #macro bossBars        mod_variable_get("mod", "main", "bossBars");
 #macro doubleChests    mod_variable_get("mod", "main", "doubleChests");
 #macro doubleShrines   mod_variable_get("mod", "main", "doubleShrines");
 #macro forceSupport    mod_variable_get("mod", "main", "forceSupport");
+#macro c_fir merge_colour(c_orange, c_red,  .5);
+#macro c_poi merge_colour(c_lime, c_green, .35);
 
 #define game_start
 	Player.lunarDrops = 1;
@@ -525,7 +527,7 @@
 
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				get_item(item[? "edge"], 1)
+				get_item(item[? "incendiary"], 1)
 			}
 		}
 	}
@@ -638,7 +640,7 @@
 				if (GameCont.rad - global.MinusRad) >= _radcost
 				{
 					global.MinusRad += _radcost;
-					repeat(_radcost / GameCont.level - 2)
+					repeat(round((_radcost / GameCont.level - 2) * amount))
 					{
 						var _dir = random(360)
 						with instance_create(x + lengthdir_x(hspeed + bbox_right - bbox_left, _dir), y + lengthdir_y(vspeed + bbox_bottom - bbox_top, _dir), Rad) motion_add(_dir, random_range(3, 5))
@@ -743,20 +745,20 @@
 
 	//Vile Flask
 	var amount = item_get_power("flask")
-	if amount >= 1{with instances_matching(ToxicGas, "sprite_index", sprToxicGas){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self {instance_nearest(x, y, enemy).OnPoison = min(9 ,2 + amount)}}}
+	if amount >= 1{with ToxicGas{if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self && ("tag" not in self || "tag" in self && tag != "boss") {instance_nearest(x, y, enemy).OnPoison = 3 + amount * 2}}}
 
 	with instances_matching_ge(enemy, "OnPoison", 1)
 	{
 	  image_blend = merge_color(c_lime, c_white, .45)
-		if (current_frame + id) mod 20 <= 1 && self != BigMaggotBurrow && self != RavenFly && self != LilHunterFly
+		if (current_frame + id) mod 16 <= 1 && self != BigMaggotBurrow && self != RavenFly && self != LilHunterFly
 		{
-			projectile_hit(self, maxhealth / 10, 0, 0)
+			projectile_hit(self, OnPoison, 0, 0)
+			if my_health < 2 my_health = 2
 			with instance_create(x + random_range(-10, 10), y + random_range(-8, 8), AcidStreak){image_angle = 90; image_xscale = .5; image_yscale = .5;}
-			OnPoison--
 			if OnPoison = 0{image_blend = merge_color(c_lime, c_white, 1)}
 			if my_health <= 0
 			{
-				repeat(size + 2 + amount)
+				repeat(size * 2 + 2 + amount)
 				{
 					with instance_create(x, y, ToxicGas)
 					{
@@ -789,7 +791,7 @@
 				noproc = true
 				team = 2
 				damage = 1 + amount * .35
-				image_speed = 3
+				image_speed = 10
 				force = 0
 				direction = random(360)
 			}
@@ -1847,15 +1849,20 @@
 				}
 			}
 			else{_col = c_orange}
+			if "OnPoison" in self _col = c_poi;
+
 			if object_index != RavenFly && object_index != Mimic && object_index != SuperMimic
 			{
-				var _x     = x,
+				var _x = x,
 				_y     = y,
 				_maxh  = clamp(maxhealth, 10, 50),
-				_currh = max(my_health, 0);
+				_currh = max(my_health, 1);
 				draw_rectangle_colour(_x - _maxh / 2    , bbox_bottom + 5    , _x + _maxh / 2                              				       , bbox_bottom + 5 + 3, c_black, c_black, c_black, c_black, false);
 				if my_health > 0
-				draw_rectangle_colour(_x - _maxh / 2 + 1, bbox_bottom + 5 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, bbox_bottom + 5 + 2,    _col,    _col,    _col,    _col, false);
+				{
+					draw_rectangle_colour(_x - _maxh / 2 + 1, bbox_bottom + 5 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, bbox_bottom + 5 + 2,    _col,    _col,    _col,    _col, false);
+					if "OnFire" in self && OnFire > 0 draw_rectangle_colour(_x - _maxh / 2 + _maxh * max((my_health - floor(OnFire * 1 + item_get_power("incendiary") * .35))  / maxhealth, 0) + 1, bbox_bottom + 5 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, bbox_bottom + 5 + 2,   c_fir,   c_fir,   c_fir,   c_fir, false);
+				}
 			}
 		}
 	}
