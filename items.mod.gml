@@ -61,7 +61,7 @@
 
 	global.RadiGumdropTimer 		= 0;
 	global.RadiatedSnackCounter = 0;
-	global.MaskCounter 					= 0;
+	global.InvisibleTimer 			= 0;
 	global.BloodCounter 				= 0;
 	global.GemCoeff 						= choose(-1, 1)
 	global.MinusRad             = 0;
@@ -105,8 +105,8 @@
 #macro doubleChests    mod_variable_get("mod", "main", "doubleChests");
 #macro doubleShrines   mod_variable_get("mod", "main", "doubleShrines");
 #macro forceSupport    mod_variable_get("mod", "main", "forceSupport");
-#macro c_fir merge_colour(c_orange, c_red,  .5);
-#macro c_poi merge_colour(c_lime, c_green, .35);
+#macro c_fire   merge_colour(c_orange, c_red,  .5);
+#macro c_poison merge_colour(c_lime, c_green, .35);
 
 #define game_start
 	Player.lunarDrops = 1;
@@ -142,7 +142,14 @@
 	Player.fx_celesteel = 0;
 	Player.shakeText    = 0;
 
-	#define level_start
+#define level_start
+  var amount = item_get_power("shield")
+  if amount >= 1
+	{
+		Player.shieldCount = ceil(amount)
+		Player.CanShield = 0
+	}
+
 	var amount = item_get_power("metal")
 	if amount >= 1{Player.armor += 2 * amount}
 
@@ -171,7 +178,7 @@
 
 	//Bandit Mask
 	var amount = item_get_power("mask")
-	if (amount >= 1) global.MaskCounter = (room_speed * (1 + 4 *  amount))
+	if (amount >= 1) global.InvisibleTimer = (room_speed * (1 + 4 * amount))
 	//Bandit Mask
 
 	global.descriptionTimer = 0;
@@ -487,7 +494,7 @@
 
 				if button_pressed(Player.index, "pick") && mod_variable_get("mod", "main", "coins") <= 0
 				{
-					sound_play_pitch(sndClick, random_range(0.8, 1.2))
+					sound_play(sndCursedReminder)
 					with instance_create(Player.x, Player.y, PopupText)
 					{
 						text = "@wNot enough"
@@ -527,11 +534,14 @@
 
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				get_item(item[? "rubber"], 1)
+				get_item(item[? "bulb"], 1)
+				get_item(item[? "slosher"], 1)
+				//global.InvisibleTimer = room_speed * 5
 			}
 		}
 	}
-	//Timer
+
+	//T imer
 	global.frame += current_time_scale; if (global.frame == 60) global.frame = 0;
 	//WHAT DO ITEMS DO YOU MAY ASK???
 
@@ -685,11 +695,11 @@
 	}
 	//Rubber Projectile
 
-	//Bandit Mask
+	//Invisibility
 	var amount = item_get_power("mask")
 	with (Player)
 	{
-	  if global.MaskCounter > 0
+	  if global.InvisibleTimer > 0
 		{
 		  if instance_exists(enemy) with enemy
 			{
@@ -924,7 +934,7 @@
 	//Slosher
 	var amount = item_get_power("slosher")
 	if amount >= 1 {
-	    with instances_matching(projectile, "team", 2) {
+	    with instances_matching(instances_matching_ne(projectile, "noproc", true), "team", 2) {
 	        if "sloshed" not in self {
 	            var direct = direction
 	            repeat(amount) with instance_create(x, y, EnemyBullet2) {
@@ -1231,7 +1241,7 @@
 	{
 		with instances_matching_le(enemy, "my_health", 0) if size > 0
 		{
-			if irandom(99) < ((1 - 1 / (.3* amount *(1 * 1 + (skill_get(mut_rabbit_paw)) * .4) +1)) * 100 * (.1 + (Player.infammo > 0 ? 1 : 0) * .2))
+			if irandom(99) < ((1 - 1 / (.3* amount *(1 * 1 + (skill_get(mut_rabbit_paw)) * .4) +1)) * 10)
 			with obj_create(x, y, "CustomPickup")
 			{
 				tag = "fern"
@@ -1290,7 +1300,7 @@
 				if irandom(99) < ((1 - 1/(.08 * amount / (1 + Player.armor * .1) * (1 + skill_get(mut_rabbit_paw) * .4) + 1))*100 * .6)
 				with obj_create(x, y, "CustomPickup")
 				{
-					tag = "exhaust"
+					tag = "armor"
 					sprite_index = global.sprArmorPickup
 
 				}
@@ -1339,10 +1349,6 @@
 		}
 	}
 	//Explosive Rounds
-
-	//Molding Clay
-	//Check opening chest script *
-	//Molding Clay
 
 	//Diamond Bullets
 	var amount = item_get_power("diamond")
@@ -1541,41 +1547,44 @@
 	var amount = item_get_power("shield")
 	if amount >= 1 && instance_exists(Player)
 	{
-	with (Player) if (("shieldCount") not in self) shieldCount = 0
-	if (Player.shieldCount = 1) sound_play_pitch(sndSnowTankAim, 1.2)
-	if Player.shieldCount == 0 {
-	with (Player) if my_health < lsthealth
-	{
-		sound_play_pitch(sndLaserCrystalHit, 1.2 + random_range(-0.2, 0.2))
-	var damageTaken = (Player.lsthealth - Player.my_health)
-		blockPercent = 0.6 - (amount * .2) //Base 40%, with +20% per stack, max 90%
-		if (blockPercent <= 0.1) blockPercent = 0.1;
-		block = round(((damageTaken) * blockPercent))
-		Player.my_health += damageTaken - block
-		temp = (room_speed)*(5-(amount * .5)) //Base 4 second recharge, -0.5 second per stack, minumum 1 second
-		if (temp <= 0) temp = (room_speed * 1);
-		Player.shieldCount = temp
+		with (Player)
+		{
+			if (("shieldCount") not in self)
+			{
+				shieldCount = ceil(amount)
+				CanShield = 0
+			}
+			if CanShield > 0
+			{
+				with instances_matching_le(enemy, "my_health", 0){other.CanShield -= max(1, size)}
+				if CanShield <= 0
+				{
+					CanShield = 0
+					sleep(25)
+					sound_play_pitchvol(sndSnowTankAim, 1.8, .6)
+				}
+			}
+			else if shieldCount > 0
+			{
+				if my_health < lsthealth
+				{
+					sound_play_pitch(sndLaserCrystalHit, 1.2 + random_range(-0.2, 0.2))
+					my_health = maxhealth
+					CanShield = 16
+					shieldCount--
+
+				}
+			}
+		}
 	}
-	} else {
-	Player.shieldCount--
-	}
-	}
-	//Scale health with level
-	if (GameCont.level >= 2) { extra_health += 3} // 4
-	if (GameCont.level >= 3) { extra_health += 3} // 4
-	if (GameCont.level >= 4) { extra_health += 4} // 8
-	if (GameCont.level >= 5) { extra_health += 5} // 18
-	if (GameCont.level >= 6) { extra_health += 5} // 30 //Health currently doesn't increase with level due to the stat chanes /!\
-	if (GameCont.level >= 7) { extra_health += 5} //50
-	if (GameCont.level >= 8) { extra_health += 5} // 80
-	if (GameCont.level >= 9) { extra_health += 5} // 100
+
 	//Stat changes
 
 	if instance_exists(Player)
 	{
 		Player.reloadspeed = Player.reloadspeed_base   + extra_reload 	 + (skill_get(mut_stress) * (1 - Player.my_health/Player.maxhealth)) + ultra_get(char_venuz, 1)   * .4
 		Player.maxspeed    = Player.speed_base         + extra_speed  	 + (skill_get(mut_extra_feet) * .5)
-		Player.maxhealth   = round((Player.health_base + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6) - item_get_count("injury"))
+		Player.maxhealth   = round((Player.health_base + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6) - item_get_count("injury") - item_get_count("heater") * 3 + (GameCont.level - 1) * 2)
 		Player.accuracy    = Player.accuracy_base      / (extra_accuracy + skill_get(mut_eagle_eyes) * 5 / 3 + 1)
 
 		with instances_matching(projectile, "team", Player.team)
@@ -1602,6 +1611,7 @@
 	with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction + 1 instance_destroy()}
 
 	if instance_exists(Player) Player.lsthealth = Player.my_health
+
 
 /// ITEM-RELATED FUNCTIONS ///
 
@@ -1649,6 +1659,15 @@
 	// Molding clay
 
 	// Pickup effect
+	if ITEM = item[? "shield"] && global.ItemGetAmount > 0
+	{
+		if "shieldCount" in Player
+		{
+			Player.shieldCount += ceil(global.ItemGetAmount)
+			Player.CanShield = 0
+		}
+	}
+
 	var _ang = random(360),
 	    _i   = 0;
 	if ITEM = item[? "gift"] && global.ItemGetAmount > 0 repeat(3 * global.ItemGetAmount)
@@ -1814,10 +1833,11 @@
 #define draw
 	//drawing shield
 	var amount = item_get_power("shield")
-	if amount >= 1 && instance_exists(Player)
+	if amount >= 1 && instance_exists(Player) with Player
 	{
-		if (Player.shieldCount = 0) draw_sprite_ext(global.sprShieldBubble, current_frame / 5, Player.x + 12, Player.y + 12, 1, 1, 0, c_white, random_range(0.4, 1.6))
+		if (shieldCount > 0 && CanShield <= 0) draw_sprite_ext(global.sprShieldBubble, current_frame / 5, x + 12, y + 12, 1, 1, 0, c_white, random_range(0.4, 1.6))
 	}
+
 	//near cursed chests text
 	with instances_matching(chestprop, "name", "ItemChest")
 	{
@@ -1849,19 +1869,19 @@
 				}
 			}
 			else{_col = c_orange}
-			if "OnPoison" in self _col = c_poi;
+			if "OnPoison" in self _col = c_poison;
 
 			if object_index != RavenFly && object_index != Mimic && object_index != SuperMimic
 			{
 				var _x = x,
 				_y     = y,
 				_maxh  = clamp(maxhealth, 10, 50),
-				_currh = max(my_health, 1);
-				draw_rectangle_colour(_x - _maxh / 2    , bbox_bottom + 5    , _x + _maxh / 2                              				       , bbox_bottom + 5 + 3, c_black, c_black, c_black, c_black, false);
+				_currh = max(ceil(my_health), 5);
+				draw_rectangle_colour(_x - _maxh / 2, bbox_bottom + 5, _x + _maxh / 2, bbox_bottom + 5 + 3, c_black, c_black, c_black, c_black, false);
 				if my_health > 0
 				{
-					draw_rectangle_colour(_x - _maxh / 2 + 1, bbox_bottom + 5 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, bbox_bottom + 5 + 2,    _col,    _col,    _col,    _col, false);
-					if "OnFire" in self && OnFire > 0 draw_rectangle_colour(_x - _maxh / 2 + _maxh * max((my_health - floor(OnFire * 1 + item_get_power("incendiary") * .35))  / maxhealth, 0) + 1, bbox_bottom + 5 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, bbox_bottom + 5 + 2,   c_fir,   c_fir,   c_fir,   c_fir, false);
+					draw_rectangle_colour(_x - _maxh / 2 + 1, bbox_bottom + 5 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, bbox_bottom + 5 + 2, _col, _col, _col, _col, false);
+					if "OnFire" in self && OnFire > 0 draw_rectangle_colour(_x - _maxh / 2 + _maxh * max((my_health - floor(OnFire * 1 + item_get_power("incendiary") * .35))  / maxhealth, 0) + 1, bbox_bottom + 5 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, bbox_bottom + 5 + 2,   c_fire,   c_fire,   c_fire,   c_fire, false);
 				}
 			}
 		}
@@ -1885,6 +1905,7 @@
 		}
 	}
 
+	draw_set_blend_mode(bm_add)
 	var amount = item_get_power("bulb") //PRE WAR LIGHT BULBS
 	var _light = 30 + random(2);
 	if amount >= 1 && instance_exists(Player)
@@ -1916,26 +1937,38 @@
 			on_projectile = void;
 			on_step 			= bulb_step;
 			on_hit  			= bulb_hit;
+			on_projectile = void;
 		}
 	}
+	draw_set_blend_mode(bm_normal)
 
 	with instances_matching_ne(TangleSeed, "noproc", true){noproc = true}
 
-	if global.MaskCounter >= 0 && instance_exists(Player)
+	if global.InvisibleTimer >= 0 && instance_exists(Player)
 	{
-		if (global.MaskCounter > 15) with (Player) {image_blend = merge_color(c_aqua, c_white, 0.7); image_alpha = .6} else with (Player) {image_blend = merge_color(c_aqua, c_white, 1); image_alpha = 1}
-		global.MaskCounter--
+		if (global.InvisibleTimer > 15) with (Player) {image_blend = merge_color(c_aqua, c_white, 0.7); image_alpha = .6} else with (Player) {image_blend = merge_color(c_aqua, c_white, 1); image_alpha = 1}
+		global.InvisibleTimer--
 		draw_set_halign(fa_center)
-		var count = round(global.MaskCounter / room_speed)
-		if instance_exists(Player) && global.MaskCounter > 15 draw_text_nt(Player.x, Player.y + 10, string(count));
+		var count = round(global.InvisibleTimer / room_speed),
+		   _blink = current_frame;
+		if global.InvisibleTimer <= room_speed * 3 {_blink = global.InvisibleTimer <= room_speed ? 2 : 4}
+		if instance_exists(Player) && global.InvisibleTimer > 15 && current_frame mod _blink = 0 draw_text_nt(Player.x, Player.y + 10, string(count));
 		if Player.my_health < Player.lsthealth
 		{
-			sleep(70)
+			sleep(50)
 			view_shake_at(Player.x, Player.y, 12)
-			global.MaskCounter = 0
+			global.InvisibleTimer = 16
 		}
+
 		if irandom(7) = 0 with instance_create(Player.x + random_range(-12, 12), Player.y + random_range(-12, 12), Smoke){sprite_index = sprExtraFeetDust; motion_add(90, 2); friction *= 2; depth = Player.depth - choose(0, 1, 1)}
-		if global.MaskCounter = 15  {sound_play_pitch(sndPickupDisappear, 1.3); sleep(20); view_shake_at(Player.x, Player.y, 6	); repeat(18) with instance_create(Player.x + random_range(-12, 12) + Player.hspeed, Player.y + random_range(-12, 12) + Player.vspeed, Smoke){depth = Player.depth - 1}}
+
+		if global.InvisibleTimer = 15
+		{
+			sound_play_pitch(sndPickupDisappear, 1.3)
+			sleep(60)
+			view_shake_at(Player.x, Player.y, 8)
+			repeat(18) with instance_create(Player.x + random_range(-12, 12) + Player.hspeed, Player.y + random_range(-12, 12) + Player.vspeed, Smoke){depth = Player.depth - 1}
+		}
 	}
 
 	//Shrine
@@ -2635,7 +2668,7 @@
 	switch tag
 	{
 		case "fern":
-			global.MaskCounter += room_speed * (5 + round(num)) - 15;
+			global.InvisibleTimer += room_speed * (5 + round(num)) - 15;
 			with instance_create(x, y, PopupText)
 			{
 				target = Player;
@@ -2664,7 +2697,7 @@
 			}
 			sound_play_pitch(sndAmmoPickup, _pitch)
 			break;
-		default: repeat(num) with instance_create(x, y, PopupText){mytext = "INVALID TAG"}
+		default: repeat(num) with instance_create(x, y, PopupText){mytext = "INVALID CHEST TAG"}
 	}
 
 #define antifx_step
@@ -2672,7 +2705,7 @@
 	instance_delete(self)
 
 #define inv_step
-	with instance_place(x, y, Player){if global.MaskCounter < room_speed * 5 global.MaskCounter += 2}
+	with instance_place(x, y, Player){if global.InvisibleTimer < room_speed * 5 global.InvisibleTimer += 2}
 	if image_xscale < maxradius
 	{
 		image_xscale += grow_speed

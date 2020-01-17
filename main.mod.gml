@@ -26,7 +26,7 @@
 	global.hours = 0;
 	global.coins = 3;
 	global.teleporter = false;
-	global.reset = 5;
+	global.reset = 3;
 	global.BossesLeft = 0;
 	global.perfected = false;
 
@@ -35,7 +35,7 @@
 	global.CircleSurf = -1;
 	//Garbo Variables
 	global.radi = 0;
-	global.maxradi = 150
+	global.maxradi = 110
 
 	//spawn arrays
 	global.spwDesert     = [Bandit, Bandit, Bandit, Scorpion, BigMaggot, BigMaggot, Maggot, Maggot]
@@ -61,8 +61,9 @@
 	global.BarLength = 0;
 	global.DarkCircle = false;
 	global.respawn = 0;
-	global.MenuIndex			 = -1;    // -1 = no menu, 0 = modes, 1 = info, 2 = options
-	global.Gamemode  			 = 0;     // 0 = normal mode, 1 = hardmode
+	global.MenuIndex	 = -1; // -1 = no menu, 0 = modes, 1 = info, 2 = options
+	global.Gamemode  	 = 0;  // 0 = normal mode, 1 = hardmode
+	global.MenuXoffset = 3;
 
 	global.preformanceMode = false; // Turn on to avoid lag (recommended)
 	global.hpBars 				 = true;
@@ -115,241 +116,149 @@
 #macro c_inv merge_colour(merge_colour(c_aqua, c_blue, .35), c_white, .3);
 
 #define level_start
+	global.BossesLeft = 0; // 0 at level start, after teleport activation = amount of boss enemies, at 0 again spawns an item
 
-global.BossesLeft    = 0; // 0 at level start, after teleport activation = amount of boss enemies, at 0 again spawns an item
+	if (global.Gamemode == 2) {
+		global.perfected = true
+	//Arena mode setup
+	wait(1);
+	var template = "regular"
+	_roll = round(random_range(1, 7))
+	if (_roll = 1) template = "crowded"
+	if (_roll = 2) template = "scarce"
+	if (_roll = 3) template = "filler"
 
-if (global.Gamemode == 2) {
-	global.perfected = true
-//Arena mode setup
-wait(1);
-var template = "regular"
-_roll = round(random_range(1, 7))
-if (_roll = 1) template = "crowded"
-if (_roll = 2) template = "scarce"
-if (_roll = 3) template = "filler"
-
-//Deleting everything
-with(Floor) instance_delete(self)
-	with(Wall) instance_delete(self)
-	with(Top) instance_delete(self)
-	with(TopSmall) instance_delete(self)
-	with(TopPot) instance_delete(self)
-	with(Bones) instance_delete(self)
-	with(Detail) instance_delete(self)
-with(enemy) instance_delete(self);
-with(prop) instance_delete(self);
-with(chestprop) instance_delete(self);
-//Creating the arenaaa
-//trace("MOUSE_X:" + string(mouse_x))
-for(o = 1; o < 14; o++) { // Creating Floor
-for(i = 1; i < 7; i++) {instance_create(Player.x - i * 32, 10032 - o * 16, Floor);}//Floor (X)
-for(i = 1; i > -5; i--) {instance_create(Player.x - i * 32, 10032 - o * 16, Floor)}}//Floor (Y)
-for(i = 1; i < 15; i++) { instance_create(9808, 10048 - i * 16, Wall) //Left Wall
- instance_create(10176, 10048 - i * 16, Wall)}//Right Wall
-for(i = 1; i < 24; i++) { instance_create(9808 + i*16, 10048, Wall) //Bottom Wall
- instance_create(9808 + i*16, 9824, Wall)} //Top Wall
-for(i = 1; i < 30; i++) {instance_create(9808 - 16, 10048 - i * 8, Top)//Top of Left Wall
-instance_create(10176 + 16, 10048 - i * 8, Top)} //Top of Right Wall
-for(i = 1; i < 48; i++) {instance_create(9808 + i*8, 10048, Top) //Top of Bottom Wall
-instance_create(9808 + i*8, 9824, Top)} //Top of Bottom Wall
-//Creating extra walls
-var _x
-var _y
-var DWall = 3;
-var m = 1
-if template == "crowded" m = 1.5
-if template == "scarce" m = 0.4
-if template == "filler" m = 0.2
-if (GameCont.area == 1) DWall = 24
-if (GameCont.area == 101) DWall = 12
-if (GameCont.area == 2) DWall = 8
-if (GameCont.area == 3) DWall = 4
-DWall = round(DWall*m)
-if (GameCont.area == 2) && DWall < 2 DWall = 2 //Scrapyard always has at least 2 traps
-for(i = 1; i < DWall; i++) {
-var variety_y = round(random_range(1,13))
-var variety_x = round(random_range(1,23))
-_x = round(random_range(9808 + 16*variety_x,9808 + 16*variety_x)) 
-_y = round(random_range(9824 + 16*variety_y, 9824 + 16*variety_y)) //Draw random walls
-instance_create(_x, _y, Wall)
-if (GameCont.area = 3) instance_create(_x, _y, Trap)
-}
-//creating props
-var DProp = 3;
-var _prop = Cactus
-if template == "filler" m = 3
-
-
-for(i = 1; i < DProp; i++) {
-	if (GameCont.area == 1) { 
-		_roll = round(random_range(1, 16))
-		DProp = 24;
-_prop = Cactus
-if _roll = 1 _prop = BonePile//Barrel
-if _roll = 2 _prop = Barrel
-if _roll = 3 _prop = WeaponChest
-if _roll = 4 _prop = AmmoChest
-}
-	if (GameCont.area == 2) { 
-		DProp = 8;
-		_roll = round(random_range(1, 8))
-_prop = Pipe
-if _roll = 1 _prop = ToxicBarrel
-if _roll = 2 || _roll = 3 _prop = RadChest
-if _roll = 4 _prop = WeaponChest
-}
-	if (GameCont.area == 3) { 
-		DProp = 8;
-		_roll = round(random_range(1, 8))
-_prop = Tires
-if _roll = 1 _prop = Car
-if _roll = 2 = _prop = RadChest
-if _roll = 3 = _prop = AmmoChest
-if _roll = 4 _prop = WeaponChest
-}
-	if (GameCont.area == 4) { 
-		DProp = 24;
-_prop = Cactus
-}
-	if (GameCont.area == 5) { 
-		DProp = 24;
-_prop = Cactus
-}
-	if (GameCont.area == 6) { 
-		DProp = 24;
-_prop = Cactus
-}
-	if (GameCont.area == 7) { 
-		DProp = 24;
-_prop = Cactus
-}
-
-DProp = round(DProp*m)
-var variety_y = round(random_range(1,13))
-var variety_x = round(random_range(1,24))
-_x = round(random_range(9808 + 16*variety_x,9808 + 16*variety_x)) 
-_y = round(random_range(9824 + 16*variety_y, 9824 + 16*variety_y)) //Draw random walls
-instance_create(_x, _y, _prop)
-}
-
-with (prop) { //Delete props too close to each other or walls
-if distance_to_object(Wall) <= 5 {
-	instance_delete(self);
-}}
-
-with (prop) {
-if distance_to_object(prop) <= 5 || distance_to_object(chestprop) <= 5{
-	instance_delete(self);
-}}
-
-with (chestprop) {
-if distance_to_object(Wall) <= 5 {
-	instance_delete(self);
-}}
-
-with (chestprop) {
-if distance_to_object(prop) <= 5 || distance_to_object(chestprop) <= 5{
-	instance_delete(self);
-}}
-
-//removing dangerous props near player
-with (Barrel) || (ToxicBarrel) {
-if distance_to_object(Player) <= 35 {
-	x += 10000
-	y += 10000
-	instance_delete(self);
-}}
-
-//Spawning Boss
-with (Player) var w = instance_furthest(x, y, Wall)
-var _boss_amount = 1;
-switch GameCont.area
-				{
-					case   1: _boss  = BanditBoss;
-								  	sound_play_music( musBoss1);
-								  	break;
-					case   2: _boss  = FrogQueen;
-								  	sound_play_music( musBoss5);
-								  	break;
-					case   3: _boss  = ScrapBoss;
-								  	sound_play_music( musBoss2);
-								  	break;
-					case   4: _boss  = HyperCrystal;
-										sound_play_music( musBoss6);
-										break;
-					case 	 5: _boss  = LilHunter;
-										sound_play_music( musBoss3);
-										break;
-					case 	 6: _boss  = TechnoMancer;
-										sound_play_music( musBoss7);
-										break;
-					case	 7: _boss  = Guardian;
-										sound_play_music(musBoss4B);
-										break;
-					case   0: _boss  = Nothing2;
-					 			  	sound_play_music( musBoss8);
-								  	break;
-					case 101: _boss  = OasisBoss;
-										sound_play_music(musBoss3);
-										break;
-					case 102: _boss  = Turtle;
-					 					sound_play_music(musBoss3);
-										_boss_amount += 3;
-										break;
-					case 103: _boss  = SuperFireBaller;
-										sound_play_music(mus104);
-					    			_boss_amount += 4;
-										break;
-				}
-				repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
-					tag = "boss"
-				}
-global.BossesLeft++
-if (GameCont.area == 1) GameCont.subarea = 1;
-}
-/*
-if (Player.fancy == 1) global.fancy = 1
-if (Player.fancy == 0) global.fancy = 0
-
-with instance_create(0, 0, CustomObject)
-{
-	name = "RoRSurfaceHandler"
-	depth = -1.9
-	on_draw = circlesurface_draw
-}
-*/
-global.crownVault = false;
-//Reset vars
-global.subareaChoice = 0;
-global.areaChoice    = 0;
-
-global.respawn = irandom_range(6, 12) * (crown_current = 7 ? 2 : 1) // double enemies with cob
-//Spawn invincible anti-portal maggot
-if (GameCont.area != 100) with instance_create(Player.x-500, Player.y-500, Maggot) {
-    visible = false;
-    image_xscale = 0;
-    image_yscale = 0;
-    mask_index = mskNone;
-    meleedamage = 0;
-    canfly = true;
-    my_health = 999999999;
-    tag = "god"
-}
-
-if (global.Gamemode = 1)
-{
-	with (WeaponChest)
-	{
-	  if (GameCont.area = 1 || GameCont.area == 101)
-		{
-	    wait(2)
-	    if instance_exists(WeaponChest)
-			{
-		  	instance_create(x, y, BigWeaponChest)
-		    instance_delete(self);
-	    }
-	  }
+	//Deleting everything
+	with(Floor) instance_delete(self)
+		with(Wall) instance_delete(self)
+		with(Top) instance_delete(self)
+		with(TopSmall) instance_delete(self)
+		with(TopPot) instance_delete(self)
+		with(Bones) instance_delete(self)
+		with(Detail) instance_delete(self)
+	with(enemy) instance_delete(self);
+	with(prop) instance_delete(self);
+	with(chestprop) instance_delete(self);
+	//Creating the arenaaa
+	//trace("MOUSE_X:" + string(mouse_x))
+	for(o = 1; o < 14; o++) { // Creating Floor
+	for(i = 1; i < 7; i++) {instance_create(Player.x - i * 32, 10032 - o * 16, Floor);}//Floor (X)
+	for(i = 1; i > -5; i--) {instance_create(Player.x - i * 32, 10032 - o * 16, Floor)}}//Floor (Y)
+	for(i = 1; i < 15; i++) { instance_create(9808, 10048 - i * 16, Wall) //Left Wall
+	 instance_create(10176, 10048 - i * 16, Wall)}//Right Wall
+	for(i = 1; i < 24; i++) { instance_create(9808 + i*16, 10048, Wall) //Bottom Wall
+	 instance_create(9808 + i*16, 9824, Wall)} //Top Wall
+	for(i = 1; i < 30; i++) {instance_create(9808 - 16, 10048 - i * 8, Top)//Top of Left Wall
+	instance_create(10176 + 16, 10048 - i * 8, Top)} //Top of Right Wall
+	for(i = 1; i < 48; i++) {instance_create(9808 + i*8, 10048, Top) //Top of Bottom Wall
+	instance_create(9808 + i*8, 9824, Top)} //Top of Bottom Wall
+	//Creating extra walls
+	var _x
+	var _y
+	var DWall = 3;
+	var m = 1
+	if template == "crowded" m = 1.5
+	if template == "scarce" m = 0.4
+	if template == "filler" m = 0.2
+	if (GameCont.area == 1) DWall = 24
+	if (GameCont.area == 101) DWall = 12
+	if (GameCont.area == 2) DWall = 8
+	if (GameCont.area == 3) DWall = 4
+	DWall = round(DWall*m)
+	if (GameCont.area == 2) && DWall < 2 DWall = 2 //Scrapyard always has at least 2 traps
+	for(i = 1; i < DWall; i++) {
+	var variety_y = round(random_range(1,13))
+	var variety_x = round(random_range(1,23))
+	_x = round(random_range(9808 + 16*variety_x,9808 + 16*variety_x))
+	_y = round(random_range(9824 + 16*variety_y, 9824 + 16*variety_y)) //Draw random walls
+	instance_create(_x, _y, Wall)
+	if (GameCont.area = 3) instance_create(_x, _y, Trap)
 	}
+	//creating props
+	var DProp = 3;
+	var _prop = Cactus
+	if template == "filler" m = 3
+
+
+	for(i = 1; i < DProp; i++) {
+		if (GameCont.area == 1) {
+			_roll = round(random_range(1, 16))
+			DProp = 24;
+	_prop = Cactus
+	if _roll = 1 _prop = BonePile//Barrel
+	if _roll = 2 _prop = Barrel
+	if _roll = 3 _prop = WeaponChest
+	if _roll = 4 _prop = AmmoChest
+	}
+		if (GameCont.area == 2) {
+			DProp = 8;
+			_roll = round(random_range(1, 8))
+	_prop = Pipe
+	if _roll = 1 _prop = ToxicBarrel
+	if _roll = 2 || _roll = 3 _prop = RadChest
+	if _roll = 4 _prop = WeaponChest
+	}
+		if (GameCont.area == 3) {
+			DProp = 8;
+			_roll = round(random_range(1, 8))
+	_prop = Tires
+	if _roll = 1 _prop = Car
+	if _roll = 2 = _prop = RadChest
+	if _roll = 3 = _prop = AmmoChest
+	if _roll = 4 _prop = WeaponChest
+	}
+		if (GameCont.area == 4) {
+			DProp = 24;
+	_prop = Cactus
+	}
+		if (GameCont.area == 5) {
+			DProp = 24;
+	_prop = Cactus
+	}
+		if (GameCont.area == 6) {
+			DProp = 24;
+	_prop = Cactus
+	}
+		if (GameCont.area == 7) {
+			DProp = 24;
+	_prop = Cactus
+	}
+
+	DProp = round(DProp*m)
+	var variety_y = round(random_range(1,13))
+	var variety_x = round(random_range(1,24))
+	_x = round(random_range(9808 + 16*variety_x,9808 + 16*variety_x))
+	_y = round(random_range(9824 + 16*variety_y, 9824 + 16*variety_y)) //Draw random walls
+	instance_create(_x, _y, _prop)
+	}
+
+	with (prop) { //Delete props too close to each other or walls
+	if distance_to_object(Wall) <= 5 {
+		instance_delete(self);
+	}}
+
+	with (prop) {
+	if distance_to_object(prop) <= 5 || distance_to_object(chestprop) <= 5{
+		instance_delete(self);
+	}}
+
+	with (chestprop) {
+	if distance_to_object(Wall) <= 5 {
+		instance_delete(self);
+	}}
+
+	with (chestprop) {
+	if distance_to_object(prop) <= 5 || distance_to_object(chestprop) <= 5{
+		instance_delete(self);
+	}}
+
+	//removing dangerous props near player
+	with (Barrel) || (ToxicBarrel) {
+	if distance_to_object(Player) <= 35 {
+		x += 10000
+		y += 10000
+		instance_delete(self);
+	}}
 
 	//Spawning Boss
 	with (Player) var w = instance_furthest(x, y, Wall)
@@ -374,7 +283,7 @@ if (global.Gamemode = 1)
 						case 	 6: _boss  = TechnoMancer;
 											sound_play_music( musBoss7);
 											break;
-						case	 7: _boss  = Nothing2;
+						case	 7: _boss  = Guardian;
 											sound_play_music(musBoss4B);
 											break;
 						case   0: _boss  = Nothing2;
@@ -392,20 +301,16 @@ if (global.Gamemode = 1)
 						    			_boss_amount += 4;
 											break;
 					}
-					if (GameCont.area != 7) repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
-						tag = "boss"
-					}
-
-					if (GameCont.area = 7) && (GameCont.subarea = 1) repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
+					repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
 						tag = "boss"
 					}
 	global.BossesLeft++
 	if (GameCont.area == 1) GameCont.subarea = 1;
 	}
 
-
 	if (Player.fancy == 1) global.fancy = 1
 	if (Player.fancy == 0) global.fancy = 0
+
 	with instance_create(0, 0, CustomObject)
 	{
 		name = "RoRSurfaceHandler"
@@ -430,6 +335,7 @@ if (global.Gamemode = 1)
 	    my_health = 999999999;
 	    tag = "god"
 	}
+
 	if (global.Gamemode = 1)
 	{
 		with (WeaponChest)
@@ -444,52 +350,150 @@ if (global.Gamemode = 1)
 		    }
 		  }
 		}
-	}
 
-	//SPAWN OBJECTS ON LEVEL START
-	with Player
-	{
-		// Teleporter
-		if GameCont.area != 100 && global.Gamemode != 2 with instance_create(instance_furthest(x, y, Floor).x - sprite_xoffset + sprite_width / 2, instance_furthest(x, y, Floor).y - sprite_yoffset + sprite_height / 2, CustomProp)
-		{
-			name     = "Teleporter"
-			teledone = false
-			radifac  = random_range(.9, 1.1)
-			portal   = "regular"
+		//Spawning Boss
+		with (Player) var w = instance_furthest(x, y, Wall)
+		var _boss_amount = 1;
+		switch GameCont.area
+						{
+							case   1: _boss  = BanditBoss;
+										  	sound_play_music( musBoss1);
+										  	break;
+							case   2: _boss  = FrogQueen;
+										  	sound_play_music( musBoss5);
+										  	break;
+							case   3: _boss  = ScrapBoss;
+										  	sound_play_music( musBoss2);
+										  	break;
+							case   4: _boss  = HyperCrystal;
+												sound_play_music( musBoss6);
+												break;
+							case 	 5: _boss  = LilHunter;
+												sound_play_music( musBoss3);
+												break;
+							case 	 6: _boss  = TechnoMancer;
+												sound_play_music( musBoss7);
+												break;
+							case	 7: _boss  = Nothing2;
+												sound_play_music(musBoss4B);
+												break;
+							case   0: _boss  = Nothing2;
+							 			  	sound_play_music( musBoss8);
+										  	break;
+							case 101: _boss  = OasisBoss;
+												sound_play_music(musBoss3);
+												break;
+							case 102: _boss  = Turtle;
+							 					sound_play_music(musBoss3);
+												_boss_amount += 3;
+												break;
+							case 103: _boss  = SuperFireBaller;
+												sound_play_music(mus104);
+							    			_boss_amount += 4;
+												break;
+						}
+						if (GameCont.area != 7) repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
+							tag = "boss"
+						}
 
-			spr_idle   = global.sprTeleporterIdle
-			spr_hurt   = global.sprTeleporterIdle
-			spr_dead   = global.sprTeleporterIdle
-			spr_shadow = mskNone
-			mask_index   = global.mskTeleporter
-			image_speed  = .5
-			maxhealth    = 999999999999999999999999 // yeah
-			my_health    = maxhealth
-
-			var _i = 0;
-			do
-			{
-				with instance_nearest(x, y, Wall) if distance_to_object(other) <= 64
-				{
-					instance_create(x, y, FloorExplo);
-					instance_destroy();
-				}
-				_i++;
-			}until(_i = 64)
-			with Debris instance_delete(self);
-
-			on_step  = teleporter_step
-			on_draw  = teleporter_draw
+						if (GameCont.area = 7) && (GameCont.subarea = 1) repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
+							tag = "boss"
+						}
+		global.BossesLeft++
+		if (GameCont.area == 1) GameCont.subarea = 1;
 		}
-	}
 
-	global.radi = 0;
-	global.speed = 15;
-	global.charge = 0;
-	global.chargeF = 0;
-	global.teleporter = false;
 
-	#define enemySpawn
+		if (Player.fancy == 1) global.fancy = 1
+		if (Player.fancy == 0) global.fancy = 0
+		with instance_create(0, 0, CustomObject)
+		{
+			name = "RoRSurfaceHandler"
+			depth = -1.9
+			on_draw = circlesurface_draw
+		}
+
+		global.crownVault = false;
+		//Reset vars
+		global.subareaChoice = 0;
+		global.areaChoice    = 0;
+
+		global.respawn = irandom_range(6, 12) * (crown_current = 7 ? 2 : 1) // double enemies with cob
+		//Spawn invincible anti-portal maggot
+		if (GameCont.area != 100) with instance_create(Player.x-500, Player.y-500, Maggot) {
+		    visible = false;
+		    image_xscale = 0;
+		    image_yscale = 0;
+		    mask_index = mskNone;
+		    meleedamage = 0;
+		    canfly = true;
+		    my_health = 999999999;
+		    tag = "god"
+		}
+		if (global.Gamemode = 1)
+		{
+			with (WeaponChest)
+			{
+			  if (GameCont.area = 1 || GameCont.area == 101)
+				{
+			    wait(2)
+			    if instance_exists(WeaponChest)
+					{
+				  	instance_create(x, y, BigWeaponChest)
+				    instance_delete(self);
+			    }
+			  }
+			}
+		}
+
+		//SPAWN OBJECTS ON LEVEL START
+		with Player
+		{
+			// Teleporter
+			if GameCont.area != 100 && global.Gamemode != 2 with instance_create(instance_furthest(x, y, Floor).x - sprite_xoffset + sprite_width / 2, instance_furthest(x, y, Floor).y - sprite_yoffset + sprite_height / 2, CustomProp)
+			{
+				name      = "Teleporter"
+				teledone  = false
+				radifac   = random_range(.9, 1.1)
+				portal    = "regular"
+				addframes = room_speed * 2;
+				currad    = 0;
+				radius    = 0;
+				maxradius = 100 + irandom(20);
+
+				spr_idle   = global.sprTeleporterIdle
+				spr_hurt   = global.sprTeleporterIdle
+				spr_dead   = global.sprTeleporterIdle
+				spr_shadow = mskNone
+				mask_index   = global.mskTeleporter
+				image_speed  = .5
+				maxhealth    = 999999999999999999999999 // yeah
+				my_health    = maxhealth
+
+				var _i = 0;
+				do
+				{
+					with instance_nearest(x, y, Wall) if distance_to_object(other) <= 64
+					{
+						instance_create(x, y, FloorExplo);
+						instance_destroy();
+					}
+					_i++;
+				}until(_i = 64)
+				with Debris instance_delete(self);
+
+				on_step  = teleporter_step
+				on_draw  = teleporter_draw
+			}
+		}
+
+		global.radi = 0;
+		global.speed = 15;
+		global.charge = 0;
+		global.chargeF = 0;
+		global.teleporter = false;
+
+#define enemySpawn
 	if instance_exists(Player)
 	{
 		var _place = -4
@@ -520,8 +524,8 @@ if (global.Gamemode = 1)
 			case 105: _place = global.spwJungle; break;
 			default:  _place =  global.spwNight; break;
 		}
-	
-	
+
+
 
 		// Chests
 		var  _floorq = ds_list_create(), // put all available floor tiles into a list
@@ -551,10 +555,10 @@ if (global.Gamemode = 1)
 	}
 
 #define step
-//Boss Rush stuff
-if global.Gamemode == 2 && instance_exists(Player) {
-	//Guardian Boss
-	with (Guardian) {
+	 //Boss Rush stuff
+ 	 if global.Gamemode == 2 && instance_exists(Player) {
+	 //Guardian Boss
+	 with (Guardian) {
 		if ("tag" in self) && (tag == "boss") {
 			if ('GuardianBuff' not in self) {
 				GuardianBuff = true;
@@ -582,11 +586,11 @@ if global.Gamemode == 2 && instance_exists(Player) {
 		instance_create(x, y, Explosion)
 		}
 	}
-with (Player) if my_health < lsthealth && global.perfected = true
-{
-global.perfected = false;
-}
-with instances_matching_le(enemy,"my_health",0) {
+	with (Player) if my_health < lsthealth && global.perfected = true
+	{
+	global.perfected = false;
+	}
+	with instances_matching_le(enemy,"my_health",0) {
 	if ("tag" in self && tag = "boss") global.BossesLeft--
 	chance = round(random_range(1, (18)))
 	if (global.doubleChests == true) chance = round(random_range(1, 9))
@@ -964,9 +968,7 @@ with instances_matching_le(enemy,"my_health",0) {
 		draw_sprite(global.sprTeleporterSiphon, portal = "vault" ? 1 : 0, x, y)
 	}
 
-	#define teleporter_step
-	//TELEPORTER EVENT
-
+#define teleporter_step
 	if my_health < maxhealth my_health = maxhealth
 
 	var _tele = self;
@@ -1085,7 +1087,6 @@ with instances_matching_le(enemy,"my_health",0) {
 	}
 
 
-
 /// DRAW-RELATED FUNCTIONS ///
 
 #define draw_gui
@@ -1100,6 +1101,23 @@ with instances_matching_le(enemy,"my_health",0) {
 		draw_set_alpha(.75);
 		draw_rectangle_colour(0, 36, game_width, game_height - 35, c_black, c_black, c_black, c_black, false);
 		draw_set_alpha(1);
+
+		// Hide CharSelect
+		if instance_exists(Menu)
+		{
+			var _hasmenu = false;
+			with instances_matching(CustomObject, "name", "RoarMenu") _hasmenu = true;
+			if _hasmenu = false
+			{
+				with instance_create(0, 0, CustomObject)
+				{
+					name = "RoarMenu";
+
+					on_step 	 = roarmenu_step;
+					on_destroy = roarmenu_destroy;
+				}
+			}
+		}
 	}
 
 	if instance_exists(CharSelect)
@@ -1135,7 +1153,6 @@ with instances_matching_le(enemy,"my_health",0) {
 				_button_h = sprite_get_height(global.sprButtons),
 				_string_h = string_height("M") / 2,
 				_active = false;
-				_strbutton = "";
 
 		// Button backdrop
 		var _i = 0;
@@ -1154,7 +1171,8 @@ with instances_matching_le(enemy,"my_health",0) {
 				{
 	        if global.MenuIndex != 0
 					{
-						global.MenuIndex = 0;
+						global.MenuIndex   = 0;
+						global.MenuXoffset = 3;
 					}
 					else
 					{
@@ -1167,9 +1185,7 @@ with instances_matching_le(enemy,"my_health",0) {
 			if global.MenuIndex = 0  || _active = true
 			{
 				_active = true;
-				_strbutton = "MODES";
 			}
-	    draw_sprite_ext(global.sprButtons, 0, _draw_x, _draw_y - _active, 1, 1, 0, _active = true ? c_white : c_ltgray, 1);
 
 					/// INFO
 					_active = false;
@@ -1182,7 +1198,8 @@ with instances_matching_le(enemy,"my_health",0) {
 						{
 					    if (global.MenuIndex) != 1
 							{
-									global.MenuIndex = 1;
+									global.MenuIndex   = 1;
+									global.MenuXoffset = 3;
 					    }
 							else
 							{
@@ -1195,9 +1212,7 @@ with instances_matching_le(enemy,"my_health",0) {
 					if _active = true
 					{
 						_active = true;
-						_strbutton = "UPDATE#INFO";
 					}
-			    draw_sprite_ext(global.sprButtons, 1, _draw_x, _draw_y - _active, 1, 1, 0, _active = true ? c_white : c_ltgray, 1);
 
 					/// SETTINGS
 					_active = false;
@@ -1209,7 +1224,8 @@ with instances_matching_le(enemy,"my_health",0) {
 						{
 							if (global.MenuIndex) != 2
 							{
-								global.MenuIndex = 2;
+								global.MenuIndex   = 2;
+								global.MenuXoffset = 3;
 							}
 							else
 							{
@@ -1222,30 +1238,66 @@ with instances_matching_le(enemy,"my_health",0) {
 					if global.MenuIndex = 2 || _active = true
 					{
 						_active = true;
-						_strbutton = "SETTINGS";
 					}
-					draw_sprite_ext(global.sprButtons, 2, _draw_x, _draw_y - _active, 1, 1, 0, _active = true ? c_white : c_ltgray, 1);
+
+					if button_pressed(0, "sout")
+					{
+						global.MenuIndex++
+						if global.MenuIndex > 2 global.MenuIndex = 0
+						global.MenuXoffset = 3
+					}
+					if button_pressed(0, "nort")
+					{
+						global.MenuIndex--
+						if global.MenuIndex < 0 global.MenuIndex = 2
+						global.MenuXoffset = 3
+					}
+
 					draw_set_font(fntSmall);
+					var _strbutton = "";
+					switch global.MenuIndex
+					{
+						case 0: _strbutton = "MODES"      ; break;
+						case 1: _strbutton = "UPDATE#INFO"; break;
+						case 2: _strbutton = "OPTIONS"    ; break;
+					}
+					for(var _i = 0, _sy = _draw_y - (_button_h + 1) * 2, _hover = false; _i <= 2; _i++)
+					{
+						if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i], _draw_x - _button_w/2, _sy + _i * (_button_h + 1) - _button_h/2, _draw_x + _button_w/2, _sy + _i * (_button_h + 1) + _button_h/2) || global.MenuIndex = _i
+						{
+							_hover = true
+							switch global.MenuIndex
+							{
+								case 0: _strbutton = "MODES"      ; break;
+								case 1: _strbutton = "UPDATE#INFO"; break;
+								case 2: _strbutton = "OPTIONS"    ; break;
+							}
+						}
+						draw_sprite_ext(global.sprButtons, _i, _draw_x, _sy + _i * (_button_h + 1) - _hover, 1, 1, 0, _hover = true ? c_white : c_ltgray, 1);
+						_hover = false
+					}
 					draw_text_nt(_draw_x - 9, _draw_y  +  sprite_get_height(global.sprButtons) / 2 + 4, _strbutton);
 					draw_set_font(fntM);
 
 	    		if global.MenuIndex = 1
 					{
-		        draw_text_nt(game_width / 2 - 120, 42, (floor(current_frame/8)*30 % 20 ? "@sVERSION 1.7" : "@pVERSION 1.7"));
-		        draw_text_nt(game_width / 2 - 120, 52, "@s[INSERT UPDATE RELEASE DATE]")
-		        draw_text_nt(game_width / 2 - 120, 42, "@s            [CURSED UPDATE]")
+						var _drawx = game_width / 2 - (120 + global.MenuXoffset);
+		        draw_text_nt(_drawx, 42, (floor(current_frame/8)*30 % 20 ? "@sVERSION 1.7" : "@pVERSION 1.7"));
+		        draw_text_nt(_drawx, 52, "@s[INSERT UPDATE RELEASE DATE]")
+		        draw_text_nt(_drawx, 42, "@s            [CURSED UPDATE]")
 		        var draw_y = -5
-		        draw_text_nt(game_width / 2 - 120, 66 + draw_y, "@s-PATCH NOTES-")
+		        draw_text_nt(_drawx, 66 + draw_y, "@s-PATCH NOTES-")
 		        draw_set_font(fntChat)
-		        draw_text_nt(game_width / 2 - 120, 182 + draw_y, "ITEMS: 38")
-						draw_text_nt(game_width / 2 - 120, 72 + draw_y, "@w-Added \# cursed items #-Added \# other items#-Polished Menus#-Increased Preformance#-Fancier Effects#@w-Options now @ysave#@w-Added @pCursed Coins, @wcan be used to open @pcursed chests")
-		        draw_text_nt(game_width / 2 - 120, 191 + draw_y, "SHRINES: 9")
-	    		}
+		        draw_text_nt(_drawx, 182 + draw_y, "ITEMS: 38")
+						draw_text_nt(_drawx,  72 + draw_y, "@w-Added \# cursed items #-Added \# other items#-Polished Menus#-Increased Preformance#-Fancier Effects#@w-Options now @ysave#@w-Added @pCursed Coins, @wcan be used to open @pcursed chests")
+		        draw_text_nt(_drawx, 191 + draw_y, "SHRINES: 9")
+						if global.MenuXoffset != 0 global.MenuXoffset = 0;
+					}
 
 				// Draw the gamemode menu
 		    if global.MenuIndex = 0
 				{
-					draw_x = 161
+					draw_x = 161 - global.MenuXoffset;
 					draw_y = 79
 					x_offset = 70 //space between each button
 					y_offset = 15
@@ -1303,6 +1355,7 @@ with instances_matching_le(enemy,"my_health",0) {
 			        sound_play_pitch(sndSwapShotgun, 0.8)
 		        }
 	        }
+					if global.MenuXoffset != 0 global.MenuXoffset = 0;
 	    }
 
 			// OPTIONS
@@ -1311,7 +1364,7 @@ with instances_matching_le(enemy,"my_health",0) {
 				var draw_x  = game_width / 2 - 120,
 				 		draw_y  = 20,
 						_str    = "PERFORMANCE MODE",
-						_x1     = game_width / 2 - 120,
+						_x1     = game_width / 2 - 120 - global.MenuXoffset,
 						_x2     = _x1 + string_width(_str) + string_width(" OFF") + 6,
 						_y1     = game_height / 2 - 70,
 						_y2     = _y1 + string_height(_str),
@@ -1320,7 +1373,7 @@ with instances_matching_le(enemy,"my_health",0) {
 						_varstr = global.preformanceMode = true ? " ON" : " OFF",
 						_vardst = string_width(_str) + 12,
 						_detstr = "",
-						_dety   = game_height - 55,
+						_dety   = game_height - 20,
 						_chtstr = "";
 
 				// Preformance Mode Toggle
@@ -1444,7 +1497,7 @@ with instances_matching_le(enemy,"my_health",0) {
 				{
 					_c 			= "@w";
 					_inbox  = true;
-					_detstr = "TOGGLES 60 FPS MODE, WHICH LOOKS SMOOTHER BUT MAY LAG THE GAME";
+					_detstr = "TOGGLES 60 FPS MODE, WHICH LOOKS SMOOTHER#MAY LAG THE GAME";
 				}
 				draw_text_nt(_x1, _y1 - (_inbox = true ? 1 : 0), _c + _str);
 				draw_text_nt(_x1 + _vardst, _y1 - (_inbox = true ? 1 : 0), _c + _varstr);
@@ -1535,15 +1588,15 @@ with instances_matching_le(enemy,"my_health",0) {
 
 				// RESET PROGRESS
 				_str    = "RESET PROGRESS IN " + string(global.reset);
-				_y1    += string_height(_str) + 27;
+				_y1    += string_height(_str) + 21;
 				_y2     = _y1 + string_height(_str);
-				_c      = "@y";
+				_c      = "@s";
 				_inbox  = false;
 				_varstr = " "
 
 				if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i], _x1, _y1, _x2, _y2)
 				{
-					_c 			= "@r";
+					_c 			= "@w";
 					_inbox  = true;
 					_detstr = "RESET ALL RISK OF ACID RAIN PROGRESS";
 				}
@@ -1558,13 +1611,14 @@ with instances_matching_le(enemy,"my_health",0) {
 					{
 						sound_play_pitch(sndClick, 0.8 - ((4 - global.reset * 1.5)/10));
 						if (global.reset >= 1) global.reset--
-						if (global.reset <= 0) resetProgress();
+						if (global.reset <= 0) reset_progress();
 						save_save();
 					}
 				}
 
 				draw_set_font(fntSmall);
 				draw_text_nt(_x1, _dety, _detstr);
+				if global.MenuXoffset > 0 global.MenuXoffset = 0;
 			}
 		}
 	}
@@ -1624,9 +1678,9 @@ with instances_matching_le(enemy,"my_health",0) {
 			{
 				if(button_pressed(index, "pick")) && global.teleporter == false //What to do when the activate teleporter
 				{
+					with other currad = addframes;
 					sound_play(sndLevelUltra)
 	        global.teleporter = true;
-	        global.radi += 1;
 					var i = 0
 					do
 					{
@@ -1725,18 +1779,24 @@ with instances_matching_le(enemy,"my_health",0) {
 			draw_set_halign(fa_left)
 		}
 		var _ang = random(360)
-		if global.teleporter = true && (current_frame mod (room_speed * 5)) = 0 && instance_number(_enemy) < 12
+		if global.teleporter = true
 		{
-			repeat(irandom(2) + 1) with instance_create(x + lengthdir_x(global.radi * radifac * random_range(.3, .8), _ang), y + lengthdir_y(global.radi * radifac * random_range(.3, .8), _ang), _enemy)
+			currad--;
+			radius += (maxradius - radius) * (addframes - currad) / addframes;
+
+			if(current_frame mod (room_speed * 5)) = 0 && instance_number(_enemy) < 12
 			{
-				repeat(6) with instance_create(x, y, Smoke){sprite_index = sprDust; depth = other.depth - choose(0, 1, 1)}
-				if instance_exists(Player) && distance_to_object(Player) <= 32
+				repeat(irandom(2) + 1) with instance_create(x + lengthdir_x(radius * radifac * random_range(.3, .8), _ang), y + lengthdir_y(global.radi * radifac * random_range(.3, .8), _ang), _enemy)
 				{
-					var _i = 0;
-					do
+					repeat(6) with instance_create(x, y, Smoke){sprite_index = sprDust; depth = other.depth - choose(0, 1, 1)}
+					if instance_exists(Player) && distance_to_object(Player) <= 32
 					{
-						move_contact_solid(point_direction(Player.x, Player.y, x, y), 1)
-					}until(_i = 100 or distance_to_object(Player) > 32)
+						var _i = 0;
+						do
+						{
+							move_contact_solid(point_direction(Player.x, Player.y, x, y), 1)
+						}until(_i = 100 or distance_to_object(Player) > 32)
+					}
 				}
 			}
 		}
@@ -1825,7 +1885,7 @@ with instances_matching_le(enemy,"my_health",0) {
 			    _y = y - view_yview;
 
 			if (global.fancy == 1) surface_set_target(global.CircleSurf)
-			draw_circle_colour(_x -4, _y, global.radi, c_red, c_red, false);
+			draw_circle_colour(_x -4, _y, radius, c_red, c_red, false);
 			if (global.fancy == 1) surface_reset_target();
 		}
 	}
@@ -1878,16 +1938,16 @@ with instances_matching_le(enemy,"my_health",0) {
 
 			if (global.fancy == 1) surface_set_target(global.CircleSurf)
 			draw_set_blend_mode(bm_subtract)
-			draw_circle_colour(_x -4, _y, global.radi - 2, c_white, c_white, false);
+			draw_circle_colour(_x -4, _y, radius - 2, c_white, c_white, false);
 			draw_set_blend_mode(bm_normal)
 			if (global.fancy == 1) surface_reset_target();
 
 			draw_set_alpha(.15)
-			draw_circle_colour(x -4, y, global.radi, c_red, c_red, false)
+			draw_circle_colour(x -4, y, radius, c_red, c_red, false)
 			draw_set_alpha(1)
 		}
 	}
-	
+
 	with instances_matching(CustomSlash, "name", "Inv Area")
 	{
 		var _x = x - view_xview,
@@ -1941,17 +2001,17 @@ with instances_matching_le(enemy,"my_health",0) {
 			if (global.fancy == 1) surface_reset_target();
 		}
 	}
-/*
+
 	if surface_exists(global.CircleSurf)
 	{
 		if (global.fancy == 1) draw_surface_ext(global.CircleSurf, view_xview, view_yview, 1, 1, 0, c_white, .8)
 		if (global.fancy == 1) surface_free(global.CircleSurf)
 	}
-*/
+
 #define point_in_teleporter(OBJECT)
 	with instances_matching(CustomProp, "name", "Teleporter")
 	{
-		if distance_to_object(OBJECT) <= global.radi * radifac && global.charge > 0 {return true}else{return false}
+		if distance_to_object(OBJECT) <= radius * radifac && global.charge > 0 {return true}else{return false}
 	}
 	return false;
 
@@ -2053,13 +2113,61 @@ with instances_matching_le(enemy,"my_health",0) {
 	string_save(_str,savefile);
 	//trace("Settings Saved");
 
-#define resetProgress
-	global.reset = 5
+#define reset_progress
+	global.reset = 3
 	trace_color("Progress Reset", c_red)
 	sound_play_pitch(sndExplosion, 1)
 
 	//Progress Reset: (Include all non-settings saved progress here)
 	global.coins = 3;
+
+
+/// OTHER ///
+
+#define roarmenu_step
+	var _f = button_pressed(0, "fire"), // yeah idunno either
+	    _s = button_pressed(0, "spec"),
+			_p = button_pressed(0, "paus");
+	with(Menu)
+	{
+		mode = 0;
+		charsplat = 1;
+		for(var i = 0; i < array_length(charx); i++) charx[i] = 0;
+		sound_volume(sndMenuCharSelect, 0);
+	}
+	with(Loadout) instance_destroy();
+	with(loadbutton) instance_destroy();
+	with(menubutton) instance_destroy();
+	with(BackFromCharSelect) noinput = 10;
+	var _close = false;
+	if point_in_rectangle(mouse_x, mouse_y, -94, -52, -72, -26)
+	{
+		if _f = true
+		{
+			_close = true;
+		}
+	}
+	if _s || _p || global.MenuIndex <= -1{_close = true}
+	if _close = true
+	{
+		global.MenuIndex = -1
+		instance_destroy()
+	}
+
+#define roarmenu_destroy
+	MenuSplat = 1;
+	sound_play(sndClickBack);
+
+	with(Menu)
+	{
+		mode = 0;
+		event_perform(ev_step, ev_step_end);
+		sound_volume(sndMenuCharSelect, 1);
+		sound_stop(sndMenuCharSelect);
+		with(CharSelect) alarm0 = 2;
+	}
+	with(Loadout) selected = 0;
+
 
 #define chest_setup(TAG)																 return mod_script_call("mod", "items","chest_setup"   , TAG)
 #define obj_create(X, Y, OBJ_NAME)											 return mod_script_call("mod", "items","obj_create"    , X, Y, OBJ_NAME)

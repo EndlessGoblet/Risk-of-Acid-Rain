@@ -65,7 +65,7 @@
 
 															subname 			= "DEATH"
 															uses 					= 4;
-															originaltimer = room_speed * 7;
+															originaltimer = (room_speed * 7 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") * 2 : 0));
 															timer 				= 0;
 															has_purchased = true
 															break;
@@ -138,11 +138,11 @@
 																cost    = 0;
 																costval = 30 * GameCont.level;
 
-																subname 				= "PROTECTION"
+																subname 		= "PROTECTION"
 																maxradius   = 79 + irandom(6);
 																radius      = 0;
 																shrinkspeed = .14;
-																maxinv      = room_speed * 3  * current_time_scale;
+																maxinv      = room_speed * 5  * current_time_scale;
 																addframes   = 12;
 																currad      = 0;
 
@@ -265,7 +265,6 @@
 	with instance_create(x, y, ChestOpen){sprite_index = other.sprite_broke}
 	view_shake_at(x, y, 16);
 	sleep(15);
-
 
 #define death_interact// 2: Shrine of Death
 	has_purchased = true;
@@ -541,11 +540,11 @@
 					if distance_to_object(other) < max(1, (other.radius - (sprite_get_width(sprite_index) + sprite_get_height(sprite_index))/2) + 6)
 					{
 						other.radius -= other.shrinkspeed * (item_get_power("paragon") > 0 ? 1 / (1 + item_get_power("paragon") * .1) : 1);
-						var _inv = mod_variable_get("mod", "items", "MaskCounter");
-						if _inv < (other.maxinv + item_get_power("paragon") * room_speed * current_time_scale * 2) mod_variable_set("mod", "items", "MaskCounter", mod_variable_get("mod", "items", "MaskCounter") + room_speed / 16 * current_time_scale)
+						var _inv = mod_variable_get("mod", "items", "InvisibleTimer");
+						if _inv < (other.maxinv + item_get_power("paragon") * room_speed * current_time_scale * 2) mod_variable_set("mod", "items", "InvisibleTimer", mod_variable_get("mod", "items", "InvisibleTimer") + room_speed / 8 * current_time_scale)
 					}
 				}
-				if radius <= 8 radius = 0
+				if radius <= 16 radius = 16
 			}
 			else{radius = 0}
 		}

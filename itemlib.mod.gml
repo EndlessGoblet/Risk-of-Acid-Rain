@@ -367,7 +367,7 @@
 #macro item_soulful_heater item[? "heater"] // ITEM 35: SOULFUL HEATER
   item_soulful_heater = {
     name              : "Soulful Heater",
-  	description_small : "@sTurn 25% @rMax HP @sinto @ypermanent armor",
+  	description_small : "@sTurn 3 @rMax HP @sinto @w2 @ypermanent armor",
   	description_large : "-",
   	spr_index         : 35,
   	tier              : 3
