@@ -28,7 +28,7 @@
 #macro item_ancient_armor_plate item[? "plate"] // ITEM 1: ANCIENT ARMOUR PLATE
   item_ancient_armor_plate = {
     name              : "Ancient Armor Plate",
-  	description_small : "@s+@w2 @yArmor@s, less @wcontact damage @staken",
+  	description_small : "@s+@w2 @yarmor@s, less @wcontact damage @staken",
   	description_large : "@sTake @w50% @d(+50 per stack) from @wtouch damage",
   	spr_index         : 1,
   	tier              : 1
@@ -68,7 +68,7 @@
 #macro item_incendiary_rounds item[? "incendiary"] // ITEM 5: INCENDIARY ROUNDS
   item_incendiary_rounds = {
     name              : "Incendiary Rounds",
-  	description_small : "@wEnemies @scatch @rFire @supon taking @wDamage",
+  	description_small : "@wEnemies @scatch @rfire @supon taking @wdamage",
   	description_large : "@wBullets @sput @wenemies @son @rFire, dealing @w0.04 damage @d(+0.04 damage per stack)",
   	spr_index         : 5,
   	tier              : 1
@@ -118,7 +118,7 @@
 #macro item_growth_fungus item[? "fungus"] // ITEM 10: GROWTH FUNGUS
   item_growth_fungus = {
     name              : "Growth Fungus",
-  	description_small : "@wstronger@s, larger @yProjectiles",
+  	description_small : "@wstronger@s, larger @yprojectiles",
   	description_large : "kinda gave up starting here since its not really used sorry#-Karmelyth, 2019",
   	spr_index         : 10,
   	tier              : 2
@@ -188,7 +188,7 @@
 #macro item_rubber_rounds item[? "rubber"] // ITEM 17: RUBBER ROUNDS
   item_rubber_rounds = {
     name              : "Rubber Rounds",
-  	description_small : "Bullets @ybounce @soff of @wWalls",
+  	description_small : "Bullets @ybounce @soff of @wwalls",
   	description_large : "-",
   	spr_index         : 17,
   	tier              : 0
@@ -207,7 +207,7 @@
 #macro item_focus item[? "focus"] // ITEM 19: FOCUS
   item_focus = {
     name              : "Focus",
-  	description_small : "@wEnemy bullets @sare @wsmaller",
+  	description_small : "@wDamage up @snear active @rteleporters",
   	description_large : "-",
   	spr_index         : 19,
   	tier              : 0
@@ -217,7 +217,7 @@
 #macro item_binky item[? "binky"] // ITEM 20: BINKY
   item_binky = {
     name              : "Binky",
-  	description_small : "@wEnemies @shave a chance to become @bbabies",
+  	description_small : "@wEnemies @smay turn into @bbabies",
   	description_large : "-",
   	spr_index         : 20,
   	tier              : 1
@@ -237,7 +237,7 @@
 #macro item_forgotten_gift item[? "gift"] // ITEM 22: FORGOTTEN GIFT
   item_forgotten_gift = {
     name              : "Forgotten Gift",
-  	description_small : "+@w3 @sCommon @wItems!",
+  	description_small : "+@w3 @scommon @witems!",
   	description_large : "-",
   	spr_index         : 22,
   	tier              : 1
@@ -287,7 +287,7 @@
 #macro item_teleporter_siphon item[? "siphon"] // ITEM 27: TELEPORTER SIPHON
   item_teleporter_siphon = {
     name              : "Teleporter Siphon",
-  	description_small : " @wreload @sfaster @snear active @rTeleporters",
+  	description_small : " @wReload @sfaster @snear active @rteleporters",
   	description_large : "-",
   	spr_index         : 27,
   	tier              : 1
@@ -307,7 +307,7 @@
 #macro item_ammo_extractor item[? "extractor"] // ITEM 29: AMMO EXTRACTOR
   item_ammo_extractor = {
     name              : "Ammo Extractor",
-  	description_small : "@wEnemies @smay drop @yinfammo packs",
+  	description_small : "@wEnemies @sdrop @yinfammo packs",
   	description_large : "-",
   	spr_index         : 29,
   	tier              : 2
@@ -327,7 +327,7 @@
 #macro item_chopper item[? "chopper"] // ITEM 31: CHOPPER
   item_chopper = {
     name              : "Chopper",
-  	description_small : "@wEnemies @sthrow @wChoppers @son @wdeath",
+  	description_small : "@wEnemies @sshoot out @wchoppers @son @wdeath",
   	description_large : "-",
   	spr_index         : 31,
   	tier              : 0
@@ -337,7 +337,7 @@
 #macro item_broken_locket item[? "locket"] // ITEM 32: BROKEN LOCKET
   item_broken_locket = {
     name              : "Broken Locket",
-  	description_small : "@wEnemies @sdrop @wRusty Chests @son @wdeath",
+  	description_small : "@wEnemies @sdrop @wrusty chests @son @wdeath",
   	description_large : "-",
   	spr_index         : 32,
   	tier              : 0
@@ -357,7 +357,7 @@
 #macro item_chaotic_brooch item[? "brooch"] // ITEM 34: CHAOTIC DICE
   item_chaotic_brooch = {
     name              : "Chaotic Brooch",
-  	description_small : "@w+2 @gUncommon @wItems@s, @wreorder @severy @warea",
+  	description_small : "@w+2 @guncommon @witems@s, @wreorder @severy @warea",
   	description_large : "-",
   	spr_index         : 34,
   	tier              : 3
@@ -367,7 +367,7 @@
 #macro item_soulful_heater item[? "heater"] // ITEM 35: SOULFUL HEATER
   item_soulful_heater = {
     name              : "Soulful Heater",
-  	description_small : "@sTurn 3 @rMax HP @sinto @w2 @ypermanent armor",
+  	description_small : "@sTurn 3 @rmax HP @sinto @w2 @ypermanent armor",
   	description_large : "-",
   	spr_index         : 35,
   	tier              : 3
@@ -387,7 +387,7 @@
 #macro item_glowing_fern item[? "fern"] // ITEM 37: GLOWING FERN
   item_glowing_fern = {
     name              : "Glowing Fern",
-  	description_small : "@wEnemies @smay drop @wStealth Packs",
+  	description_small : "@wEnemies @sdrop @wstealth packs",
   	description_large : "-",
   	spr_index         : 37,
   	tier              : 1
@@ -407,7 +407,7 @@
 #macro item_metal_plating item[? "metal"] // ITEM 39: STEEL PLATING
   item_metal_plating = {
     name              : "Metal Plating",
-  	description_small : "@s+@w2 @yArmor @sper @warea",
+  	description_small : "@s+@w2 @yarmor @sper @warea",
   	description_large : "-",
   	spr_index         : 39,
   	tier              : 0
@@ -427,7 +427,7 @@
 #macro item_celesteel item[? "celesteel"] // ITEM 41: CELESTEEL
   item_celesteel = {
     name              : "CELESTEEL",
-  	description_small : "@s+@w5 @yArmor@s, chance to not lose @yarmor",
+  	description_small : "@s+@w5 @yarmor@s, chance to not lose @yarmor",
   	description_large : "@sGain 5 @warmor @son pickup, and have a small chance to not lose armor upon being hit",
   	spr_index         : 41,
   	tier              : 1
@@ -437,7 +437,7 @@
 #macro item_scrap_missile item[? "missile"] // ITEM 42: SCRAP MISSILE
   item_scrap_missile = {
     name              : "SCRAP MISSILE",
-  	description_small : "@s+@w8 @yArmor@s, scale @wdamage @swith @yarmor",
+  	description_small : "@s+@w8 @yarmor@s, scale @wdamage @swith @yarmor",
   	description_large : "-",
   	spr_index         : 42,
   	tier              : 2
@@ -447,7 +447,7 @@
 #macro item_mercenary_canteen item[? "canteen"] // ITEM 43: MERC'S CANTEEN
   item_mercenary_canteen = {
     name              : "MERC'S CANTEEN",
-  	description_small : "@wEnemies @smay drop @yarmor",
+  	description_small : "@wEnemies @sdrop @yarmor packs",
   	description_large : "-",
   	spr_index         : 43,
   	tier              : 1
@@ -457,7 +457,7 @@
 #macro item_injury item[? "injury"] // ITEM 44: INJURY
   item_injury = {
     name              : "INJURY",
-  	description_small : "@s-@w1 @rMax HP",
+  	description_small : "@s-@w1 @rmax HP",
   	description_large : "-",
   	spr_index         : 44,
   	tier              : 4
@@ -566,7 +566,7 @@
 #macro item_sarkora item[? "sarkora"] // ITEM 56: SARKORA
   item_sarkora = {
     name              : "SARKORA",
-  	description_small : "@s+@w50% Item power@s, -@w25% @gmutation @wpower",
+  	description_small : "@s+@w50% item power@s, -@w25% @gmutation @wpower",
   	description_large : "-",
   	spr_index         : 56,
   	tier              : 3
@@ -575,7 +575,7 @@
 #macro item_papora item[? "papora"] // ITEM 57: PAPORA
   item_papora = {
     name              : "PAPORA",
-  	description_small : "@s+@w50% @gmutation @wpower@s, -@w25% Item power",
+  	description_small : "@s+@w50% @gmutation @wpower@s, -@w25% item power",
   	description_large : "-",
   	spr_index         : 57,
   	tier              : 3
@@ -613,7 +613,7 @@
 #macro item_kalidos item[? "kalidos"] // ITEM 61: KALIDOS
   item_kalidos = {
     name              : "KALIDOS",
-  	description_small : "@s+@w50% Item power",
+  	description_small : "@s+@w50% item power",
   	description_large : "-",
   	spr_index         : 61,
   	tier              : 6
@@ -649,7 +649,7 @@
 #macro item_vile_flask item[? "flask"] // ITEM 65: VILE FLASK
   item_vile_flask = {
     name              : "VILE FLASK",
-  	description_small : "@sApply @gblight @swith @gToxic Gas",
+  	description_small : "@sApply @gblight @swith @gtoxic gas",
   	description_large : "-",
   	spr_index         : 65,
   	tier              : 4
@@ -658,7 +658,7 @@
 #macro item_quartz_flower item[? "flower"] // ITEM 66: QUARTZ FLOWER
   item_quartz_flower = {
     name              : "QUARTZ FLOWER",
-  	description_small : "@s+@wall stats@s, @wbreaks @son @whit",
+  	description_small : "@wall stats @sup, @wbreaks @son @whit",
   	description_large : "-",
   	spr_index         : 66,
   	tier              : 2
@@ -666,8 +666,8 @@
 
 #macro item_broken_quartz_flower item[? "spent flower"] // ITEM 67: BROKEN QUARTZ FLOWER
   item_broken_quartz_flower = {
-    name              : "SPENT FLOWER",
-  	description_small : "@sBroken, @wreturns @sfixed @wnext stage",
+    name              : "BROKEN FLOWER",
+  	description_small : "@sUseless, @wreturns @sfixed @wnext stage",
   	description_large : "-",
   	spr_index         : 67,
   	tier              : 5
@@ -698,6 +698,33 @@
     description_large : "-",
     spr_index         : 70,
     tier              : 3
+  };
+
+#macro item_radiating_core item[? "core"] // ITEM 71: RADIATING CORE
+  item_radiating_core = {
+    name              : "RADIATING CORE",
+    description_small : "@s+@w1 @grad @sper @wenemy",
+    description_large : "-",
+    spr_index         : 71,
+    tier              : 4
+  };
+
+#macro item_sugilith_fragment item[? "fragment"] // ITEM 72: SUGILITH FRAGMENT
+  item_sugilith_fragment = {
+    name              : "SUGILITH FRAGMENTS",
+    description_small : "@s+@w1 @rmax HP",
+    description_large : "-",
+    spr_index         : 72,
+    tier              : 4
+  };
+
+#macro item_medical_tweezers item[? "tweezers"] // ITEM 73: MEDICAL TWEEZERS
+  item_medical_tweezers = {
+    name              : "MEDICAL TWEEZERS",
+    description_small : "@gHeal @swhen entering a new @warea",
+    description_large : "-",
+    spr_index         : 73,
+    tier              : 0
   };
 
 #define items_finalize()

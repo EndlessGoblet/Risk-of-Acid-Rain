@@ -233,7 +233,7 @@
 			if uses <= 0 instance_destroy();
 
 			// Small Accolade
-			var _amount = item_get_power("accolade") > 0 ? .5 + item_get_power("accolade") *.5 : 0;
+			var _amount = item_get_power("accolade") > 0 ? item_get_power("accolade") : 0;
 			if _amount > 0
 			{
 				var _hp = roll(_amount);
@@ -371,7 +371,7 @@
 	uses--;
 	costval++;
 	var _dir = point_direction(x, y, Player.x, Player.y)
-	with obj_create(x + lengthdir_x(-24, _dir), y + lengthdir_y(-24, _dir), "Item")
+	with obj_create(x + lengthdir_x(-24, _dir), y + lengthdir_y(-24, _dir), "dropitem")
 	{
 		item_index = CursedItems[round(random_range(0, array_length_1d(CursedItems) - 1))]
 	}
@@ -382,7 +382,7 @@
 	sound_play_pitch(sndBloodLauncherExplo, 1)
 	var _ang = point_direction(Player.x, Player.y, x, y),
 			_i   = 0;
-	repeat(roll(1 + item_get_power("paragon"))) with obj_create(Player.x + lengthdir_x(26, _ang), Player.y + lengthdir_y(26, _ang), "Item")
+	repeat(roll(1 + item_get_power("paragon"))) with obj_create(Player.x + lengthdir_x(26, _ang), Player.y + lengthdir_y(26, _ang), "dropitem")
 	{
 		item_index = UncommonItems[round(random_range(0, array_length_1d(UncommonItems) - 1))]
 	}
@@ -408,7 +408,7 @@
 	{
 		var _item = _tierarray[round(random_range(0, array_length_1d(_tierarray) - 1))]
 		remove_item(_item, 1);
-		get_item(item_index, 1);
+		with obj_create(x, y, "dropitem"){item_index = other.item_index}
 	}
 	else
 	{
@@ -579,11 +579,14 @@
 			draw_sprite(shd16, 1, x, y + 7)
 		}
 	}
-
+	with instances_matching(CustomProjectile, "name", "dropitem")
+	{
+		draw_sprite_ext(shd16, 1, x, y - 2, clamp((maxzspeed / z) + .2, .2, 1), clamp((maxzspeed / z) + .2, .2, 1), 0, c_white, 1)
+	}
 	with instances_matching(CustomProjectile, "name", "death grenade")
 	{
 		var _shd = size > 1 ? shd16 : shd24
-		draw_sprite_ext(shd24, 1, x, y - 2, clamp((zbase / z) + .2, .2, 1), clamp((zbase / z) + .2, .2, 1), 0, c_white, 1)
+		draw_sprite_ext(_shd, 1, x, y - 2, clamp((zbase / z) + .2, .2, 1), clamp((zbase / z) + .2, .2, 1), 0, c_white, 1)
 	}
 
 #define draw_weapon(SPRITE_INDEX, X, Y, COLOUR)

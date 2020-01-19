@@ -65,17 +65,19 @@
 	global.BloodCounter 				= 0;
 	global.GemCoeff 						= choose(-1, 1)
 	global.MinusRad             = 0;
+	global.RustedChests         = 0;
+	global.StartLevel           = 0;
 	global.hurtFloor 						= false;
 
 	global.PlusItems = 0;
 	global.hideDes = 0;
 	global.popoChance = 0;
 
-	global.CommonItems   = [item[? "info"]      , item[? "gumdrop"], item[? "bandages"], item[? "fruit"]   , item[? "golden"]   , item[? "rubber"] , item[? "focus"]   , item[? "mush"]       , item[? "grease"] , item[? "boots"]  , item[? "chopper"] , item[? "locket"], item[? "metal"]    , item[? "mask"]] //TO DO: Chopper
-	global.UncommonItems = [item[? "incendiary"], item[? "lens"]   , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]       , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]  , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"]] //To-Do: Horror In a Bottle
-	global.RareItems     = [item[? "artifact"]  , item[? "slosher"], item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"]  , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]] //To-Do: None
-	global.CursedItems   = [item[? "brooch"]    , item[? "heater"] , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]] // Todo: None
-	global.UniqueItems   = [item[? "energy"]    , item[? "times"]  ,  item[? "injury"] , item[? "currency"], item[? "Fcurrency"], item[? "pearl"]  , item[? "Dpearl"]  , item[? "key"]        , item[? "flask"]]
+	global.CommonItems   = [item[? "info"]      , item[? "tweezers"], item[? "gumdrop"] , item[? "bandages"], item[? "fruit"]    , item[? "golden"] , item[? "rubber"]  , item[? "focus"]     , item[? "mush"]   , item[? "grease"] , item[? "boots"]   , item[? "chopper"] , item[? "locket"]   , item[? "metal"]  , item[? "mask"]] //TO DO: Chopper
+	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"]] //To-Do: Horror In a Bottle
+	global.RareItems     = [item[? "artifact"]  , item[? "slosher"] , item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"] , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]] //To-Do: None
+	global.CursedItems   = [item[? "brooch"]    , item[? "heater"]  , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]] // Todo: None
+	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "pearl"]  , item[? "Dpearl"]  , item[? "key"]       , item[? "flask"]  , item[? "fragment"]]
 	global.PlayerItems 	 = [item[? "none"]]
 	//set new level function
 	if instance_exists(CharSelect) CharSelect.debugSet  = false;
@@ -143,11 +145,21 @@
 	Player.shakeText    = 0;
 
 #define level_start
+
+	global.RustedChests = 0;
+	global.StartLevel = GameCont.level;
+
   var amount = item_get_power("shield")
   if amount >= 1
 	{
 		Player.shieldCount = ceil(amount)
 		Player.CanShield = 0
+	}
+
+	var amount = item_get_power("tweezers")
+  if amount >= 1
+	{
+		Player.my_health += roll(.5 + .5 * amount)
 	}
 
 	var amount = item_get_power("metal")
@@ -311,6 +323,9 @@
 
 #define step
 
+	with instances_matching_ne(Debris, "team", 2){team = 2}
+  if instance_exists(Menu){global.descriptionTimer = 0}
+
 	//Cross Variables
 	dc_ = mod_variable_get("mod", "main", "doubleChests")
 	ds_ = mod_variable_get("mod", "main", "doubleShrines")
@@ -327,11 +342,11 @@
 			if (_g == 0) _chance = round(random_range(1, 500 * Player.lunarDrops))
 			if (_g == 1) _chance = round(random_range(1, 250 * Player.lunarDrops))
 			if (_g == 2) _chance = round(random_range(1, 500))
-		}
-		if _chance = 1
-		{
-			Player.lunarDrops++
-			obj_create(x, y, "Coin")
+			if _chance = 1
+			{
+				Player.lunarDrops++
+				obj_create(x, y, "Coin")
+			}
 		}
 	}
 
@@ -489,7 +504,7 @@
 											 break;
 		 }
 
-		 if place_meeting(x, y, Player) || place_meeting(x, y, PortalShock) || instance_exists(BigPortal)
+		 if (place_meeting(x, y, Player) || place_meeting(x, y, PortalShock) || (instance_exists(BigPortal)) && tag != "item")
 		 {
 
 				if button_pressed(Player.index, "pick") && mod_variable_get("mod", "main", "coins") <= 0
@@ -534,8 +549,8 @@
 
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				get_item(item[? "bulb"], 1)
-				get_item(item[? "slosher"], 1)
+				//obj_create(mouse_x, mouse_y, "dropitem")
+				get_item(item[? "tweezers"], 1)
 				//global.InvisibleTimer = room_speed * 5
 			}
 		}
@@ -683,17 +698,6 @@
 	sound_play_pitch(sndHPPickup, 1.3)
 	}}}}
 	//Radiated Snack
-
-	//Rubber Projectile
-	var amount = item_get_power("rubber")
-	if amount >= 1
-	{
-		with instances_matching(projectile, "team", 2)
-		{
-			if "extra_bounce" not in self extra_bounce = ceil(amount)+1
-		 }
-	}
-	//Rubber Projectile
 
 	//Invisibility
 	var amount = item_get_power("mask")
@@ -920,42 +924,250 @@
 	}
 	//Fel Rounds
 
-	//Occult Artifact
-	var amount = item_get_power("artifact")
-	if amount >= 1
-	{
-		with instances_matching_le(enemy,"my_health",0)
+	// On death effects go here
+	with instances_matching_le(enemy, "my_health", 0)
 		{
-			if instance_exists(Player) if roll_luck(10 + 15 * amount) repeat(size + 1) with instance_create(x + random_range(-5, 5), y + random_range(-5, 5), MeatExplosion) team = Player.team
+			//Occult Artifact
+			var amount = item_get_power("artifact")
+			if amount >= 1
+			{
+				if instance_exists(Player) if roll_luck(10 + 15 * amount) repeat(size + 1) with instance_create(x + random_range(-5, 5), y + random_range(-5, 5), MeatExplosion) team = Player.team
+			}
+
+			//Ammo Extractor
+			var amount = item_get_power("extractor")
+			if amount >= 1
+			{
+				if size > 0
+				{
+					if irandom(99) < ((1 - 1 / (.3* amount *(1 * 1 + (skill_get(mut_rabbit_paw)) * .4) +1)) * 100 * (.1 + (Player.infammo > 0 ? 1 : 0) * .2))
+					with obj_create(x, y, "CustomPickup")
+					{
+						tag = "infammo"
+						sprite_index = global.sprInfammoPickup
+					}
+				}
+			}
+
+			//Glowing Fern
+			var amount = item_get_power("fern")
+			if amount >= 1
+			{
+				if size > 0
+				{
+					if irandom(99) < ((1 - 1 / (.3* amount *(1 * 1 + (skill_get(mut_rabbit_paw)) * .4) +1)) * 10)
+					with obj_create(x, y, "CustomPickup")
+					{
+						tag = "fern"
+						sprite_index = global.sprFernPickup
+					}
+				}
+			}
+
+			//Chopper
+			var amount = item_get_power("chopper")
+			if amount >= 1
+			{
+				if roll_luck(8) = true && size > 0
+				{
+					for(var _i = 0, _amount = roll(amount) + 1, _ang = random(360), _dang = 360/_amount; _i < _amount; _i++)
+					{
+						with obj_create(x, y, "chopper")
+						{
+							creator = Player;
+							team 		= creator.team;
+							pierce += ceil(amount);
+							motion_add(_ang + _dang * _i, 18);
+						}
+					}
+				}
+			}
+
+			//Broken Locket
+			var amount = item_get_power("locket")
+			if amount >= 1
+			{
+				if size > 1 && roll_luck((5 + (1.7 * amount))/(1 + amount * .1 + .55 * global.RustedChests)) // 6% base chance to drop chest + 2% per stack
+				{
+					with obj_create(x, y, "ItemChest")
+					{
+						tag = "rusty";
+						chest_setup(tag)
+						global.RustedChests++;
+					}
+				}
+			}
+
+			// Merc Canteen
+			var amount = item_get_power("canteen")
+			if amount >= 1
+			{
+				if size > 0
+				{
+					if irandom(99) < ((1 - 1/(.08 * amount / (1 + Player.armor * .1) * (1 + skill_get(mut_rabbit_paw) * .4) + 1))*100 * .6)
+					with obj_create(x, y, "CustomPickup")
+					{
+						tag = "armor"
+						sprite_index = global.sprArmorPickup
+					}
+				}
+			}
+
+			//Sharp CD
+			var amount = item_get_power("CD")
+			if amount >= 1 && instance_exists(Player) repeat(roll(amount))
+			{
+				var _size = max(size, 1);
+				do
+				{
+					if _size >= 4
+					{
+						with obj_create(x, y, "Large Cursed Disc")
+						{
+							direction = random(360)
+							speed = 4;
+							image_angle = direction
+						}
+						_size -= 4;
+						continue;
+					}
+					if _size >= 2
+					{
+						with obj_create(x, y, "Cursed Disc")
+						{
+							direction = random(360)
+							speed = 5;
+							dist = 10 + irandom(15)
+							image_angle = direction
+						}
+						_size -= 2;
+						continue;
+					}
+					if _size >= 1
+					{
+						with obj_create(x, y, "Small Cursed Disc")
+						{
+							direction = random(360)
+							speed = 6;
+							dist = 190 + irandom(15)
+							image_angle = direction
+						}
+						_size -= 1;
+						continue;
+					}
+				}
+				until(_size <= 0)
+			}
 		}
-	}
-	//Occult Artifact
 
-	//Slosher
-	var amount = item_get_power("slosher")
-	if amount >= 1 {
-	    with instances_matching(instances_matching_ne(projectile, "noproc", true), "team", 2) {
-	        if "sloshed" not in self {
-	            var direct = direction
-	            repeat(amount) with instance_create(x, y, EnemyBullet2) {
-	            sacred = true;
-							damage = 2
-	            motion_set(direct + random_range(-50, 50),16)
-				image_angle = direction
-							friction = random_range(1.5, 1.65)
-	            var roll2 = random_range(0.5, 1)
-	            image_xscale = roll2
-	            image_yscale = roll2
-				damage = damage / 1.5;
-				team = 2;
-				sloshed = true;
-	            }
+	// On create effects go here
+	with instances_matching_ne(enemy, "roar_check_create", true)
+		{
+			roar_check_create = true;
 
-	        sloshed = true;
-	        }
-	    }
-	}
-	//Slosher
+			//Binky
+			var amount = item_get_power("binky")
+			if amount >= 1
+			{
+				if roll_luck(4 + 3 * amount)
+				{
+					image_xscale /= 1.5
+					image_yscale /= 1.5
+					my_health /= 2.5
+					maxhealth /= 2.5
+				}
+			}
+
+			// Radiating Core
+			var amount = item_get_power("core")
+			if amount >= 1
+			{
+				raddrop += roll(amount);
+			}
+
+			if GameCont.level - global.StartLevel > 0
+			{
+				raddrop -= (GameCont.level - global.StartLevel)
+			}
+		}
+
+  // On projectile create effects go here
+	with instances_matching_ne(instances_matching_ne(projectile, "noproc", true), "roar_check_projectile", true)
+		{
+			roar_check_projectile = true;
+			if team = 2 // player projectiles
+			{
+				// Focus
+				var amount = item_get_power("focus")
+				if amount >= 1 && instance_exists(Player)
+				{
+					if point_in_teleporter(Player) = true extra_damage += 1 + .05 * amount
+				}
+
+				//Rubber Projectile
+				var amount = item_get_power("rubber")
+				if amount >= 1
+				{
+					if "extra_bounce" not in self extra_bounce = ceil(amount)+1
+				}
+
+				//Slosher
+				var amount = item_get_power("slosher")
+				if amount >= 1 && "sacred" not in self and "blessed" not in self
+				{
+					var direct = direction
+					repeat(roll(amount)) with instance_create(x, y, EnemyBullet2)
+					{
+						sacred = true;
+						damage = 2
+						motion_set(direct + random_range(-50, 50),16)
+						image_angle = direction
+						friction = random_range(1.5, 1.65)
+						var roll2 = random_range(0.5, 1)
+						image_xscale = roll2
+						image_yscale = roll2
+						team = Player.team;
+					}
+				}
+
+				//Bullet Grease
+				var amount = item_get_power("grease")
+				if amount >= 1
+				{
+					friction /= (1 + (.12 * amount))
+					speed *= 1.15
+				}
+
+				//Gun God's Blessing
+				var amount = item_get_power("blessing")
+				if amount >= 1
+				{
+					if "blessed" not in self && "sacred" not in self
+					{
+						if roll_luck((1 - 1/(.15 * amount + 1))*100) with instance_create(x,y,object_index) // hyperbolic item stacking
+						{
+							motion_set(other.direction,other.speed*1.2)
+							image_angle = direction
+							team = other.team;
+							sprite_index = other.sprite_index
+							sound_play_pitch(sndPopgun, random_range(.8, 1.2))
+							sound_play_pitchvol(sndPopPop, random_range(.8, 1.2), .3)
+							blessed = 1
+						}
+						blessed = 1;
+					}
+				}
+			}
+			else // enemy projectiles
+			{
+				//Sabotage Tools
+				var amount = item_get_power("tools")
+				if amount >= 1
+				{
+					if roll_luck(clamp(8 * amount, 0, 40)){instance_destroy()}
+				}
+			}
+		}
 
 	//Growth Fungus
 	var amount = item_get_power("fungus")
@@ -983,20 +1195,6 @@
 	}
 	}
 	//R-Wing
-
-	//Sabotage Tools
-	var amount = item_get_power("tools")
-	if amount >= 1
-	{
-		with (projectile)
-		{
-		  if "jam" not in self && team != 2
-			{
-		  	if roll_luck(clamp(8 * amount, 0, 40)){instance_destroy(); exit}else{jam = true}
-		  }
-		}
-	}
-	//Sabotage Tools
 
 	//Metafillings
 	var amount = item_get_power("fillings")
@@ -1034,12 +1232,7 @@
 	  image_blend = merge_color(c_red, c_white, 1)
 	}
 	}
-
 	//Bloody Lust
-
-	//Liquid Nitrogen
-	//Check define draw
-	//Liquid Nitrogen
 
 	//Focus
 	var amount = item_get_power("focus")
@@ -1051,41 +1244,6 @@
 	    }}
 	}
 	//Focus
-
-	//Binky
-	var amount = item_get_power("binky")
-	if amount >= 1
-	{
-		with (enemy) if "Shrink" not in self
-		{
-	    var chance = roll_luck(6 + 8 * amount)
-	    Shrink = true
-	    if chance == 1
-			{
-		    image_xscale /= 1.5
-		    image_yscale /= 1.5
-		    my_health /= 2.5
-		    maxhealth /= 2.5
-	    }
-		}
-	}
-	//Binky
-
-	//Bullet Grease
-	var amount = item_get_power("grease")
-	if amount >= 1
-	{
-		if instance_exists(Player) with instances_matching(projectile, "team", Player.team)
-		{
-			if "grease" not in self
-			{
-				friction /= (1 + (.3 * amount))
-				grease = true
-				speed *= 1.15
-			}
-		}
-	}
-	//Bullet Grease
 
 	var amount = item_get_power("gumdrop")
 	if amount >= 1
@@ -1106,10 +1264,6 @@
 		}
 	}
 
-	//Forgotten Gift
-	    //Check get_item()
-	//Forgotten Gift
-
 	//Mini-Mush
 	var amount = item_get_power("mush")
 	if amount >= 1
@@ -1124,27 +1278,6 @@
 		}
 	}
 	//Mini-Mush
-
-	//Gun God's Blessing
-	var amount = item_get_power("blessing")
-	if amount >= 1
-	{
-	  with (projectile) if "blessed" not in self && "sacred" not in self && team = 2
-		{
-			if roll_luck((1 - 1/(.15 * amount + 1))*100) with instance_create(x,y,object_index) // hyperbolic item stacking
-			{
-				motion_set(other.direction,other.speed*1.2)
-				image_angle = direction
-				team = other.team;
-				sprite_index = other.sprite_index
-	      sound_play_pitch(sndPopgun, random_range(.8, 1.2))
-				sound_play_pitchvol(sndPopPop, random_range(.8, 1.2), .3)
-				blessed = 1
-			}
-	    blessed = 1;
-		}
-	}
-	//Gun God's Blessing
 
 	//Gun Boots
 	var amount = item_get_power("boots")
@@ -1218,96 +1351,6 @@
 		}
 	}
 	//Firewood
-
-	//Ammo Extractor
-	var amount = item_get_power("extractor")
-	if amount >= 1
-	{
-		with instances_matching_le(enemy, "my_health", 0) if size > 0
-		{
-			if irandom(99) < ((1 - 1 / (.3* amount *(1 * 1 + (skill_get(mut_rabbit_paw)) * .4) +1)) * 100 * (.1 + (Player.infammo > 0 ? 1 : 0) * .2))
-			with obj_create(x, y, "CustomPickup")
-			{
-				tag = "infammo"
-				sprite_index = global.sprInfammoPickup
-			}
-		}
-	}
-	//Ammo Extractor
-
-	//Glowing Fern
-	var amount = item_get_power("fern")
-	if amount >= 1
-	{
-		with instances_matching_le(enemy, "my_health", 0) if size > 0
-		{
-			if irandom(99) < ((1 - 1 / (.3* amount *(1 * 1 + (skill_get(mut_rabbit_paw)) * .4) +1)) * 10)
-			with obj_create(x, y, "CustomPickup")
-			{
-				tag = "fern"
-				sprite_index = global.sprFernPickup
-			}
-		}
-	}
-	//Glowing Fern
-
-	//Chopper
-	var amount = item_get_power("chopper")
-	if amount >= 1
-	{
-	  with instances_matching_le(enemy, "my_health", 0) if roll_luck(8) = true && size > 0
-		{
-			for(var _i = 0, _amount = roll(amount) + 1, _ang = random(360), _dang = 360/_amount; _i < _amount; _i++)
-			{
-				with obj_create(x, y, "chopper")
-				{
-					creator = Player;
-					team 		= creator.team;
-					pierce += ceil(amount);
-					motion_add(_ang + _dang * _i, 18);
-				}
-			}
-		}
-	}
-	//Chopper
-
-	//Broken Locket
-	var amount = item_get_power("locket")
-	if amount >= 1
-	{
-		with instances_matching_le(enemy, "my_health", 0)
-		{
-			if size > 1 && roll_luck((5 + (1.7 * amount))/(1 + amount * .1)) // 7% base chance to drop chest + 2% per stack
-			{
-				with obj_create(x, y, "ItemChest")
-				{
-					tag = "rusty";
-					chest_setup(tag)
-				}
-			}
-		}
-	}
-	//Broken Locket
-
-	// Merc Canteen
-	var amount = item_get_power("canteen")
-	if amount >= 1
-	{
-		with instances_matching_le(enemy, "my_health", 0)
-		{
-			if size > 0
-			{
-				if irandom(99) < ((1 - 1/(.08 * amount / (1 + Player.armor * .1) * (1 + skill_get(mut_rabbit_paw) * .4) + 1))*100 * .6)
-				with obj_create(x, y, "CustomPickup")
-				{
-					tag = "armor"
-					sprite_index = global.sprArmorPickup
-
-				}
-			}
-		}
-	}
-	// Merc Canteen
 
 	//Scrap Missile
 	var amount = item_get_power("missile")
@@ -1387,56 +1430,6 @@
 
 	//Death's Scythe
 
-	//Sharp CD
-	var amount = item_get_power("CD")
-	if amount >= 1 && instance_exists(Player) repeat(roll(amount))
-	{
-		with instances_matching_le(enemy,"my_health",0)
-		{
-			var _size = max(size, 1);
-			do
-			{
-				if _size >= 4
-				{
-					with obj_create(x, y, "Large Cursed Disc")
-					{
-						direction = random(360)
-						speed = 4;
-						image_angle = direction
-					}
-					_size -= 4;
-					continue;
-				}
-				if _size >= 2
-				{
-					with obj_create(x, y, "Cursed Disc")
-					{
-						direction = random(360)
-						speed = 5;
-						dist = 10 + irandom(15)
-						image_angle = direction
-					}
-					_size -= 2;
-					continue;
-				}
-				if _size >= 1
-				{
-					with obj_create(x, y, "Small Cursed Disc")
-					{
-						direction = random(360)
-						speed = 6;
-						dist = 190 + irandom(15)
-						image_angle = direction
-					}
-					_size -= 1;
-					continue;
-				}
-			}
-			until(_size <= 0)
-		}
-	}
-	//Sharp CD
-
 	//Dark Pearl
 	var amount = item_get_power("Dpearl")
 	if amount >= 1 && instance_exists(Player)
@@ -1484,6 +1477,7 @@
 		extra_damage   += amount * 3
 		extra_reload   += amount * .3
 		extra_accuracy += amount * .6
+		extra_health   += ceil(amount * 2)
 
 		with (Player) if my_health < lsthealth
 		{
@@ -1584,7 +1578,7 @@
 	{
 		Player.reloadspeed = Player.reloadspeed_base   + extra_reload 	 + (skill_get(mut_stress) * (1 - Player.my_health/Player.maxhealth)) + ultra_get(char_venuz, 1)   * .4
 		Player.maxspeed    = Player.speed_base         + extra_speed  	 + (skill_get(mut_extra_feet) * .5)
-		Player.maxhealth   = round((Player.health_base + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6) - item_get_count("injury") - item_get_count("heater") * 3 + (GameCont.level - 1) * 2)
+		Player.maxhealth   = round((Player.health_base + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6) - item_get_count("injury") - item_get_count("heater") * 3 + ceil(item_get_count("fragment")) + (GameCont.level - 1) * 2)
 		Player.accuracy    = Player.accuracy_base      / (extra_accuracy + skill_get(mut_eagle_eyes) * 5 / 3 + 1)
 
 		with instances_matching(projectile, "team", Player.team)
@@ -1608,7 +1602,7 @@
 		}
 	}
 
-	with instances_matching(EnemyBullet2, "sloshed", true){if speed <= friction + 1 instance_destroy()}
+	with instances_matching(EnemyBullet2, "roar_check_projectile", true){if speed <= friction + 1 instance_destroy()}
 
 	if instance_exists(Player) Player.lsthealth = Player.my_health
 
@@ -1667,26 +1661,29 @@
 			Player.CanShield = 0
 		}
 	}
-
+	if ITEM = item[? "fragment"] && global.ItemGetAmount > 0
+	{
+		Player.my_health++
+	}
 	var _ang = random(360),
 	    _i   = 0;
 	if ITEM = item[? "gift"] && global.ItemGetAmount > 0 repeat(3 * global.ItemGetAmount)
 	{
-		with obj_create(Player.x + lengthdir_x(26, _ang + _i * 120), Player.y + lengthdir_y(26, _ang + _i * 120), "ItemChest")
+		with obj_create(Player.x + lengthdir_x(26, _ang + _i * 120 / global.ItemGetAmount), Player.y + lengthdir_y(26, _ang + _i * 120 / global.ItemGetAmount), "dropitem")
 		{
 			tag = "item"
 			item_index = global.CommonItems[round(random_range(0, array_length_1d(global.CommonItems) - 1))]
 			chest_setup(tag)
+			direction = _ang + _i * 120 / global.ItemGetAmount
 		}
 		_i++
 	}
 	if ITEM = item[? "brooch"] && global.ItemGetAmount > 0 repeat(2 * global.ItemGetAmount)
 	{
-		with obj_create(Player.x + lengthdir_x(26, _ang + _i * 180), Player.y + lengthdir_y(26, _ang + _i * 180), "ItemChest")
+		with obj_create(Player.x + lengthdir_x(26, _ang + _i * 180 / global.ItemGetAmount), Player.y + lengthdir_y(26, _ang + _i * 180 / global.ItemGetAmount), "dropitem")
 		{
-			tag = "item"
 			item_index = global.UncommonItems[round(random_range(0, array_length_1d(global.UncommonItems) - 1))]
-			chest_setup(tag)
+			direction = _ang + _i * 180 / global.ItemGetAmount
 		}
 		_i++
 	}
@@ -1934,7 +1931,7 @@
 			damage       = .175 + amount * .05
 			noproc       = true
 
-			on_projectile = void;
+			on_grenade    = void;
 			on_step 			= bulb_step;
 			on_hit  			= bulb_hit;
 			on_projectile = void;
@@ -2403,7 +2400,7 @@
 
 #define roll_luck(VALUE)
 	var _chance = irandom_range(1,100),
-	    _luck   = item_get_power("coin") + ((item_get_power("gem") > 0 ? 3 : 0) + item_get_power("gem") * 2) * global.GemCoeff + (crown_current = 10 ? 7 : 0); // lucky coin + cracked gem + crown of luck
+	    _luck   = item_get_power("coin") + item_get_power("flower") + ((item_get_power("gem") > 0 ? 3 : 0) + item_get_power("gem") * 2) * global.GemCoeff + (crown_current = 10 ? 7 : 0); // lucky coin + cracked gem + crown of luck
 	if _luck != 0
 	{
 		for (i = 0; i < abs(_luck); i++ )
@@ -2429,6 +2426,28 @@
 	var _obj = -4
 	switch string_lower(obj_name)
 	{
+		case "dropitem":
+					_obj = instance_create(_x, _y, CustomProjectile)
+					with _obj
+					{
+						team      = 2;
+						name		  = "dropitem";
+						depth 		= TopCont.depth - 1;
+						z 				= 0;
+						maxzspeed = 6;
+						zspeed 		= maxzspeed;
+						zfriction = maxzspeed / room_speed * 3.5 * random_range(.9, 1.1);
+						motion_add(random(360), 2);
+						item_index = item[? "flower"];
+						mask_index = mskRhinoFreak;
+
+						on_hit     = void;
+						on_step 	 = dropitem_step;
+						on_draw		 = dropitem_draw;
+						on_wall    = dropitem_wall;
+						on_destroy = dropitem_destroy;
+					}
+					return _obj;
 		case "deathnade":
 					_obj = create_deathnade(_x, _y);
 					return _obj;
@@ -2615,6 +2634,48 @@
 			break;
 	}
 
+#define dropitem_step
+	if zspeed > - maxzspeed
+	{
+		zspeed -= zfriction * current_time_scale;
+		z += zspeed
+	}
+	else instance_destroy()
+
+#define dropitem_draw
+	var _c = c_white,
+	    _z = z + 12;
+	switch item_index.tier
+	{
+		case 0: _c = c_white ; break;
+		case 1: _c = c_lime  ; break;
+		case 2: _c = c_red   ; break;
+		case 3: _c = c_purple; break;
+		case 4: _c = c_yellow; break;
+	}
+	draw_set_blend_mode(bm_add)
+	draw_set_alpha(.2)
+	draw_circle_colour(x, y - _z, 10, _c, _c, false);
+	draw_set_alpha(1)
+	draw_set_blend_mode(bm_normal)
+	draw_circle_colour(x, y - _z, 6, _c, _c, false);
+	draw_circle_colour(x, y - _z, 4, c_white, c_white, false);
+
+#define dropitem_wall
+	move_bounce_solid(false);
+
+#define dropitem_destroy
+	switch item_index.tier
+	{
+		case 0: sleep( 5); break;
+		case 1: sleep(10); break;
+		case 2: sleep(15); break;
+		case 3: sleep(25); break;
+		case 4: sleep(50); break;
+	}
+	repeat(8 + item_index.tier * 2){with instance_create(x, y, Dust){depth = other.depth - 1; motion_add(random(360), random_range(4, 5))}}
+	with obj_create(x, y, "item"){item_index = other.item_index}
+
 #define itemchest_open
 	sound_play(sndAmmoChest);
 
@@ -2653,8 +2714,8 @@
 		}
 		if tag == "item" || tag == "coin" with instance_create(x, y, CustomObject){on_step = antifx_step}
 	}
-
-	get_item(tem, amount)
+	sleep(10)
+	if tag != "item" with obj_create(x, y, "dropitem"){item_index = tem}else{get_item(tem, amount)}
 
 	// crown of hatred
 	if crown_current = 6 && place_meeting(x, y, Player) && tag != "item" && tag != "coin"

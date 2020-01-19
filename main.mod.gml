@@ -5,8 +5,8 @@
 	global.version = "1.7";
 	global.released = false;
 
-	global.sprInteractSplat = sprite_add("sprites/other/sprInteractSplat.png", 1, 0, 0);
-		global.sprItemChestParty      = sprite_add_weapon("sprites/chests/sprItemChestParty.png"  ,     8, 8)
+	global.sprInteractSplat  = sprite_add("sprites/other/sprInteractSplat.png", 1, 0, 0);
+	global.sprItemChestParty = sprite_add_weapon("sprites/chests/sprItemChestParty.png", 8, 8);
 
 	#macro savefile "RoAR_Settings.txt" //Remembering settings
 	if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
@@ -16,6 +16,7 @@
 	global.AnomalyGet  = 0;
 	global.HardmodeGet = 0;
 	global.FlaskGet    = 0;
+	global.FragmentGet = 0;
 
 	global.difficulty = 0;
 	global.fancy = true;
@@ -33,9 +34,6 @@
 	global.NitrogenCountdown = 0;
 
 	global.CircleSurf = -1;
-	//Garbo Variables
-	global.radi = 0;
-	global.maxradi = 110
 
 	//spawn arrays
 	global.spwDesert     = [Bandit, Bandit, Bandit, Scorpion, BigMaggot, BigMaggot, Maggot, Maggot]
@@ -44,16 +42,15 @@
 	global.spwCaves      = [LaserCrystal, LightningCrystal, Spider, Gator]
 	global.spwIce        = [Bandit, SnowTank, SnowBot, Wolf]
 	global.spwLabs       = [Freak, Turret, Freak, ExploFreak, Necromancer, RhinoFreak]
-	global.spwPalace     = [ExploGuardian, DogGuardian, Guardian, Guardian, ExploGuardian]
+	global.spwPalace     = [ExploGuardian, DogGuardian, Guardian, Guardian, Guardian, Guardian, ExploGuardian]
 	global.spwPizza      = [Turtle, Rat]
-	global.spwOasis      = [BoneFish, Crab, BoneFish, BoneFish, BoneFish, Bandit, Bandit]
+	global.spwOasis      = [BoneFish, BoneFish, BoneFish, BoneFish, BoneFish, Bandit, Bandit, Bandit, Bandit, Bandit, Crab]
 	global.spwMansion    = [FireBaller, SuperFireBaller, Jock, Molefish, Molesarge]
 	global.spwCursed     = [InvLaserCrystal, InvSpider]
 	global.spwEverything = [Bandit, Scorpion, BigMaggot, Maggot, Rat, Ratking, Gator, BuffGator, Raven, MeleeBandit, Sniper, Salamander, LaserCrystal, LightningCrystal, Spider, Bandit, SnowTank, SnowBot, Wolf, Turret, Freak, ExploFreak, Necromancer, RhinoFreak, ExploGuardian, Guardian, DogGuardian, Turtle, BoneFish, Crab, FireBaller, SuperFireBaller, Jock, Molefish, Molesarge, InvLaserCrystal, InvSpider]
 	global.spwJungle     = [JungleAssassinHide, JungleBandit, JungleFly]
 	global.spwNight      = [Bandit, Bandit]
 
-	global.speed = 15;
 	global.charge = 0;
 	global.chargeF = 0;
 	global.areaChoice = 0
@@ -130,28 +127,78 @@
 
 	//Deleting everything
 	with(Floor) instance_delete(self)
-		with(Wall) instance_delete(self)
-		with(Top) instance_delete(self)
-		with(TopSmall) instance_delete(self)
-		with(TopPot) instance_delete(self)
-		with(Bones) instance_delete(self)
-		with(Detail) instance_delete(self)
+	with(Wall) instance_delete(self)
+	with(Top) instance_delete(self)
+	with(TopSmall) instance_delete(self)
+	with(TopPot) instance_delete(self)
+	with(TopDecalDesert) instance_delete(self)
+	with(TopDecalCave) instance_delete(self)
+	with(TopDecalCity) instance_delete(self)
+	with(TopDecalInvCave) instance_delete(self)
+	with(TopDecalJungle) instance_delete(self)
+	with(TopDecalNightDesert) instance_delete(self)
+	with(TopDecalPizzaSewers) instance_delete(self)
+	with(TopDecalScrapyard) instance_delete(self)
+	with(TopDecalSewers) instance_delete(self)
+	with(Bones) instance_delete(self)
+	with(Detail) instance_delete(self)
 	with(enemy) instance_delete(self);
 	with(prop) instance_delete(self);
 	with(chestprop) instance_delete(self);
 	//Creating the arenaaa
-	//trace("MOUSE_X:" + string(mouse_x))
-	for(o = 1; o < 14; o++) { // Creating Floor
-	for(i = 1; i < 7; i++) {instance_create(Player.x - i * 32, 10032 - o * 16, Floor);}//Floor (X)
-	for(i = 1; i > -5; i--) {instance_create(Player.x - i * 32, 10032 - o * 16, Floor)}}//Floor (Y)
-	for(i = 1; i < 15; i++) { instance_create(9808, 10048 - i * 16, Wall) //Left Wall
-	 instance_create(10176, 10048 - i * 16, Wall)}//Right Wall
-	for(i = 1; i < 24; i++) { instance_create(9808 + i*16, 10048, Wall) //Bottom Wall
-	 instance_create(9808 + i*16, 9824, Wall)} //Top Wall
-	for(i = 1; i < 30; i++) {instance_create(9808 - 16, 10048 - i * 8, Top)//Top of Left Wall
-	instance_create(10176 + 16, 10048 - i * 8, Top)} //Top of Right Wall
-	for(i = 1; i < 48; i++) {instance_create(9808 + i*8, 10048, Top) //Top of Bottom Wall
-	instance_create(9808 + i*8, 9824, Top)} //Top of Bottom Wall
+
+	for(o = 1; o < 14; o++)
+	{ // Creating Floor
+		for(i = 1; i <  7; i++)
+		{
+			with instance_create(Player.x - i * 32, 10032 - o * 16, Floor)
+			{
+				if !irandom( 9) styleb = true;
+				if !irandom(14) instance_create(x - random_range(-12, 12), y - random_range(-12, 12), Detail)
+			}
+		} //Floor (X)
+		for(i = 1; i > -5; i--)
+		{
+			with instance_create(Player.x - i * 32, 10032 - o * 16, Floor)
+			{
+				if !irandom( 9) styleb = true;
+				if !irandom(14) instance_create(x - random_range(-12, 12), y - random_range(-12, 12), Detail)
+			}
+		} //Floor (Y)
+	}
+	for(i = 1; i < 15; i++)
+	{
+		instance_create (9808, 10048 - i * 16, Wall) //Left Wall
+	  instance_create(10176, 10048 - i * 16, Wall)//Right Wall
+	}
+	for(i = 1; i < 24; i++)
+	{
+		instance_create(9808 + i*16, 10048, Wall) //Bottom Wall
+	  instance_create(9808 + i*16,  9824, Wall) //Top Wall
+	 }
+	for(i = 1; i < 30; i++)
+	{
+		instance_create( 9808 - 16, 10048 - i * 8, Top) //Top of Left Wall
+		instance_create(10176 + 16, 10048 - i * 8, Top) //Top of Right Wall
+	}
+	for(i = 1; i < 48; i++)
+	{
+		instance_create(9808 + i*8, 10048, Top) //Top of Bottom Wall
+		instance_create(9808 + i*8,  9824, Top) //Top of Bottom Wall
+	}
+
+	// Area specific things
+	var _c = irandom(4) + 2
+	switch GameCont.area
+	{
+		case 1: repeat(_c) instance_create(Wall.x, Wall.y, TopDecalDesert); break;
+		case 2: repeat(_c) instance_create(Wall.x, Wall.y, TopDecalSewers); break;
+		case 3: repeat(_c) instance_create(Wall.x, Wall.y, TopDecalScrapyard); break;
+		case 4: repeat(_c) instance_create(Wall.x, Wall.y, TopDecalCave); break;
+		case 5: repeat(_c) instance_create(Wall.x, Wall.y, TopDecalCity); break;
+		case 7: repeat(_c) instance_create(Wall.x, Wall.y, TopDecalPalace); break;
+	}
+
 	//Creating extra walls
 	var _x
 	var _y
@@ -233,7 +280,7 @@
 	}
 
 	with (prop) { //Delete props too close to each other or walls
-	if distance_to_object(Wall) <= 5 {
+	if distance_to_object(Wall) <= 16 {
 		instance_delete(self);
 	}}
 
@@ -255,8 +302,6 @@
 	//removing dangerous props near player
 	with (Barrel) || (ToxicBarrel) {
 	if distance_to_object(Player) <= 35 {
-		x += 10000
-		y += 10000
 		instance_delete(self);
 	}}
 
@@ -336,7 +381,7 @@
 	    tag = "god"
 	}
 
-	if (global.Gamemode = 1)
+	if (global.Gamemode != 2)
 	{
 		with (WeaponChest)
 		{
@@ -349,101 +394,6 @@
 			    instance_delete(self);
 		    }
 		  }
-		}
-
-		//Spawning Boss
-		with (Player) var w = instance_furthest(x, y, Wall)
-		var _boss_amount = 1;
-		switch GameCont.area
-						{
-							case   1: _boss  = BanditBoss;
-										  	sound_play_music( musBoss1);
-										  	break;
-							case   2: _boss  = FrogQueen;
-										  	sound_play_music( musBoss5);
-										  	break;
-							case   3: _boss  = ScrapBoss;
-										  	sound_play_music( musBoss2);
-										  	break;
-							case   4: _boss  = HyperCrystal;
-												sound_play_music( musBoss6);
-												break;
-							case 	 5: _boss  = LilHunter;
-												sound_play_music( musBoss3);
-												break;
-							case 	 6: _boss  = TechnoMancer;
-												sound_play_music( musBoss7);
-												break;
-							case	 7: _boss  = Nothing2;
-												sound_play_music(musBoss4B);
-												break;
-							case   0: _boss  = Nothing2;
-							 			  	sound_play_music( musBoss8);
-										  	break;
-							case 101: _boss  = OasisBoss;
-												sound_play_music(musBoss3);
-												break;
-							case 102: _boss  = Turtle;
-							 					sound_play_music(musBoss3);
-												_boss_amount += 3;
-												break;
-							case 103: _boss  = SuperFireBaller;
-												sound_play_music(mus104);
-							    			_boss_amount += 4;
-												break;
-						}
-						if (GameCont.area != 7) repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
-							tag = "boss"
-						}
-
-						if (GameCont.area = 7) && (GameCont.subarea = 1) repeat(_boss_amount) with instance_create(w.x + 64, w.y + 64, _boss) {
-							tag = "boss"
-						}
-		global.BossesLeft++
-		if (GameCont.area == 1) GameCont.subarea = 1;
-		}
-
-
-		if (Player.fancy == 1) global.fancy = 1
-		if (Player.fancy == 0) global.fancy = 0
-		with instance_create(0, 0, CustomObject)
-		{
-			name = "RoRSurfaceHandler"
-			depth = -1.9
-			on_draw = circlesurface_draw
-		}
-
-		global.crownVault = false;
-		//Reset vars
-		global.subareaChoice = 0;
-		global.areaChoice    = 0;
-
-		global.respawn = irandom_range(6, 12) * (crown_current = 7 ? 2 : 1) // double enemies with cob
-		//Spawn invincible anti-portal maggot
-		if (GameCont.area != 100) with instance_create(Player.x-500, Player.y-500, Maggot) {
-		    visible = false;
-		    image_xscale = 0;
-		    image_yscale = 0;
-		    mask_index = mskNone;
-		    meleedamage = 0;
-		    canfly = true;
-		    my_health = 999999999;
-		    tag = "god"
-		}
-		if (global.Gamemode = 1)
-		{
-			with (WeaponChest)
-			{
-			  if (GameCont.area = 1 || GameCont.area == 101)
-				{
-			    wait(2)
-			    if instance_exists(WeaponChest)
-					{
-				  	instance_create(x, y, BigWeaponChest)
-				    instance_delete(self);
-			    }
-			  }
-			}
 		}
 
 		//SPAWN OBJECTS ON LEVEL START
@@ -459,7 +409,7 @@
 				addframes = room_speed * 2;
 				currad    = 0;
 				radius    = 0;
-				maxradius = 100 + irandom(20);
+				maxradius = 100 * (1 + (item_get_count("focus") > 0 ? .15 : 0) + (item_get_count("siphon") > 0 ? .15 : 0));
 
 				spr_idle   = global.sprTeleporterIdle
 				spr_hurt   = global.sprTeleporterIdle
@@ -487,11 +437,10 @@
 			}
 		}
 
-		global.radi = 0;
-		global.speed = 15;
 		global.charge = 0;
 		global.chargeF = 0;
 		global.teleporter = false;
+	}
 
 #define enemySpawn
 	if instance_exists(Player)
@@ -555,77 +504,89 @@
 	}
 
 #define step
+
+	with instances_matching_le(instances_matching(enemy, "tag", "boss"),"my_health",0) global.BossesLeft--
+
+	 // special horror drop
+	 with instances_matching_le(EnemyHorror, "my_health", 0)
+	 {
+		 with obj_create(x, y, "dropitem")
+		 {
+			 item_index = item[? "core"]
+		 }
+	 }
+
 	 //Boss Rush stuff
- 	 if global.Gamemode == 2 && instance_exists(Player) {
-	 //Guardian Boss
-	 with (Guardian) {
-		if ("tag" in self) && (tag == "boss") {
-			if ('GuardianBuff' not in self) {
-				GuardianBuff = true;
-				team = 2;
-				maxhealth = 1000;
-				image_blend = merge_color(c_blue, c_white, 0.5)
-			}
-			//my_health = maxhealth
-			for(i = 0; i < 5; i++){
-					alarm_set(i, 1000);
-			}
-			with instances_matching_le(enemy,"my_health",0) {
-			with (Guardian) if ("tag" in self) && (tag == "boss") my_health -= 50;
-			}
-			_roll = round(random_range(1,5))
-			if (_roll = 1)with instance_create(x + random_range(-25, 25), y+random_range(-25,25), Smoke) {
-			image_blend = merge_color(c_blue, c_white, 0.5)
-			}
-		}
-	}
-	//BOSSES GAINS WALL DESTRUCTION MEGA POWERS
-	with (enemy) {
-		if "tag" in self && tag = "boss" {
-		if place_meeting(x, y, Wall)
-		instance_create(x, y, Explosion)
-		}
-	}
-	with (Player) if my_health < lsthealth && global.perfected = true
+ 	 if global.Gamemode == 2 && instance_exists(Player)
+	 {
+	 	 //Guardian Boss
+	 	 with (Guardian)
+		 {
+		   if ("tag" in self) && (tag == "boss")
+			 {
+				 if ('GuardianBuff' not in self)
+				 {
+					 GuardianBuff = true;
+					 team = 2;
+					 maxhealth = 800;
+					 image_blend = merge_color(c_blue, c_white, 0.5)
+				 }
+				 for(i = 0; i < 5; i++){alarm_set(i, alarm_get(i) + 1)}
+				 with instances_matching_le(enemy,"my_health",0)
+				 {
+				 	 with instances_matching(Guardian, "tag", "boss") my_health -= 50;
+				 }
+				 _roll = irandom_range(1,5)
+				 if (_roll = 1)with instance_create(x + random_range(-25, 25), y+random_range(-25,25), Smoke){image_blend = merge_color(c_blue, c_white, 0.5)}
+			 }
+	   }
+
+		 //BOSSES GAINS WALL DESTRUCTION MEGA POWERS
+		 with instances_matching(enemy, "tag", "boss")
+		 {
+			 if place_meeting(x, y, Wall) with instance_nearest(x, y, Wall) {instance_create(x, y, FloorExplo); instance_destroy()}
+		 }
+
+		 with (Player) if my_health < lsthealth && global.perfected = true{global.perfected = false}
+		 with instances_matching_le(enemy,"my_health",0)
+		 {
+			 var _chance = global.doubleChests == true ? irandom_range(1, 9) : irandom_range(1, 18)
+			 if _chance = 1 && global.BossesLeft >= 1
+			 {
+				 with obj_create(x, y, "ItemChest")
+				 {
+					 tag = "item"
+					 item_index = mod_variable_get("mod", "items", "CommonItems")[random_range(0, array_length(mod_variable_get("mod", "items", "CommonItems")) - 1)]
+					 chest_setup(tag)
+				 }
+			 }
+			 if (_chance == 2) && global.BossesLeft >= 1 {instance_create(x, y, WeaponChest)}
+		 }
+
+		 with (Floor)
+		 {
+			 chance = irandom_range(1, room_speed * 200)
+			 if (chance = 1) instance_create(x + 16, y + 16, AmmoPickup)
+		 }
+		 if instance_exists(Player)
+		 {
+			 if (Player.portalTimer > 0) Player.portalTimer--
+			 if (Player.portalTimer = 0) && global.BossesLeft == 0
+			 {
+				 var f_ = instance_find(Floor, irandom(instance_number(Floor) - 1));
+				 GameCont.subarea = 3;
+				 instance_create(f_.x, f_.y, Portal)
+			 }
+			 if instance_exists(Portal) || instance_exists(SpiralCont)Player.portalTimer = (room_speed * 10)
+		 }
+	 }
+
+	if mod_variable_get("mod", "items", "forceSave") == 1
 	{
-	global.perfected = false;
-	}
-	with instances_matching_le(enemy,"my_health",0) {
-	if ("tag" in self && tag = "boss") global.BossesLeft--
-	chance = round(random_range(1, (18)))
-	if (global.doubleChests == true) chance = round(random_range(1, 9))
-	if chance == 1 && global.BossesLeft >= 1 {
-		with obj_create(x, y, "ItemChest")
-			{
-				tag = "item"
-				item_index = mod_variable_get("mod", "items", "CommonItems")[random_range(0, array_length(mod_variable_get("mod", "items", "CommonItems")) - 1)]
-				chest_setup(tag)
-
-				}
-		}
-			if (chance == 2) && global.BossesLeft >= 1 {
-			instance_create(x, y, WeaponChest)
-
-		}
+		mod_variable_set("mod", "items", "forceSave", 0)
+		save_save()
 	}
 
-	with (Floor) {
-		chance = round(random_range(1, (room_speed * 200)))
-		if (chance = 1) instance_create(x + 16, y + 16, AmmoPickup)
-		}
-	if (Player.portalTimer > 0) Player.portalTimer--
-	wait(1) if (Player.portalTimer = 0) && global.BossesLeft == 0 {
-	var f_ = instance_find(Floor, irandom(instance_number(Floor) - 1));
-	GameCont.subarea = 3;
-	instance_create(f_.x, f_.y, Portal)
-	}
-	if instance_exists(Portal) || instance_exists(SpiralCont)Player.portalTimer = (room_speed * 10)
-	}
-	save = mod_variable_get("mod", "items", "forceSave")
-	if (save == 1) {
-	mod_variable_set("mod", "items", "forceSave", 0)
-	save_save()
-	}
 	with instances_matching(Maggot, "tag", "god")
 	{
 		x = -10000;
@@ -642,16 +603,20 @@
 		room_speed = 30
 		current_time_scale = 1
 	}
+
 	var BossRushModifier = 0;
-	if (global.Gamemode == 2) BossRushModifier = 10
-	if (global.Gamemode == 2) && (GameCont.area == 7) && (GameCont.subarea = 1) BossRushModifier = 0.5
+	if global.Gamemode = 2
+	{
+		BossRushModifier = 10
+		if (GameCont.area == 7) && (GameCont.subarea = 1) BossRushModifier = 0.5
+	}
 	if irandom(instance_number(enemy) + (BossRushModifier * 20) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
 
 	//Crown Vault Fix
 	if instance_exists(CrownPed) global.crownVault = true;
 	if instance_exists(Portal) && global.crownVault == true
 	{
-	  GameCont.area = (GameCont.lastarea );
+	  GameCont.area = (GameCont.lastarea);
 	  GameCont.subarea = 3;
 	}
 
@@ -660,35 +625,35 @@
 	{
 		if my_health <= 0
 		{
-			if global.Gamemode == 2 && global.perfected == true {
-				with instance_create(Player.x, Player.y, PopupText) {
+			if global.Gamemode == 2 && global.perfected == true
+			{
+				with instance_create(Player.x, Player.y, PopupText)
+				{
 					time = 20;
 					text = "@yPERFECT!"
 				}
-				repeat(50) with instance_create(Player.x, Player.y, Confetti) {
-				direction = random_range(0, 360)
-				speed = random_range(1, 10)
-				}
-				sound_play_pitch(sndConfetti1, 1)
-				with obj_create(x, y, "ItemChest")
-			{
-			tag = "none"
-			sprite_index = global.sprItemChestParty
-			}
-			}
-			repeat(Player.s_Challenge) with obj_create(x, y, "ItemChest")
-			{
-				repeat(Player.s_Challenge) with obj_create(x, y, "ItemChest")
+				repeat(50) with instance_create(Player.x, Player.y, Confetti)
 				{
-					if (global.Gamemode != 2) {
-					tag = "item"
+					direction = random_range(0, 360)
+					speed = random_range(1, 10)
+				}
+				sound_play_pitch(choose(sndConfetti1, sndConfetti2, sndConfetti3, sndConfetti4, sndConfetti5), 1)
+				with obj_create(x, y, "ItemChest")
+				{
+					tag = "none"
+					sprite_index = global.sprItemChestParty
+				}
+			}
+			repeat(Player.s_Challenge) with obj_create(x, y, "dropitem")
+			{
+				if (global.Gamemode != 2)
+				{
 					item_index = mod_variable_get("mod", "items", "UncommonItems")[random_range(0, array_length(mod_variable_get("mod", "items", "UncommonItems")) - 1)]
-					} else {
-					tag = "large"
+				}
+				else
+				{
+					item_index = mod_variable_get("mod", "items", "UncommonItems")[random_range(0, array_length(mod_variable_get("mod", "items", "UncommonItems")) - 1)]
 					Player.portalTimer = (room_speed * 16)
-					}
-					chest_setup(tag)
-
 				}
 			}
 		}
@@ -712,7 +677,7 @@
 			}
 
 	if "convert" not in self && global.Gamemode = 1 {
-		    var _roll = round(max(random_range(1, 5.25 - .25 * item_get_count("times")), 1))
+		    var _roll = round(max(random_range(1, 7.25 - .25 * item_get_count("times")), 1))
 		    if (_roll == 1) {
 		if (object_index == Scorpion) {
 		instance_create(x, y, GoldScorpion);
@@ -772,7 +737,14 @@
 			get_item(item[? "energy"], 2)
 		}
 	}
-
+	if global.FragmentGet = false && instance_exists(Player) && Player.race = "crystal"
+	{
+		if ultra_get("crystal", 1) = true || ultra_get("crystal", 2) = true
+		{
+			global.FragmentGet = true
+			get_item(item[? "fragment"], 4)
+		}
+	}
 	if global.FlaskGet = false && instance_exists(Player) && Player.race = "frog"
 	{
 		if ultra_get("frog", 1) = true || ultra_get("frog", 2) = true
@@ -869,13 +841,6 @@
 	//CHEAT VARIABLES
 	speed = (0) + (room_speed / 30)
 
-	//INCREASE GLOBAL.RADI
-	if global.radi < global.maxradi && global.teleporter == true
-	{
-	    global.radi += (1 * (global.speed));
-	    global.speed *= 0.9;
-	}
-
 	//TIME SYSTEM
 	if instance_exists(Player) && !instance_exists(GenCont) global.frame += speed * current_time_scale
 	if global.frame == room_speed {
@@ -897,7 +862,7 @@
 	if global.time >= global.timeControl && global.difficulty != 8 { //increases every 3 minutes //11520
 	global.time = 0;
 	global.difficulty++ //difficulty increase
-	sound_play_pitch(sndDragonStop,1)
+	sound_play_pitchvol(sndCursedPickup, 1.3, 1.5)
 	}
 
 	if global.difficulty == 8 {global.time = global.timeControl}
@@ -935,8 +900,10 @@
 	if (global.Gamemode == 2) 	Player.bossKilled = false
 
 	save_save()
-	global.AnomalyGet  = false;
-	global.HardmodeGet = false;
+	global.AnomalyGet  = 0;
+	global.HardmodeGet = 0;
+	global.FlaskGet    = 0;
+	global.FragmentGet = 0;
 	Player.debug1 = 0;
 
 	if irandom_range(1, 3) = 1 && global.Gamemode != 2
@@ -974,21 +941,13 @@
 	var _tele = self;
 	with (Player)
 	{
-		if !instance_exists(Spiral) && instance_exists(Player) && global.teleporter = true && point_in_circle(Player.x, Player.y, _tele.x - 4, _tele.y, global.radi)
+		if !instance_exists(Spiral) && instance_exists(Player) && global.teleporter = true && point_in_circle(Player.x, Player.y, _tele.x - 4, _tele.y, _tele.radius)
 		{
 			global.chargeF++
-			if global.chargeF == round(room_speed / 1.5)
+			if global.chargeF >= round(room_speed - (global.BossesLeft > 0 ? 0 : 15))
 			{
 				global.chargeF = 0;
-				global.charge += 1 + (global.BossesLeft = 0 ? 3 : 0) //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
-				if (GameCont.area = 101) global.charge += 4 //Charge faster in oasis
-				with instances_matching_le(enemy,"my_health",0)
-				{
-					if size > 0
-					{
-						if (irandom(9) = 0) instance_create(x, y, AmmoPickup)
-					}
-				}
+				global.charge++; //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
 			}
 			global.charge = clamp(global.charge, 0, max(100 - item_get_count("energy") * 10, 1))
 			if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get_count("energy") * 10) && global.BossesLeft <= 0 && other.teledone = false // fully charged
@@ -1672,31 +1631,33 @@
 	draw_set_halign(fa_center)
 	with instances_matching(CustomProp, "name", "Teleporter")
 	{
+		var _tele = self
 		if (distance_to_object(Player) <= 8) && (global.teleporter == false)
 		{
 			with Player
 			{
 				if(button_pressed(index, "pick")) && global.teleporter == false //What to do when the activate teleporter
 				{
-					with other currad = addframes;
+					_tele.currad = _tele.addframes;
 					sound_play(sndLevelUltra)
 	        global.teleporter = true;
 					var i = 0
 					do
 					{
-						with instance_nearest(x, y, Wall) if distance_to_object(other)<= global.maxradi
+						with instance_nearest(x, y, Wall) if distance_to_object(other)<= _tele.maxradius - 16
 						{
 							instance_create(x, y, FloorExplo)
 							instance_destroy()
 							sleep(2)
 						}
 						i++;
-					}until(i = 1000)
+					}until(i = 1000 || distance_to_object(instance_nearest(x, y, Wall)) > _tele.maxradius - 16)
 
 					sound_play_music(musBoss8)
 
 	 				var _boss_amount = 1,
-					    _boss        = CrownGuardianOld;
+					    _boss        = CrownGuardianOld,
+							_bosshp      = 2;
 				  other._enemy = Guardian;
 					switch GameCont.area
 					{
@@ -1707,10 +1668,12 @@
 						case   2: _boss  = FrogQueen;
 											other._enemy = FastRat;
 									  	sound_play_music( musBoss5);
+											_bosshp = .6;
 									  	break;
 						case   3: _boss  = ScrapBoss;
 											other._enemy = Raven;
 									  	sound_play_music( musBoss2);
+											_bosshp = 1.6;
 									  	break;
 						case   4: _boss  = HyperCrystal;
 											other._enemy = Spider;
@@ -1735,6 +1698,7 @@
 						case 101: _boss  = OasisBoss;
 											other._enemy = Bubble;
 											sound_play_music(musBoss3);
+											_bosshp = .7;
 											break;
 						case 102: _boss  = Turtle;
 											other._enemy = Rat;
@@ -1757,12 +1721,15 @@
 						{
 							global.BossesLeft++
 							tag = "boss"
+							maxhealth *= 1.75
+							my_health = maxhealth
 							if instance_exists(Player) && distance_to_object(Player) <= 64
 							{
 								var _i = 0;
 								do
 								{
 									move_contact_solid(point_direction(Player.x, Player.y, x, y), 1)
+									_i++;
 								}until(_i = 100 or distance_to_object(Player) > 64)
 							}
 						}
@@ -1786,16 +1753,25 @@
 
 			if(current_frame mod (room_speed * 5)) = 0 && instance_number(_enemy) < 12
 			{
-				repeat(irandom(2) + 1) with instance_create(x + lengthdir_x(radius * radifac * random_range(.3, .8), _ang), y + lengthdir_y(global.radi * radifac * random_range(.3, .8), _ang), _enemy)
+				repeat(irandom(2) + 1) with instance_create(_tele.x, _tele.y, _enemy)
 				{
-					repeat(6) with instance_create(x, y, Smoke){sprite_index = sprDust; depth = other.depth - choose(0, 1, 1)}
 					if instance_exists(Player) && distance_to_object(Player) <= 32
 					{
 						var _i = 0;
 						do
 						{
-							move_contact_solid(point_direction(Player.x, Player.y, x, y), 1)
-						}until(_i = 100 or distance_to_object(Player) > 32)
+							move_contact_solid(point_direction(Player.x, Player.y, x, y) + random_range(-20, 20), 1)
+						}until(_i = 84 or distance_to_object(Player) > 64)
+
+						if place_meeting(x, y, Wall)
+						{
+							with instance_nearest(x, y, Wall)
+							{
+								instance_create(x, y, Wall)
+								instance_destroy()
+							}
+						}
+						repeat(6) with instance_create(x, y, Smoke){depth = other.depth - choose(0, 1, 1)}
 					}
 				}
 			}
@@ -1805,8 +1781,8 @@
 	{
 		if "boss_buff" not in self
 		{
-			boss_buff = (self != OasisBoss ? 2 : 1) + item_get_count("times") * .25
-			maxhealth *= boss_buff
+			boss_buff = 1 + item_get_count("times") * .25 + global.Gamemode
+			maxhealth *= boss_buff + _bosshp
 			my_health = maxhealth
 		}
 	}
@@ -1820,7 +1796,7 @@
 				draw_x = 5
 				draw_y = 20
 				var _strTele      = string(global.charge) + "%",
-						_strTeleBlink = point_distance(_tele.x, _tele.y, Player.x, Player.y) <= global.radi ? "@w" : (current_frame mod 5 <= 2 ? "@w" : "@r"),
+						_strTeleBlink = point_distance(_tele.x, _tele.y, Player.x, Player.y) <= _tele.radius ? "@w" : (current_frame mod 5 <= 2 ? "@w" : "@r"),
 						_x            = clamp(_tele.x + draw_x - 2, view_xview + string_width(_strTele)/2, view_xview + game_width  + 2 - string_width(_strTele)/2),
 						_y            = clamp(_tele.y + 12        , view_yview                           , view_yview + game_height - string_height(_strTele)),
 						_portal       = _tele.portal = "vault" ? sprProtoPortal : sprPortal
@@ -1877,15 +1853,12 @@
 			//DRAW TELEPORTER PERCENT
 			draw_x = 5
 			draw_y = 20
-			draw_set_alpha(0.5)
-			draw_set_color(c_black);
-			draw_rectangle(draw_x+x + 15 , draw_y+y - 9 , x+draw_x-23 ,y+draw_y , false)
-			draw_set_alpha(1)
+			draw_sprite(global.sprInteractSplat, 0, draw_x, draw_y)
 			var _x = x - view_xview,
 			    _y = y - view_yview;
 
 			if (global.fancy == 1) surface_set_target(global.CircleSurf)
-			draw_circle_colour(_x -4, _y, radius, c_red, c_red, false);
+			draw_circle_colour(_x, _y, radius, c_red, c_red, false);
 			if (global.fancy == 1) surface_reset_target();
 		}
 	}
@@ -1929,39 +1902,19 @@
 			//DRAW TELEPORTER PERCENT
 			draw_x = 5
 			draw_y = 20
-			draw_set_alpha(0.5)
-			draw_set_color(c_black);
-			draw_rectangle(draw_x+x + 15 , draw_y+y - 9 , x+draw_x-23 ,y+draw_y , false)
-			draw_set_alpha(1)
 			var _x = x - view_xview,
 			    _y = y - view_yview;
 
 			if (global.fancy == 1) surface_set_target(global.CircleSurf)
 			draw_set_blend_mode(bm_subtract)
-			draw_circle_colour(_x -4, _y, radius - 2, c_white, c_white, false);
+			draw_circle_colour(_x, _y, radius - 2, c_white, c_white, false);
 			draw_set_blend_mode(bm_normal)
 			if (global.fancy == 1) surface_reset_target();
 
 			draw_set_alpha(.15)
-			draw_circle_colour(x -4, y, radius, c_red, c_red, false)
+			draw_circle_colour(x, y, radius, c_red, c_red, false)
 			draw_set_alpha(1)
 		}
-	}
-
-	with instances_matching(CustomSlash, "name", "Inv Area")
-	{
-		var _x = x - view_xview,
-				_y = y - view_yview;
-
-		if (global.fancy == 1) surface_set_target(global.CircleSurf)
-		draw_set_blend_mode(bm_subtract)
-		draw_circle_colour(_x, _y, image_xscale - 2, c_white, c_white, false);
-		draw_set_blend_mode(bm_normal)
-		if (global.fancy == 1) surface_reset_target();
-
-		draw_set_alpha(.25)
-		draw_circle_colour(x, y, global.radi, c_fel, c_fel, false)
-		draw_set_alpha(1)
 	}
 
 
@@ -2084,15 +2037,12 @@
 
 #define load_save
 
-	//trace("Attempted Load")
-
 	wait file_load(savefile);
 	if file_exists(savefile){
 		/* */
 			var _settings = string_load(savefile);
 			_settings = string_split(_settings,"|");
 			global.preformanceMode = real(_settings[0]);
-			//trace("Settings Loaded: " + string(global.preformanceMode));
 			global.hpBars = real(_settings[1]);
 			global.bossBars = real(_settings[2]);
 			global.forceSupport = real(_settings[3]);
@@ -2103,19 +2053,11 @@
 		}
 
 #define save_save
-	/*
-	trace_color("Preformance Mode: " + string(global.preformanceMode), c_red)
-	trace_color("Enemy HP Bars: " + string(global.hpBars), c_lime)
-	trace_color("Boss HP Bars: " + string(global.bossBars), c_orange)
-	trace_color("Force Support: " + string(global.forceSupport), c_blue)
-	*/
 	var _str = "" + string(global.preformanceMode) + "|" + string(global.hpBars) + "|" + string(global.bossBars)+ "|" + string(global.forceSupport) + "|" + string(global.sixtyFPS) + "|" + string(global.coins);
 	string_save(_str,savefile);
-	//trace("Settings Saved");
 
 #define reset_progress
 	global.reset = 3
-	trace_color("Progress Reset", c_red)
 	sound_play_pitch(sndExplosion, 1)
 
 	//Progress Reset: (Include all non-settings saved progress here)
