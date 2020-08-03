@@ -611,7 +611,12 @@
 	var BossRushModifier = 0;
 	if global.Gamemode = 2
 	{
-		BossRushModifier = 10
+		switch GameCont.area
+				{
+				case 1: BossRushModifier = 10; break;
+				case 2: BossRushModifier = 150; break;
+				case 3: BossRushModifier = 10; break;
+				}
 		if (GameCont.area == 7) && (GameCont.subarea = 1) BossRushModifier = 0.5
 	}
 	if irandom(instance_number(enemy) + (BossRushModifier * 20) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
@@ -818,27 +823,27 @@
 	//Difficulty Changes
 	with (enemy) {
 	    if ("boost") not in self { //Boost non-boosted enemies based on difficulty
-	if (global.difficulty == 1) {maxhealth *= 1.3; my_health *= 1.3;if (meleedamage >= 1) meleedamage = round(meleedamage * 1.5); boost = true; }
-	if (global.difficulty == 2) {maxhealth *= 1.6; my_health *= 1.6;if (meleedamage >= 1) meleedamage *=  2; boost = true; }
-	if (global.difficulty == 3) {maxhealth *= 1.9; my_health *= 1.9;if (meleedamage >= 1) meleedamage *=  3; boost = true; }
-	if (global.difficulty == 4) {maxhealth *= 2.2; my_health *= 2.2;if (meleedamage >= 1) meleedamage *=  4; boost = true; }
-	if (global.difficulty == 5) {maxhealth *= 2.5; my_health *= 2.5;if (meleedamage >= 1) meleedamage *=  5; boost = true; }
-	if (global.difficulty == 6) {maxhealth *= 2.8; my_health *= 2.8;if (meleedamage >= 1) meleedamage = round(meleedamage * 6.5); boost = true; }
-	if (global.difficulty == 7) {maxhealth *= 3.1; my_health *= 3.1;if (meleedamage >= 1) meleedamage *=  8; boost = true; }
-	if (global.difficulty == 8) {maxhealth *= 3.4; my_health *= 3.4;if (meleedamage >= 1) meleedamage *= 10; boost = true; }
+	if (global.difficulty == 1) {maxhealth *= 1.25; my_health *= 1.25;if (meleedamage >= 1) meleedamage = round(meleedamage * 1.2); boost = true; }
+	if (global.difficulty == 2) {maxhealth *= 1.4; my_health *= 1.4;if (meleedamage >= 1) meleedamage = round(meleedamage *1.5); boost = true; }
+	if (global.difficulty == 3) {maxhealth *= 1.8; my_health *= 1.8;if (meleedamage >= 1) meleedamage = round(meleedamage *1.8); boost = true; }
+	if (global.difficulty == 4) {maxhealth *= 2.2; my_health *= 2.2;if (meleedamage >= 1) meleedamage = round(meleedamage *2.2); boost = true; }
+	if (global.difficulty == 5) {maxhealth *= 2.5; my_health *= 2.5;if (meleedamage >= 1) meleedamage =  round(meleedamage *2.6); boost = true; }
+	if (global.difficulty == 6) {maxhealth *= 3; my_health *= 3;if (meleedamage >= 1) meleedamage = round(meleedamage * 3); boost = true; }
+	if (global.difficulty == 7) {maxhealth *= 3.75; my_health *= 3.75;if (meleedamage >= 1) meleedamage = round(meleedamage *3.5); boost = true; }
+	if (global.difficulty == 8) {maxhealth *= 4.4; my_health *= 4.4;if (meleedamage >= 1) meleedamage = round(meleedamage *3.75); boost = true; }
 	    }
 	}
 
 	with (projectile) {  //Boost non-boosted projectiles based on difficulty
 	    if team != 2 && "boost" not in self {
-	     if (global.difficulty == 1) {damage = round(damage * 1.5); boost = true;}
-	     if (global.difficulty == 2) {damage *= 2; boost = true;}
-	     if (global.difficulty == 3) {damage = round(damage * 3); boost = true;}
-	     if (global.difficulty == 4) {damage *= 4; boost = true;}
-	     if (global.difficulty == 5) {damage *= 5; boost = true;}
-	     if (global.difficulty == 6) {damage *= 6.5; boost = true;}
-	     if (global.difficulty == 7) {damage *= 8; boost = true;}
-	     if (global.difficulty == 8) {damage *= 10; boost = true;}
+	     if (global.difficulty == 1) {damage = round(damage * 1.1); boost = true;}
+	     if (global.difficulty == 2) {damage = round(damage * 1.25); boost = true;}
+	     if (global.difficulty == 3) {damage = round(damage * 1.5); boost = true;}
+	     if (global.difficulty == 4) {damage = round(damage * 2); boost = true;}
+	     if (global.difficulty == 5) {damage = round(damage * 2.25); boost = true;}
+	     if (global.difficulty == 6) {damage = round(damage * 2.75); boost = true;}
+	     if (global.difficulty == 7) {damage = round(damage * 3.2); boost = true;}
+	     if (global.difficulty == 8) {damage = round(damage * 3.5); boost = true;}
 	    }
 	}
 
@@ -863,8 +868,8 @@
 	//TIME SYSTEM END
 
 	//DIFFICULTY INCREASING TIMER
-	if !instance_exists(GenCont) && instance_exists(Player) global.time += speed * 3 * (1 + item_get_count("times") * 1.4)
-	if global.time >= global.timeControl && global.difficulty != 8 { //increases every 3 minutes //11520
+	if !instance_exists(GenCont) && instance_exists(Player) global.time += (3 - speed) * 3 * (1 + item_get_count("times") * 1.4)
+	if global.time >= global.timeControl && global.difficulty != 8 { //increases every 2 minutes	 //11520(?)
 	global.time = 0;
 	global.difficulty++ //difficulty increase
 	sound_play_pitchvol(sndCursedPickup, 1.3, 1.5)
@@ -949,6 +954,8 @@
 		if !instance_exists(Spiral) && instance_exists(Player) && global.teleporter = true && point_in_circle(Player.x, Player.y, _tele.x - 4, _tele.y, _tele.radius)
 		{
 			global.chargeF++
+			if (global.BossesLeft = 0) global.chargeF++
+			
 			if global.chargeF >= round(room_speed - (global.BossesLeft > 0 ? 0 : 15))
 			{
 				global.chargeF = 0;
@@ -1705,6 +1712,7 @@
 						case 	 5: _boss  = LilHunter;
 											other._enemy = Grunt;
 											sound_play_music( musBoss3);
+											_bosshp = 0.8;
 											break;
 						case 	 6: _boss  = TechnoMancer;
 											other._enemy = Freak;
