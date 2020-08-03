@@ -8,6 +8,8 @@
 	global.sprInteractSplat  = sprite_add("sprites/other/sprInteractSplat.png", 1, 0, 0);
 	global.sprItemChestParty = sprite_add_weapon("sprites/chests/sprItemChestParty.png", 8, 8);
 
+	global.sprItems     = sprite_add(    "sprites/items/sprItems.png", 101, 17, 17);
+
 	#macro savefile "RoAR_Settings.txt" //Remembering settings
 	if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
 	//DEBUG
@@ -91,6 +93,8 @@
 	if (instance_exists(CharSelect)) global.menu = true;
 
 	load_save()
+	//Fixing Saves
+	if (global.preformanceMode == false || global.preformanceMode == true) global.preformanceMode = 0 
 	save_save()
 	//set new level function
 	global.newLevel = instance_exists(GenCont);
@@ -808,6 +812,7 @@
 	{
 		goal = 160
 	  if (GameCont.area == 3) goal = 110
+	  if (global.preformanceMode = 2) goal = 100 //High performance mode lowers level size
 	}
 
 	//Difficulty Changes
@@ -1241,15 +1246,30 @@
 	    		if global.MenuIndex = 1
 					{
 						var _drawx = game_width / 2 - (120 + global.MenuXoffset);
-		        draw_text_nt(_drawx, 42, (floor(current_frame/8)*30 % 20 ? "@sVERSION 1.7" : "@pVERSION 1.7"));
-		        draw_text_nt(_drawx, 52, "@s[INSERT UPDATE RELEASE DATE]")
-		        draw_text_nt(_drawx, 42, "@s            [CURSED UPDATE]")
+				draw_set_halign(fa_center)		
+		        draw_text_nt(game_width / 2 - global.MenuXoffset, 42, (floor(current_frame/8)*30 % 20 ? "@wVERSION 1.7" : "@pVERSION 1.7"));
+				draw_set_font(fntChat)
+				draw_text_nt(game_width / 2 - global.MenuXoffset, 50, "@sCursed update")
+				draw_set_font(fntM0)
+				draw_sprite(global.sprItems,39, game_width / 2 - global.MenuXoffset + 5, 83)
+				draw_text_nt(game_width / 2 - global.MenuXoffset, 80, "ADDED 20 ITEMS")
+
+				draw_sprite(global.sprItems,55, game_width / 2 - global.MenuXoffset + 5, 113)
+				draw_text_nt(game_width / 2 - global.MenuXoffset, 110, "ADDED CURSED ITEMS#AND COINS")
+
+				draw_sprite(global.sprItems,63, game_width / 2 - global.MenuXoffset + 5, 153)
+				draw_text_nt(game_width / 2 - global.MenuXoffset, 150, "PLENTY OF IMPROVEMENTS#AND POLISH")
+
+				draw_text_nt(game_width / 2 - global.MenuXoffset, 190, "@sAND MORE...")
+				draw_set_halign(fa_left)
+		        //draw_text_nt(_drawx, 52, "@s[INSERT UPDATE RELEASE DATE]")
+		        //	draw_text_nt(_drawx, 42, "@s            [CURSED UPDATE]")
 		        var draw_y = -5
-		        draw_text_nt(_drawx, 66 + draw_y, "@s-PATCH NOTES-")
+		        //draw_text_nt(_drawx, 66 + draw_y, "@s-PATCH NOTES-")
 		        draw_set_font(fntChat)
-		        draw_text_nt(_drawx, 182 + draw_y, "ITEMS: 38")
-						draw_text_nt(_drawx,  72 + draw_y, "@w-Added \# cursed items #-Added \# other items#-Polished Menus#-Increased Preformance#-Fancier Effects#@w-Options now @ysave#@w-Added @pCursed Coins, @wcan be used to open @pcursed chests")
-		        draw_text_nt(_drawx, 191 + draw_y, "SHRINES: 9")
+		        //draw_text_nt(_drawx, 182 + draw_y, "ITEMS: 38")
+				//draw_text_nt(_drawx,  72 + draw_y, "@w-Added \# cursed items #-Added \# other items#-Polished Menus#-Increased Preformance#-Fancier Effects#@w-Options now @ysave#@w-Added @pCursed Coins, @wcan be used to open @pcursed chests")
+		        //draw_text_nt(_drawx, 191 + draw_y, "SHRINES: 9")
 						if global.MenuXoffset != 0 global.MenuXoffset = 0;
 					}
 
@@ -1329,18 +1349,20 @@
 						_y2     = _y1 + string_height(_str),
 						_c      = "@s",
 						_inbox  = false,
-						_varstr = global.preformanceMode = true ? " ON" : " OFF",
+						_varstr = " ERROR",	
 						_vardst = string_width(_str) + 12,
 						_detstr = "",
 						_dety   = game_height - 20,
 						_chtstr = "";
-
+						if (global.preformanceMode == 0) _varstr = " OFF";
+						if (global.preformanceMode == 1) _varstr = " LOW";
+						if (global.preformanceMode == 2) _varstr = " HIGH";
 				// Preformance Mode Toggle
 				if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i], _x1, _y1, _x2, _y2)
 				{
 					_c 			= "@w";
 					_inbox  = true;
-					_detstr = "INCREASES PERFORMANCE IN FAVOUR OF QUALITY";
+					_detstr = "INCREASES PERFORMANCE IN FAVOUR OF QUALITY#@rON HIGH GAMEPLAY IS AFFECTED";
 				}
 				draw_text_nt(_x1, _y1 - (_inbox = true ? 1 : 0), _c + _str);
 				draw_text_nt(_x1 + _vardst, _y1 - (_inbox = true ? 1 : 0), _c + _varstr);
@@ -1352,7 +1374,8 @@
 					if button_pressed(i, "fire")
 					{
 						sound_play_pitch(sndClick, random_range(0.8, 1.2));
-						if global.preformanceMode = false global.preformanceMode = true else global.preformanceMode = false
+						//if global.preformanceMode = false global.preformanceMode = true else global.preformanceMode = false
+						if (global.preformanceMode != 2) global.preformanceMode++ else global.preformanceMode = 0;
 					}
 					save_save();
 				}
