@@ -8,6 +8,8 @@
 	global.sprInteractSplat  = sprite_add("sprites/other/sprInteractSplat.png", 1, 0, 0);
 	global.sprItemChestParty = sprite_add_weapon("sprites/chests/sprItemChestParty.png", 8, 8);
 
+	global.sprItems     = sprite_add(    "sprites/items/sprItems.png", 101, 17, 17);
+
 	#macro savefile "RoAR_Settings.txt" //Remembering settings
 	if instance_exists(CharSelect) sound_play_pitch(sndLevelUltra, 0.9)
 	//DEBUG
@@ -108,6 +110,8 @@
 	if (instance_exists(CharSelect)) global.menu = true;
 
 	load_save()
+	//Fixing Saves
+	if (global.preformanceMode == false || global.preformanceMode == true) global.preformanceMode = 0 
 	save_save()
 	//set new level function
 	global.newLevel = instance_exists(GenCont);
@@ -693,7 +697,12 @@
 	var BossRushModifier = 0;
 	if global.Gamemode = 2
 	{
-		BossRushModifier = 10
+		switch GameCont.area
+				{
+				case 1: BossRushModifier = 10; break;
+				case 2: BossRushModifier = 150; break;
+				case 3: BossRushModifier = 10; break;
+				}
 		if (GameCont.area == 7) && (GameCont.subarea = 1) BossRushModifier = 0.5
 	}
 	//if irandom(instance_number(enemy) + (BossRushModifier * 20) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
@@ -895,32 +904,33 @@
 	{
 		goal = 160
 	  if (GameCont.area == 3) goal = 110
+	  if (global.preformanceMode = 2) goal = 100 //High performance mode lowers level size
 	}
 
 	//Difficulty Changes
 	with (enemy) {
 	    if ("boost") not in self { //Boost non-boosted enemies based on difficulty
-	if (global.difficulty == 1) {maxhealth *= 1.3; my_health *= 1.3;if (meleedamage >= 1) meleedamage = round(meleedamage * 1.5); boost = true; }
-	if (global.difficulty == 2) {maxhealth *= 1.6; my_health *= 1.6;if (meleedamage >= 1) meleedamage *=  2; boost = true; }
-	if (global.difficulty == 3) {maxhealth *= 1.9; my_health *= 1.9;if (meleedamage >= 1) meleedamage *=  3; boost = true; }
-	if (global.difficulty == 4) {maxhealth *= 2.2; my_health *= 2.2;if (meleedamage >= 1) meleedamage *=  4; boost = true; }
-	if (global.difficulty == 5) {maxhealth *= 2.5; my_health *= 2.5;if (meleedamage >= 1) meleedamage *=  5; boost = true; }
-	if (global.difficulty == 6) {maxhealth *= 2.8; my_health *= 2.8;if (meleedamage >= 1) meleedamage = round(meleedamage * 6.5); boost = true; }
-	if (global.difficulty == 7) {maxhealth *= 3.1; my_health *= 3.1;if (meleedamage >= 1) meleedamage *=  8; boost = true; }
-	if (global.difficulty == 8) {maxhealth *= 3.4; my_health *= 3.4;if (meleedamage >= 1) meleedamage *= 10; boost = true; }
+	if (global.difficulty == 1) {maxhealth *= 1.25; my_health *= 1.25;if (meleedamage >= 1) meleedamage = round(meleedamage * 1.2); boost = true; }
+	if (global.difficulty == 2) {maxhealth *= 1.4; my_health *= 1.4;if (meleedamage >= 1) meleedamage = round(meleedamage *1.5); boost = true; }
+	if (global.difficulty == 3) {maxhealth *= 1.8; my_health *= 1.8;if (meleedamage >= 1) meleedamage = round(meleedamage *1.8); boost = true; }
+	if (global.difficulty == 4) {maxhealth *= 2.2; my_health *= 2.2;if (meleedamage >= 1) meleedamage = round(meleedamage *2.2); boost = true; }
+	if (global.difficulty == 5) {maxhealth *= 2.5; my_health *= 2.5;if (meleedamage >= 1) meleedamage =  round(meleedamage *2.6); boost = true; }
+	if (global.difficulty == 6) {maxhealth *= 3; my_health *= 3;if (meleedamage >= 1) meleedamage = round(meleedamage * 3); boost = true; }
+	if (global.difficulty == 7) {maxhealth *= 3.75; my_health *= 3.75;if (meleedamage >= 1) meleedamage = round(meleedamage *3.5); boost = true; }
+	if (global.difficulty == 8) {maxhealth *= 4.4; my_health *= 4.4;if (meleedamage >= 1) meleedamage = round(meleedamage *3.75); boost = true; }
 	    }
 	}
 
 	with (projectile) {  //Boost non-boosted projectiles based on difficulty
 	    if team != 2 && "boost" not in self {
-	     if (global.difficulty == 1) {damage = round(damage * 1.5); boost = true;}
-	     if (global.difficulty == 2) {damage *= 2; boost = true;}
-	     if (global.difficulty == 3) {damage = round(damage * 3); boost = true;}
-	     if (global.difficulty == 4) {damage *= 4; boost = true;}
-	     if (global.difficulty == 5) {damage *= 5; boost = true;}
-	     if (global.difficulty == 6) {damage *= 6.5; boost = true;}
-	     if (global.difficulty == 7) {damage *= 8; boost = true;}
-	     if (global.difficulty == 8) {damage *= 10; boost = true;}
+	     if (global.difficulty == 1) {damage = round(damage * 1.1); boost = true;}
+	     if (global.difficulty == 2) {damage = round(damage * 1.25); boost = true;}
+	     if (global.difficulty == 3) {damage = round(damage * 1.5); boost = true;}
+	     if (global.difficulty == 4) {damage = round(damage * 2); boost = true;}
+	     if (global.difficulty == 5) {damage = round(damage * 2.25); boost = true;}
+	     if (global.difficulty == 6) {damage = round(damage * 2.75); boost = true;}
+	     if (global.difficulty == 7) {damage = round(damage * 3.2); boost = true;}
+	     if (global.difficulty == 8) {damage = round(damage * 3.5); boost = true;}
 	    }
 	}
 
@@ -945,8 +955,8 @@
 	//TIME SYSTEM END
 
 	//DIFFICULTY INCREASING TIMER
-	if !instance_exists(GenCont) && instance_exists(Player) global.time += speed * 3 * (1 + item_get_count("times") * 1.4)
-	if global.time >= global.timeControl && global.difficulty != 8 { //increases every 3 minutes //11520
+	if !instance_exists(GenCont) && instance_exists(Player) global.time += (3 - speed) * 3 * (1 + item_get_count("times") * 1.4)
+	if global.time >= global.timeControl && global.difficulty != 8 { //increases every 2 minutes	 //11520(?)
 	global.time = 0;
 	global.difficulty++ //difficulty increase
 	sound_play_pitchvol(sndCursedPickup, 1.3, 1.5)
@@ -1281,15 +1291,30 @@
 	    		if global.MenuIndex = 1
 					{
 						var _drawx = game_width / 2 - (120 + global.MenuXoffset);
-		        draw_text_nt(_drawx, 42, (floor(current_frame/8)*30 % 20 ? "@sVERSION 1.7" : "@pVERSION 1.7"));
-		        draw_text_nt(_drawx, 52, "@s[INSERT UPDATE RELEASE DATE]")
-		        draw_text_nt(_drawx, 42, "@s            [CURSED UPDATE]")
+				draw_set_halign(fa_center)		
+		        draw_text_nt(game_width / 2 - global.MenuXoffset, 42, (floor(current_frame/8)*30 % 20 ? "@wVERSION 1.7" : "@pVERSION 1.7"));
+				draw_set_font(fntChat)
+				draw_text_nt(game_width / 2 - global.MenuXoffset, 50, "@sCursed update")
+				draw_set_font(fntM0)
+				draw_sprite(global.sprItems,39, game_width / 2 - global.MenuXoffset + 5, 83)
+				draw_text_nt(game_width / 2 - global.MenuXoffset, 80, "ADDED 20 ITEMS")
+
+				draw_sprite(global.sprItems,55, game_width / 2 - global.MenuXoffset + 5, 113)
+				draw_text_nt(game_width / 2 - global.MenuXoffset, 110, "ADDED CURSED ITEMS#AND COINS")
+
+				draw_sprite(global.sprItems,63, game_width / 2 - global.MenuXoffset + 5, 153)
+				draw_text_nt(game_width / 2 - global.MenuXoffset, 150, "PLENTY OF IMPROVEMENTS#AND POLISH")
+
+				draw_text_nt(game_width / 2 - global.MenuXoffset, 190, "@sAND MORE...")
+				draw_set_halign(fa_left)
+		        //draw_text_nt(_drawx, 52, "@s[INSERT UPDATE RELEASE DATE]")
+		        //	draw_text_nt(_drawx, 42, "@s            [CURSED UPDATE]")
 		        var draw_y = -5
-		        draw_text_nt(_drawx, 66 + draw_y, "@s-PATCH NOTES-")
+		        //draw_text_nt(_drawx, 66 + draw_y, "@s-PATCH NOTES-")
 		        draw_set_font(fntChat)
-		        draw_text_nt(_drawx, 182 + draw_y, "ITEMS: 38")
-						draw_text_nt(_drawx,  72 + draw_y, "@w-Added \# cursed items #-Added \# other items#-Polished Menus#-Increased Preformance#-Fancier Effects#@w-Options now @ysave#@w-Added @pCursed Coins, @wcan be used to open @pcursed chests")
-		        draw_text_nt(_drawx, 191 + draw_y, "SHRINES: 9")
+		        //draw_text_nt(_drawx, 182 + draw_y, "ITEMS: 38")
+				//draw_text_nt(_drawx,  72 + draw_y, "@w-Added \# cursed items #-Added \# other items#-Polished Menus#-Increased Preformance#-Fancier Effects#@w-Options now @ysave#@w-Added @pCursed Coins, @wcan be used to open @pcursed chests")
+		        //draw_text_nt(_drawx, 191 + draw_y, "SHRINES: 9")
 						if global.MenuXoffset != 0 global.MenuXoffset = 0;
 					}
 
@@ -1369,18 +1394,20 @@
 						_y2     = _y1 + string_height(_str),
 						_c      = "@s",
 						_inbox  = false,
-						_varstr = global.preformanceMode = true ? " ON" : " OFF",
+						_varstr = " ERROR",	
 						_vardst = string_width(_str) + 12,
 						_detstr = "",
 						_dety   = game_height - 20,
 						_chtstr = "";
-
+						if (global.preformanceMode == 0) _varstr = " OFF";
+						if (global.preformanceMode == 1) _varstr = " LOW";
+						if (global.preformanceMode == 2) _varstr = " HIGH";
 				// Preformance Mode Toggle
 				if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i], _x1, _y1, _x2, _y2)
 				{
 					_c 			= "@w";
 					_inbox  = true;
-					_detstr = "INCREASES PERFORMANCE IN FAVOUR OF QUALITY";
+					_detstr = "INCREASES PERFORMANCE IN FAVOUR OF QUALITY#@rON HIGH GAMEPLAY IS AFFECTED";
 				}
 				draw_text_nt(_x1, _y1 - (_inbox = true ? 1 : 0), _c + _str);
 				draw_text_nt(_x1 + _vardst, _y1 - (_inbox = true ? 1 : 0), _c + _varstr);
@@ -1392,7 +1419,8 @@
 					if button_pressed(i, "fire")
 					{
 						sound_play_pitch(sndClick, random_range(0.8, 1.2));
-						if global.preformanceMode = false global.preformanceMode = true else global.preformanceMode = false
+						//if global.preformanceMode = false global.preformanceMode = true else global.preformanceMode = false
+						if (global.preformanceMode != 2) global.preformanceMode++ else global.preformanceMode = 0;
 					}
 					save_save();
 				}
@@ -1730,6 +1758,7 @@
 						case 	 5: _boss  = LilHunter;
 											other._enemy = Grunt;
 											sound_play_music( musBoss3);
+											_bosshp = 0.8;
 											break;
 						case 	 6: _boss  = TechnoMancer;
 											other._enemy = Freak;

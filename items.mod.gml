@@ -1942,7 +1942,7 @@
 	var _light = 30 * (1 + item_get_power("fungus") * .2) + random(2);
 	if amount >= 1 && instance_exists(Player)
 	{
-		if preformanceMode = false
+		if preformanceMode = 0
 		{
 			draw_set_alpha(0.8)
 			draw_circle(Player.x, Player.y, _light, 1);
