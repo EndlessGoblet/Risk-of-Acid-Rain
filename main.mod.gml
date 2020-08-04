@@ -18,6 +18,9 @@
 	global.FlaskGet    = 0;
 	global.FragmentGet = 0;
 
+	global.spawnCredits = 0;
+	global.wavetimer = 7 * 30;
+
 	global.difficulty = 0;
 	global.fancy = true;
 	global.time = 0;
@@ -35,21 +38,35 @@
 
 	global.CircleSurf = -1;
 
-	//spawn arrays
-	global.spwDesert     = [Bandit, Bandit, Bandit, Scorpion, BigMaggot, BigMaggot, Maggot, Maggot]
+	//spawn arrays  average of 7 seconds of charging = 210 credits to spend
+	global.spwDesert     = [Bandit, Bandit, Bandit, Scorpion, Scorpion, BigMaggot, Maggot, Maggot]
+	global.cosDesert     = [    40,     40,     40,       70,       70,       100,     20,     20]
 	global.spwSewers     = [Rat, Rat, Rat, Ratking, Gator, Gator, BuffGator, Bandit, Bandit]
+	global.cosSewers     = [ 70,  70,  70,     180,    90,    90,       150,     30,     30]
 	global.spwScrapyard  = [Bandit, Bandit, Raven, Raven, MeleeBandit, Sniper, Salamander]
-	global.spwCaves      = [LaserCrystal, LightningCrystal, Spider, Gator]
-	global.spwIce        = [Bandit, SnowTank, SnowBot, Wolf]
-	global.spwLabs       = [Freak, Turret, Freak, ExploFreak, Necromancer, RhinoFreak]
-	global.spwPalace     = [ExploGuardian, DogGuardian, Guardian, Guardian, Guardian, Guardian, ExploGuardian]
+	global.cosScrapyard  = [		40,     40,    70,    70,          80,     60,        120]
+	global.spwCaves      = [LaserCrystal, LaserCrystal, LaserCrystal, LightningCrystal, Spider, Spider, Spider, Gator]
+	global.cosCaves      = [				 125, 				 125,          125, 						 200,     85,     85,     85,    90]
+	global.spwIce        = [Bandit, SnowTank, SnowBot, SnowBot, Wolf]
+	global.cosIce        = [ 		45, 		 160, 		 70, 			70,   90]
+	global.spwLabs       = [Freak, Freak, Turret, ExploFreak, Necromancer, RhinoFreak]
+	global.cosLabs       = [	 35, 		35, 	 100, 				80, 				150, 				180]
+	global.spwPalace     = [DogGuardian, Guardian, Guardian, Guardian, Guardian, ExploGuardian, ExploGuardian]
+	global.cosPalace     = [				240, 			100, 			100, 			100, 			100, 					 120, 					120]
 	global.spwPizza      = [Turtle, Rat]
+	global.cosPizza      = [		70,  70]
 	global.spwOasis      = [BoneFish, BoneFish, BoneFish, BoneFish, BoneFish, Bandit, Bandit, Bandit, Bandit, Bandit, Crab]
+	global.cosOasis      = [			65, 			65, 			65, 			65, 			65, 		40, 		40, 		40, 		40, 		40,  150]
 	global.spwMansion    = [FireBaller, SuperFireBaller, Jock, Molefish, Molesarge]
+	global.cosMansion    = [				90, 						160, 	115, 			 60, 				70]
 	global.spwCursed     = [InvLaserCrystal, InvSpider]
+	global.cosCursed     = [						125,        85]
 	global.spwEverything = [Bandit, Scorpion, BigMaggot, Maggot, Rat, Ratking, Gator, BuffGator, Raven, MeleeBandit, Sniper, Salamander, LaserCrystal, LightningCrystal, Spider, Bandit, SnowTank, SnowBot, Wolf, Turret, Freak, ExploFreak, Necromancer, RhinoFreak, ExploGuardian, Guardian, DogGuardian, Turtle, BoneFish, Crab, FireBaller, SuperFireBaller, Jock, Molefish, Molesarge, InvLaserCrystal, InvSpider]
+	global.cosEverything = [		37, 		  79, 			103, 		 17,  63, 		171, 		95, 			143, 		63, 				 77, 		 53, 				111, 					119, 							187, 		 81, 		 37, 			151, 			63,   85, 		67, 	 31, 				 81, 				 147, 			 171, 					127, 			 93, 				 235, 		63, 			61,  149, 				81, 			  	  157,  109, 			 53, 				65, 						121, 				83]
 	global.spwJungle     = [JungleAssassinHide, JungleBandit, JungleFly]
+	global.cosJungle     = [								80, 					60, 			120]
 	global.spwNight      = [Bandit, Bandit]
+	global.cosNight      = [		55, 		55]
 
 	global.charge = 0;
 	global.chargeF = 0;
@@ -100,6 +117,13 @@
 		if(instance_exists(GenCont)) global.newLevel = 1;
 		else if(global.newLevel)
 		{
+			global.spawnCredits = 0
+			if global.seconds > 0 || global.minutes > 0 || global.hours > 0{
+				var _hasdone = false;
+				if _hasdone = false && global.time < global.timeControl / 3																						 {_hasdone = true; global.time = global.timeControl / 3 - 1}
+				if _hasdone = false && global.time > global.timeControl * 2 / 3																				 {_hasdone = true; global.time = 0; global.difficulty++}
+				if _hasdone = false && global.time > global.timeControl / 3 && global.time < global.timeControl * 2 / 3{_hasdone = true; global.time = global.timeControl * 2 / 3 - 1}
+			}
 			global.newLevel = 0;
 			level_start();
 					if item_get_count("spent flower") > 0 {get_item(item[? "flower"], item_get_count("spent flower")); remove_item(item[? "spent flower"], item_get_count("spent flower"))}
@@ -420,16 +444,17 @@
 				maxhealth    = 999999999999999999999999 // yeah
 				my_health    = maxhealth
 
-				var _i = 0;
+				var _i = 0,
+				    _r = 72;
 				do
 				{
-					with instance_nearest(x, y, Wall) if distance_to_object(other) <= 64
+					with instance_nearest(x, y, Wall) if distance_to_object(other) <= _r
 					{
 						instance_create(x, y, FloorExplo);
 						instance_destroy();
-					}
+					}else{_i = _r}
 					_i++;
-				}until(_i = 64)
+				}until(_i >= _r)
 				with Debris instance_delete(self);
 
 				on_step  = teleporter_step
@@ -445,33 +470,50 @@
 #define enemySpawn
 	if instance_exists(Player)
 	{
-		var _place = -4
+		var _place = -4,
+				_cost  = -4;
 		switch GameCont.area
 		{
-			case   1: _place = global.spwDesert;    break;
-			case   2: _place = global.spwSewers;    break;
-			case   3: _place = global.spwScrapyard; break;
-			case   4: _place = global.spwCaves;     break;
-			case   5: _place = global.spwIce;       break;
-			case   6: _place = global.spwLabs;      break;
-			case   7: _place = global.spwPalace;    break;
-			case   0: _place = global.spwNight;     break;
-			case 100: _place = global.spwPalace;    break;
-			case 101: _place = global.spwOasis;     break;
-			case 102: _place = global.spwPizza;     break;
-			case 103: _place = global.spwMansion;   break;
+			case   1: _place = global.spwDesert;
+								_cost  = global.cosDesert;    break;
+			case   2: _place = global.spwSewers;
+								_cost  = global.cosSewers;    break;
+			case   3: _place = global.spwScrapyard;
+								_cost  = global.cosScrapyard; break;
+			case   4: _place = global.spwCaves;
+								_cost  = global.cosCaves;     break;
+			case   5: _place = global.spwIce;
+								_cost  = global.cosIce;    		break;
+			case   6: _place = global.spwLabs;
+								_cost  = global.cosLabs;      break;
+			case   7: _place = global.spwPalace;
+								_cost  = global.cosPalace;    break;
+			case   0: _place = global.spwNight;
+								_cost  = global.cosNight;    	break;
+			case 100: _place = global.spwPalace;
+								_cost  = global.cosPalace;    break;
+			case 101: _place = global.spwOasis;
+								_cost  = global.cosOasis;     break;
+			case 102: _place = global.spwPizza;
+								_cost  = global.cosPizza;     break;
+			case 103: _place = global.spwMansion;
+								_cost  = global.cosMansion;   break;
 			case 104: if global.teleporter = true
 								{
 									_place = global.spwEverything;
+									_cost  = global.cosEverything;
 									break;
 								}
 								else
 								{
 									_place = global.spwCursed;
+									_cost  = global.cosCursed;
 									break;
 								}
-			case 105: _place = global.spwJungle; break;
-			default:  _place =  global.spwNight; break;
+			case 105: _place = global.spwJungle;
+								_cost  = global.cosJungle; break;
+			default:  _place = global.spwNight;
+			 					_cost  = global.cosNight; break;
 		}
 
 
@@ -491,19 +533,65 @@
 		}
 		ds_list_shuffle(_floorq)
 
+		if instance_number(enemy) < (10 + global.difficulty * 2){
+			var         _n = round(random_range(0, array_length(_place) - 1)),
+		     enemyChoice = _place[_n],
+				 enemyCost   = _cost[_n];
 
-	  var enemyChoice = _place[round(random_range(0, array_length(_place) - 1))]
-		if !is_undefined(_floorq[| 0]) with instance_create(_floorq[| 0].x, _floorq[| 0].y, enemyChoice)
-		{
-			if place_meeting(x, y, Wall) || place_meeting(x, y, FloorExplo) || !place_meeting(x, y, Floor) || distance_to_object(Player) <= 32
-			{
-				instance_delete(self)
-				exit
+			global.spawnCredits += current_time_scale * (.8 + global.difficulty / 100 - global.teleporter * .35);
+
+			global.wavetimer -= current_time_scale
+			if global.wavetimer <= 0{
+				global.wavetimer = 30 * irandom_range(6, 10)
+
+				do{
+					if !is_undefined(_floorq[| 0]) with instance_create(_floorq[| 0].x, _floorq[| 0].y, enemyChoice)
+					{
+						sound_play_pitch(sndIDPDPortalSpawn, 1.8)
+						global.spawnCredits -= enemyCost;
+						if place_meeting(x, y, Wall) || place_meeting(x, y, FloorExplo) || !place_meeting(x, y, Floor) || distance_to_object(Player) <= 32
+						{
+
+							instance_delete(self)
+							exit
+						}
+					}
+				}until enemyCost > global.spawnCredits
 			}
 		}
 	}
 
 #define step
+	// force some area changes
+	switch GameCont.area{
+		case 1: background_color =  6983599; break;
+		case 2: background_color =  4610380; break;
+		case 3: background_color = 10393226; break;
+		case 4: background_color = 12341889; break;
+		case 5: background_color = 12959156; break;
+		case 6: background_color =  2104329; break;
+		case 7: background_color =  2366817; break;
+		case 101: background_color = 13160785; break;
+		case 102: background_color =  6507424; break;
+		case 103: background_color = 15921390; break;
+		case 104: background_color =  2333951; break;
+		//case 105: background_color =   623338; break;
+	}
+
+	if GameCont.subarea = 2{
+		if GameCont.area = 3{
+			GameCont.area = 4;
+		}
+		if GameCont.area = 5{
+			GameCont.area = 6	;
+		}
+		if GameCont.area = 7{
+			GameCont.area = 1	;
+		}
+		GameCont.subarea = 1;
+	}
+
+ 	if button_pressed(0, "horn") = true global.difficulty++
 
 	with instances_matching_le(instances_matching(enemy, "tag", "boss"),"my_health",0) global.BossesLeft--
 
@@ -581,14 +669,12 @@
 		 }
 	 }
 
-	if mod_variable_get("mod", "items", "forceSave") == 1
-	{
+	if mod_variable_get("mod", "items", "forceSave") == 1{
 		mod_variable_set("mod", "items", "forceSave", 0)
 		save_save()
 	}
 
-	with instances_matching(Maggot, "tag", "god")
-	{
+	with instances_matching(Maggot, "tag", "god"){
 		x = -10000;
 		y = -10000;
 	}
@@ -610,7 +696,8 @@
 		BossRushModifier = 10
 		if (GameCont.area == 7) && (GameCont.subarea = 1) BossRushModifier = 0.5
 	}
-	if irandom(instance_number(enemy) + (BossRushModifier * 20) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
+	//if irandom(instance_number(enemy) + (BossRushModifier * 20) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
+	if !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
 
 	//Crown Vault Fix
 	if instance_exists(CrownPed) global.crownVault = true;
@@ -839,7 +926,7 @@
 
 
 	//CHEAT VARIABLES
-	speed = (0) + (room_speed / 30)
+	speed = (0) + (room_speed / 28)
 
 	//TIME SYSTEM
 	if instance_exists(Player) && !instance_exists(GenCont) global.frame += speed * current_time_scale
@@ -906,14 +993,12 @@
 	global.FragmentGet = 0;
 	Player.debug1 = 0;
 
-	if irandom_range(1, 3) = 1 && global.Gamemode != 2
-	{
+	if irandom(19) = 1 && global.Gamemode != 2{
 		GameCont.area        = 101;
 		global.areaChoice    = 101;
 		global.subareaChoice = 1;
 	}
-	else
-	{
+	else{
 		global.areaChoice    = 1;
 		global.subareaChoice = 1;
 	}
@@ -944,7 +1029,7 @@
 		if !instance_exists(Spiral) && instance_exists(Player) && global.teleporter = true && point_in_circle(Player.x, Player.y, _tele.x - 4, _tele.y, _tele.radius)
 		{
 			global.chargeF++
-			if global.chargeF >= round(room_speed - (global.BossesLeft > 0 ? 0 : 15))
+			if global.chargeF >= round(room_speed - (global.BossesLeft > 0 ? 0 : 45)) // 22
 			{
 				global.chargeF = 0;
 				global.charge++; //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
@@ -958,86 +1043,41 @@
 			  GameCont.hard += 2
 
 				//Area choose
-			  var _roll = round(random_range(1, 3))
-			  global.areaChoice = GameCont.lastarea + 1
 			  global.subareaChoice = 1
 
 				switch GameCont.area
 				{
-					case 106: GameCont.area    = 7;
-					          GameCont.subarea = 1;
+					case 106: global.areaChoice = 7;
 										break;
-					case 105: if _roll = 0
-										{
-											GameCont.area    = 106;
-											GameCont.subarea = 1;
-										}
-										else
-										{
-											GameCont.area    = 5;
-											GameCont.subarea = 1;
-										}
+					case 105: global.areaChoice = 6
 										break;
-					case 104: if _roll = 0
-										{
-											GameCont.area    = 105;
-											GameCont.subarea = 1;
-										}
-										else
-										{
-											GameCont.area    = 3;
-											GameCont.subarea = 3;
-										}
+					case 104: global.areaChoice = 5
 										break;
-					case 103: if _roll = 0
-										{
-											GameCont.area    = 104;
-											GameCont.subarea = 1;
-										}
-										else
-										{
-											GameCont.area    = 3;
-											GameCont.subarea = 1;
-										}
+					case 103: global.areaChoice = 4
 										break;
-					case 102: if _roll = 0
-										{
-											GameCont.area    = 103;
-											GameCont.subarea = 1;
-										}
-										else
-										{
-											GameCont.area    = 2;
-											GameCont.subarea = 1;
-										}
+					case 102: global.areaChoice = 3
 										break;
-				  case 101: if _roll = 0
-										{
-											GameCont.area    = 102;
-											GameCont.subarea = 1;
-										}
-										else
-										{
-											GameCont.area    = 1;
-											GameCont.subarea = 1;
-										}
+				  case 101: global.areaChoice = 2
 										break;
-					case   1: if _roll = 0{GameCont.area = 102}
-														else{GameCont.area = 2  }
+					case   1: global.areaChoice = 2
 										break;
-					case   2: if _roll = 0{GameCont.area = 103}
-														else{GameCont.area = 3  }
+					case   2: global.areaChoice = 3
 										break;
-					case   3: if _roll = 0{GameCont.area = 104}
-														else{GameCont.area = 4  }
+					case   3: global.areaChoice = 4
 										break;
-				  case   4: if _roll = 0{GameCont.area = 105}
-														else{GameCont.area = 5  }
+				  case   4: global.areaChoice = 5
 										break;
-				  case   5: if _roll = 0{GameCont.area = 106}
-														else{GameCont.area = 6  }
+				  case   5: global.areaChoice = 6
 										break;
+				  case   6: global.areaChoice = 7
+										break;
+					case   7: global.areaChoice = 1
+										break;
+
 				}
+				// determine if next area is a secret one
+				if irandom(14) = 0 && GameCont.area != 0 && GameCont.area != 6 && GameCont.area != 7{global.areaChoice += 100}
+
 				with instance_create(_tele.x, _tele.y, Portal){if _tele.portal = "vault" {GameCont.area = 100; type = 2}else{type = 1}}
 			  global.charge = 0;
 			  global.teleporter = false;
@@ -1256,7 +1296,7 @@
 				// Draw the gamemode menu
 		    if global.MenuIndex = 0
 				{
-					draw_x = 161 - global.MenuXoffset;
+					draw_x = 111 - global.MenuXoffset;
 					draw_y = 79
 					x_offset = 70 //space between each button
 					y_offset = 15
@@ -1625,6 +1665,14 @@
 	}
 
 #define draw_pause
+	var _e = false;
+	if !instance_exists(menubutton) _e = true
+	with OptionMenuButton  _e = true
+	with AudioMenuButton   _e = true
+	with VisualsMenuButton _e = true
+	with GameMenuButton    _e = true
+	with ControlMenuButton _e = true
+	if _e = true exit
 	draw_timehud(view_xview_nonsync, view_yview_nonsync);
 
 #define draw
@@ -1721,7 +1769,7 @@
 						{
 							global.BossesLeft++
 							tag = "boss"
-							maxhealth *= 1.75
+							maxhealth *= 1.55
 							my_health = maxhealth
 							if instance_exists(Player) && distance_to_object(Player) <= 64
 							{
@@ -1760,6 +1808,7 @@
 						var _i = 0;
 						do
 						{
+							_i++;
 							move_contact_solid(point_direction(Player.x, Player.y, x, y) + random_range(-20, 20), 1)
 						}until(_i = 84 or distance_to_object(Player) > 64)
 
@@ -1791,7 +1840,7 @@
 		with instances_matching(CustomProp, "name", "Teleporter") var _tele = self
 		if instance_exists(Player)
 		{
-			if global.teleporter == true
+			if global.teleporter == true && _tele != Player
 			{
 				draw_x = 5
 				draw_y = 20

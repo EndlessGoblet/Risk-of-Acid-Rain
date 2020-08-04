@@ -35,8 +35,9 @@
 	global.sprArmor      = sprite_add("sprites/other/sprArmor.png", 3, 9, 9);
 	global.sprArmorShine = sprite_add_weapon("sprites/other/sprArmorShine.png", 9, 9);
 
-	global.sprItems     = sprite_add(    "sprites/items/sprItems.png", 101, 17, 17);
-	global.sprItemsBack = sprite_add("sprites/items/sprItemsBack.png",   6, 20, 20);
+	global.sprItems          = sprite_add(    "sprites/items/sprItems.png",     101, 17, 17);
+	global.sprItemsBack      = sprite_add("sprites/items/sprItemsBack.png",       6, 20, 20);
+	global.sprPlasmaTrailRed = sprite_add("sprites/items/sprPlasmaTrailRed.png",  4,  4,  4);
 
 	global.sprText2 = sprite_add("sprites/other/sprText2.png", 1, 8, 8);
 
@@ -495,6 +496,28 @@
 			 case "item"   : image_index  = item_index.spr_index;
 			 								 y -= sin(current_frame / 10) / 4 / (room_speed / 30);
 			 							 	 spr_shadow_y  += sin(current_frame / 10) / 4 / (room_speed / 30);
+											 if item_index.tier = 1{
+						 						if irandom(round(30 / current_time_scale)) <= 1{
+						 							with instance_create(x - random_range(0, sprite_get_width(sprite_index)), y, PlasmaTrail){
+						 								motion_add(90, irandom(1) + 1)
+						 								friction = .1;
+						 								image_speed = .4
+														if irandom(2) > 0{depth = other.depth -1}
+						 								sprite_index = sprPlasmaTrail
+						 							}
+						 						}
+						 					}
+											if item_index.tier = 2{
+											 if irandom(round(20 / current_time_scale)) <= 1{
+												 with instance_create(x - random_range(0, sprite_get_width(sprite_index)), y, PlasmaTrail){
+													 motion_add(90, irandom(1) + 1)
+													 friction = .1;
+													 image_speed = random_range(.3, .4)
+													 if irandom(2) > 0 {depth = other.depth -1}
+													 sprite_index = global.sprPlasmaTrailRed
+												 }
+											 }
+										 }
 											 break;
 			 case  "coin"  : image_index  = item_index.spr_index;
 			 								 y -= sin(current_frame / 10) / 4 / (room_speed / 30);
@@ -523,6 +546,7 @@
 						mod_variable_set("mod", "main", "coins", mod_variable_get("mod", "main", "coins") - 1)
 						Player.cursedFlash = (3 -(room_speed / 30)) * 5
 					}
+
 					script_execute(on_open)
 
 					// fx
@@ -549,9 +573,11 @@
 
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				//obj_create(mouse_x, mouse_y, "dropitem")
-				get_item(item[? "tweezers"], 1)
-				//global.InvisibleTimer = room_speed * 5
+				with obj_create(mouse_x, mouse_y, "item"){
+					tag = "item"
+					item_index = item[? "flower"]
+					chest_setup(tag)
+				}
 			}
 		}
 	}
@@ -793,7 +819,10 @@
 
 	//Incendiary Rounds
 	var amount = item_get_power("incendiary")
-	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self {instance_nearest(x, y, enemy).OnFire = (7 + amount * 3) * (GameCont.area = 101 ? 0 : 1)}}}
+	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self
+	{
+		instance_nearest(x, y, enemy).OnFire = (7 + amount * 3) * (GameCont.area = 101 ? 0 : 1)
+	}}}
 
 	with instances_matching_ge(enemy, "OnFire", 1)
 	{
@@ -1004,7 +1033,7 @@
 			{
 				if size > 0
 				{
-					if irandom(99) < ((1 - 1/(.08 * amount / (1 + Player.armor * .1) * (1 + skill_get(mut_rabbit_paw) * .4) + 1))*100 * .6)
+					if instance_exists(Player) && irandom(99) < ((1 - 1/(.08 * amount / (1 + Player.armor * .1) * (1 + skill_get(mut_rabbit_paw) * .4) + 1))*100 * .6)
 					with obj_create(x, y, "CustomPickup")
 					{
 						tag = "armor"
@@ -1108,7 +1137,7 @@
 				var amount = item_get_power("rubber")
 				if amount >= 1
 				{
-					if "extra_bounce" not in self extra_bounce = ceil(amount)+1
+					if "extra_bounce" not in self extra_bounce = ceil(amount)
 				}
 
 				//Slosher
@@ -1622,8 +1651,10 @@
 			text = "+1 CURSED COIN"
 			time = 10;
 		}
-	sound_play_pitch(sndExplosion, 1.5)
-	sound_play_pitch(sndHyperCrystalDead, 5)
+		var _p = random_range(.8, 1.2)
+		sound_play_pitch(sndExplosion, 1.5 * _p)
+		sound_play_pitchvol(sndHyperCrystalDead, 2.6 * _p, .4)
+		sound_play_pitchvol(sndCursedPickup, 1.6 * _p, .7)
 	}
 	//fx
 	var _pitch = random_range(.8, 1.2)
@@ -1877,8 +1908,12 @@
 				draw_rectangle_colour(_x - _maxh / 2, bbox_bottom + 5, _x + _maxh / 2, bbox_bottom + 5 + 3, c_black, c_black, c_black, c_black, false);
 				if my_health > 0
 				{
-					draw_rectangle_colour(_x - _maxh / 2 + 1, bbox_bottom + 5 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, bbox_bottom + 5 + 2, _col, _col, _col, _col, false);
-					if "OnFire" in self && OnFire > 0 draw_rectangle_colour(_x - _maxh / 2 + _maxh * max((my_health - floor(OnFire * 1 + item_get_power("incendiary") * .35))  / maxhealth, 0) + 1, bbox_bottom + 5 + 1, _x - _maxh / 2 + _maxh * max(my_health / maxhealth, 0) - 1, bbox_bottom + 5 + 2,   c_fire,   c_fire,   c_fire,   c_fire, false);
+					var _bl = _x - _maxh / 2 + 1,
+							_br = _x - _maxh / 2,
+							_r  = _maxh * max(my_health / maxhealth, 0) - 1;
+
+					                                  draw_rectangle_colour(_bl																												                     , bbox_bottom + 5 + 1, _br + _r, bbox_bottom + 5 + 2, _col, _col, _col, _col, false);
+					if "OnFire" in self && OnFire > 0 draw_rectangle_colour(_bl + max(ceil(_r - (OnFire *(1 + item_get_power("incendiary") * .35)) / 4), 0), bbox_bottom + 5 + 1, _br + _r, bbox_bottom + 5 + 2, c_fire, c_fire, c_fire, c_fire, false);
 				}
 			}
 		}
@@ -1904,7 +1939,7 @@
 
 	draw_set_blend_mode(bm_add)
 	var amount = item_get_power("bulb") //PRE WAR LIGHT BULBS
-	var _light = 30 + random(2);
+	var _light = 30 * (1 + item_get_power("fungus") * .2) + random(2);
 	if amount >= 1 && instance_exists(Player)
 	{
 		if preformanceMode = false
@@ -2464,7 +2499,7 @@
 					_obj = create_disc_large(_x, _y);
 					return _obj;
 		case "coin":
-					_obj = obj_create(_x, _y, "ItemChest");
+					_obj = obj_create(_x, _y, "dropitem");
 					with _obj
 					{
 						tag = "coin";
