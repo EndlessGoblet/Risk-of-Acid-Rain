@@ -126,8 +126,8 @@
   var _p = random_range(.9, 1.2);
   if "extra_bounce" in self && extra_bounce <= 0 || "extra_bounce" not in self
   {
-    sound_play_hit(sndChickenSword, 1.5 * _p)
-    sound_play_hit(sndBoltHitWall, .8 * _p)
+    sound_play_pitch(sndChickenSword, 1.5 * _p)
+    sound_play_pitch(sndBoltHitWall, _p)
     sleep(2)
     with instance_create(x, y, CustomObject)
     {

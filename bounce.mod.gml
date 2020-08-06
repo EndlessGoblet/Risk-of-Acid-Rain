@@ -248,6 +248,8 @@ with Player
               }
               case Splinter: case Seeker:
               {
+                round(x)
+                round(y)
                 extra_bounce--;
                 image_index = 0
                 image_speed = 1

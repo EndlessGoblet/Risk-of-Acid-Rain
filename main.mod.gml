@@ -72,8 +72,9 @@
 
 	global.charge = 0;
 	global.chargeF = 0;
-	global.areaChoice = 0
-	global.subareaChoice = 0
+	global.areaChoice = 0;
+	global.subareaChoice = 0;
+	global.AreaStart = true;
 	global.BarLength = 0;
 	global.DarkCircle = false;
 	global.respawn = 0;
@@ -111,7 +112,7 @@
 
 	load_save()
 	//Fixing Saves
-	if (global.preformanceMode == false || global.preformanceMode == true) global.preformanceMode = 0 
+	if (global.preformanceMode == false || global.preformanceMode == true) global.preformanceMode = 0
 	save_save()
 	//set new level function
 	global.newLevel = instance_exists(GenCont);
@@ -437,7 +438,7 @@
 				addframes = room_speed * 2;
 				currad    = 0;
 				radius    = 0;
-				maxradius = 100 * (1 + (item_get_count("focus") > 0 ? .15 : 0) + (item_get_count("siphon") > 0 ? .15 : 0));
+				maxradius = 100 * (1 + (item_get_count("focus") > 0 ? .1 : 0) + (item_get_count("siphon") > 0 ? .1 : 0));
 
 				spr_idle   = global.sprTeleporterIdle
 				spr_hurt   = global.sprTeleporterIdle
@@ -461,6 +462,7 @@
 				}until(_i >= _r)
 				with Debris instance_delete(self);
 
+				movecheck = false;
 				on_step  = teleporter_step
 				on_draw  = teleporter_draw
 			}
@@ -542,7 +544,7 @@
 		     enemyChoice = _place[_n],
 				 enemyCost   = _cost[_n];
 
-			global.spawnCredits += current_time_scale * (.8 + global.difficulty / 100 - global.teleporter * .35);
+			global.spawnCredits += current_time_scale * (.8 + global.difficulty / 100 - global.teleporter * .35 + item_get_power("times") * .1);
 
 			global.wavetimer -= current_time_scale
 			if global.wavetimer <= 0{
@@ -551,7 +553,7 @@
 				do{
 					if !is_undefined(_floorq[| 0]) with instance_create(_floorq[| 0].x, _floorq[| 0].y, enemyChoice)
 					{
-						sound_play_pitch(sndIDPDPortalSpawn, 1.8)
+						repeat(3) instance_create(x, y, Smoke);
 						global.spawnCredits -= enemyCost;
 						if place_meeting(x, y, Wall) || place_meeting(x, y, FloorExplo) || !place_meeting(x, y, Floor) || distance_to_object(Player) <= 32
 						{
@@ -566,37 +568,50 @@
 	}
 
 #define step
-	// force some area changes
-	switch GameCont.area{
-		case 1: background_color =  6983599; break;
-		case 2: background_color =  4610380; break;
-		case 3: background_color = 10393226; break;
-		case 4: background_color = 12341889; break;
-		case 5: background_color = 12959156; break;
-		case 6: background_color =  2104329; break;
-		case 7: background_color =  2366817; break;
-		case 101: background_color = 13160785; break;
-		case 102: background_color =  6507424; break;
-		case 103: background_color = 15921390; break;
-		case 104: background_color =  2333951; break;
-		//case 105: background_color =   623338; break;
+
+	if instance_exists(Player) with instances_matching_ne(Corpse, "team", Player.team){
+		team = Player.team
 	}
 
-	if GameCont.subarea = 2{
-		if GameCont.area = 3{
-			GameCont.area = 4;
+	if global.AreaStart = true{
+		global.AreaStart = false;
+		// force some area changes
+		switch GameCont.area{
+			case   1: background_color =  6983599; break;
+			case   2: background_color =  4610380; break;
+			case   3: background_color = 10393226; break;
+			case   4: background_color = 12341889; break;
+			case   5: background_color = 12959156; break;
+			case   6: background_color =  2104329; break;
+			case   7: background_color =  2366817; break;
+			case 101: background_color = 13160785; break;
+			case 102: background_color =  6507424; break;
+			case 103: background_color = 15921390; break;
+			case 104: background_color =  2333951; break;
 		}
-		if GameCont.area = 5{
-			GameCont.area = 6	;
+
+		if GameCont.subarea = 2{
+			if GameCont.area = 3{
+				GameCont.area = 4;
+			}
+			if GameCont.area = 5{
+				GameCont.area = 6	;
+			}
+			if GameCont.area = 7{
+				GameCont.area = 1	;
+				GameCont.loops++;
+			}
+			GameCont.subarea = 1;
 		}
-		if GameCont.area = 7{
-			GameCont.area = 1	;
-		}
-		GameCont.subarea = 1;
 	}
-
- 	if button_pressed(0, "horn") = true global.difficulty++
-
+	if GameCont.area = 100 && Player.mask_index = mskNone{
+		GameCont.area = GameCont.lastarea++;
+		if GameCont.aera > 100 GameCont.aera -= 100
+		if GameCont.area = 8{
+			GameCont.aera = 1;
+			GameCont.loops++;
+		}
+	}
 	with instances_matching_le(instances_matching(enemy, "tag", "boss"),"my_health",0) global.BossesLeft--
 
 	 // special horror drop
@@ -765,10 +780,11 @@
 	with (enemy) {
 	for(i = 0; i < 5; i++){
 				var _speed_hardmode = global.Gamemode = 1 ? 1 : 0,
-				    _speed_times    = .2 * item_get_count("times"),
+				    _speed_times    = .15 * item_get_count("times"),
 						_speed_boss     = "boss_buff" in self ? 1 : 0;
+						_speed_other    = (instance_is(self, FrogQueen) || instance_is(self, OasisBoss)) ? -.6 : 0;
 				if(alarm_get(i) > 2){
-					alarm_set(i, alarm_get(i) - (_speed_hardmode + _speed_times + _speed_boss));
+					alarm_set(i, alarm_get(i) - (_speed_hardmode + _speed_times + _speed_boss + _speed_other));
 				}
 			}
 
@@ -1031,6 +1047,12 @@
 	}
 
 #define teleporter_step
+	if movecheck = false{
+		with instances_matching_ne([chestprop, WepPickup], "tag", "item") if distance_to_object(other) < 48{
+			motion_add(point_direction(other.x, other.y, x, y), 1)
+		}
+	}
+
 	if my_health < maxhealth my_health = maxhealth
 
 	var _tele = self;
@@ -1291,7 +1313,7 @@
 	    		if global.MenuIndex = 1
 					{
 						var _drawx = game_width / 2 - (120 + global.MenuXoffset);
-				draw_set_halign(fa_center)		
+				draw_set_halign(fa_center)
 		        draw_text_nt(game_width / 2 - global.MenuXoffset, 42, (floor(current_frame/8)*30 % 20 ? "@wVERSION 1.7" : "@pVERSION 1.7"));
 				draw_set_font(fntChat)
 				draw_text_nt(game_width / 2 - global.MenuXoffset, 50, "@sCursed update")
@@ -1394,7 +1416,7 @@
 						_y2     = _y1 + string_height(_str),
 						_c      = "@s",
 						_inbox  = false,
-						_varstr = " ERROR",	
+						_varstr = " ERROR",
 						_vardst = string_width(_str) + 12,
 						_detstr = "",
 						_dety   = game_height - 20,
@@ -1716,18 +1738,21 @@
 				{
 					_tele.currad = _tele.addframes;
 					sound_play(sndLevelUltra)
+					with instances_matching(CustomObject, "name", "shrine"){
+						deathtimer = distance_to_object(other) / 15;
+					}
 	        global.teleporter = true;
 					var i = 0
 					do
 					{
-						with instance_nearest(x, y, Wall) if distance_to_object(other)<= _tele.maxradius - 16
+						with instance_nearest(x, y, Wall) if distance_to_object(other)<= _tele.maxradius - 20
 						{
 							instance_create(x, y, FloorExplo)
 							instance_destroy()
 							sleep(2)
 						}
 						i++;
-					}until(i = 1000 || distance_to_object(instance_nearest(x, y, Wall)) > _tele.maxradius - 16)
+					}until(i = 1000 || distance_to_object(instance_nearest(x, y, Wall)) > _tele.maxradius - 20)
 
 					sound_play_music(musBoss8)
 
@@ -1798,7 +1823,9 @@
 						{
 							global.BossesLeft++
 							tag = "boss"
-							maxhealth *= 1.55
+							if instance_is(self, FrogQueen) ||instance_is(self, FrogQueen){
+								maxhealth *= .9
+							}else maxhealth *= 1.55
 							my_health = maxhealth
 							if instance_exists(Player) && distance_to_object(Player) <= 64
 							{
@@ -1859,7 +1886,7 @@
 	{
 		if "boss_buff" not in self
 		{
-			boss_buff = 1 + item_get_count("times") * .25 + global.Gamemode
+			boss_buff = 1 + item_get_count("times") * .1 + global.Gamemode
 			maxhealth *= boss_buff + _bosshp
 			my_health = maxhealth
 		}
@@ -2189,10 +2216,11 @@
 	with(Loadout) selected = 0;
 
 
-#define chest_setup(TAG)																 return mod_script_call("mod", "items","chest_setup"   , TAG)
-#define obj_create(X, Y, OBJ_NAME)											 return mod_script_call("mod", "items","obj_create"    , X, Y, OBJ_NAME)
-#define add_item(ITEM)																	 return mod_script_call("mod", "items","add_item"      , ITEM)
-#define remove_item(ITEM, AMOUNT)     			             return mod_script_call("mod", "items","remove_item"   , ITEM, AMOUNT)
-#define get_item(ITEM, AMOUNT)     			                 return mod_script_call("mod", "items","get_item"      , ITEM, AMOUNT)
-#define item_get_count(ITEM)                             return mod_script_call("mod", "items","item_get_count", ITEM)
-#define draw_backdrop(XSTART, YSTART, XEND, YEND, TITLE) return mod_script_call("mod", "items", "draw_backdrop", XSTART, YSTART, XEND, YEND, TITLE)
+#define chest_setup(TAG)																 return mod_script_call("mod", "items","chest_setup"    , TAG);
+#define obj_create(X, Y, OBJ_NAME)											 return mod_script_call("mod", "items","obj_create"     , X, Y, OBJ_NAME);
+#define add_item(ITEM)																	 return mod_script_call("mod", "items","add_item"       , ITEM);
+#define remove_item(ITEM, AMOUNT)     			             return mod_script_call("mod", "items","remove_item"    , ITEM, AMOUNT)
+#define get_item(ITEM, AMOUNT)     			                 return mod_script_call("mod", "items","get_item"       , ITEM, AMOUNT);
+#define item_get_count(ITEM)                             return mod_script_call("mod", "items","item_get_count" , ITEM);
+#define item_get_power(ITEM)          									 return mod_script_call("mod", "items", "item_get_power",ITEM);
+#define draw_backdrop(XSTART, YSTART, XEND, YEND, TITLE) return mod_script_call("mod", "items", "draw_backdrop" , XSTART, YSTART, XEND, YEND, TITLE);

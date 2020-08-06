@@ -34,8 +34,28 @@
 		canuse  = false; // whether or not the player has the currency for this shrine
 		uses = 1; // how many shrine uses are left before destruction
 		pause = room_speed * 1; // time buffer between successful uses
+		deathtimer = -1;
 
 		var _i = 0;
+		with instances_matching(CustomObject, "name", "Teleporter"){
+			if distance_to_object(other) < 48{
+				with other{
+					do{
+						x -= lengthdir_x(1, point_direction(x, y, other.x, other.y));
+						y -= lengthdir_y(1, point_direction(x, y, other.x, other.y));
+						if place_meeting(x, y, Wall){
+							with instance_nearest(x, y, Wall){
+								instance_create(x, y, FloorExplo);
+								instance_destroy();
+							}
+						}
+						_i++;
+					}until distance_to_object(other) >= 48 || _i = 48
+				}
+			}
+		}
+
+		_i = 0;
 		do
 		{
 			with instance_nearest(x, y, Wall) if distance_to_object(other) <= 32
@@ -155,8 +175,8 @@
 													    costval = 1;
 
 															pool = CommonItems;
-															if !irandom(  		 9) pool = UncommonItems;
-															if !irandom( 			49) pool = RareItems;
+															if !irandom(  		 4) pool = UncommonItems;
+															if !irandom( 			34) pool = RareItems;
 															if !irandom(99999999) pool = UniqueItems;
 															item_index = pool[round(random_range(0, array_length_1d(pool) - 1))]
 															subname = item_index.name + " PRINTER"
@@ -185,6 +205,14 @@
 #define shrine_step
 	if place_meeting(x, y, Player){near = true}else{near = false}
 	canuse = false;
+
+	if deathtimer > 0{
+		deathtimer -= current_time_scale
+		if deathtimer <= 0{
+			instance_destroy();
+			exit;
+		}
+	}
 
 	if pause > 0 {pause--}
 	if near = true && pause <= 0
@@ -233,7 +261,7 @@
 			if uses <= 0 instance_destroy();
 
 			// Small Accolade
-			var _amount = item_get_power("accolade") > 0 ? item_get_power("accolade") : 0;
+			var _amount = item_get_power("accolade") > 0 ? item_get_power("accolade") * 2 : 0;
 			if _amount > 0
 			{
 				var _hp = roll(_amount);
@@ -407,6 +435,10 @@
 	if array_length_1d(_tierarray) > 0
 	{
 		var _item = _tierarray[round(random_range(0, array_length_1d(_tierarray) - 1))]
+		with instance_create(x, y, PopupText){
+			target = Player;
+			mytext = "- " + _item.name
+		}
 		remove_item(_item, 1);
 		with obj_create(x, y, "dropitem"){item_index = other.item_index}
 	}
@@ -446,6 +478,12 @@
 #define draw
 	with instances_matching(CustomObject, "name", "shrine")
 	{
+		if index = "printer" || index = 14
+		{
+			draw_set_alpha(.7)
+			draw_sprite(global.sprItems, item_index.spr_index, x + sprite_get_width(global.sprItems)/2, y -32)
+			draw_set_alpha(1)
+		}
 		if near = true
 		{
 			var _splat = mskNone;
@@ -462,7 +500,7 @@
 				draw_text_nt(x, y - 30, subname);
 				draw_sprite(sprEPickup, 0, x, y - 7)
 				draw_sprite(_splat, 0, x - sprite_get_width(_splat)/2, y)
-				if cost != 4 draw_text(x - sprite_get_width(_splat)/2 + 20, y + 6, string(costval))
+				if cost != 4 && cost != -1 draw_text(x - sprite_get_width(_splat)/2 + 20, y + 6, string(costval))
 			}
 			else
 			{
@@ -471,12 +509,6 @@
 				draw_sprite(sprite_index, image_index, x, y)
 				draw_set_alpha(1)
 				d3d_set_fog(false, c_white, 0, 0)
-			}
-			if index = 14 && near = true
-			{
-				draw_set_alpha(.45)
-				draw_sprite(global.sprItems, item_index.spr_index, x + sprite_get_width(global.sprItems)/2, y -42)
-				draw_set_alpha(1)
 			}
 			if index = crwn_guns && near = true
 			{

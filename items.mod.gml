@@ -60,7 +60,6 @@
 	global.ItemGetAmount = 1;
 	global.descriptionTimer = 0;
 
-	global.RadiGumdropTimer 		= 0;
 	global.RadiatedSnackCounter = 0;
 	global.InvisibleTimer 			= 0;
 	global.BloodCounter 				= 0;
@@ -74,10 +73,10 @@
 	global.hideDes = 0;
 	global.popoChance = 0;
 
-	global.CommonItems   = [item[? "info"]      , item[? "tweezers"], item[? "gumdrop"] , item[? "bandages"], item[? "fruit"]    , item[? "golden"] , item[? "rubber"]  , item[? "focus"]     , item[? "mush"]   , item[? "grease"] , item[? "boots"]   , item[? "chopper"] , item[? "locket"]   , item[? "metal"]  , item[? "mask"]] //TO DO: Chopper
-	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"]] //To-Do: Horror In a Bottle
-	global.RareItems     = [item[? "artifact"]  , item[? "slosher"] , item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"] , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]] //To-Do: None
-	global.CursedItems   = [item[? "brooch"]    , item[? "heater"]  , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]] // Todo: None
+	global.CommonItems   = [item[? "info"]      , item[? "tweezers"], item[? "gumdrop"] , item[? "bandages"], item[? "fruit"]    , item[? "golden"] , item[? "rubber"]  , item[? "focus"]     , item[? "mush"]   , item[? "grease"] , item[? "boots"]   , item[? "chopper"] , item[? "locket"]   , item[? "metal"]  , item[? "mask"]]
+	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"], item[? "fern"], item[? "accolade"]] //To-Do: Horror In a Bottle
+	global.RareItems     = [item[? "artifact"]  , item[? "slosher"] , item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"] , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]]
+	global.CursedItems   = [item[? "brooch"]    , item[? "heater"]  , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]		  , item[? "edge"]] // Todo: None
 	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "pearl"]  , item[? "Dpearl"]  , item[? "key"]       , item[? "flask"]  , item[? "fragment"]]
 	global.PlayerItems 	 = [item[? "none"]]
 	//set new level function
@@ -94,6 +93,7 @@
 		if(instance_exists(GenCont)) global.newLevel = 1;
 		else if(global.newLevel){
 			global.newLevel = 0;
+			mod_variable_set("mod", "main", "AreaStart", true);
 			level_start();
 		}
 		var hadGenCont = global.hasGenCont;
@@ -238,7 +238,7 @@
 	}
 	ds_list_shuffle(_floorq)
 
-	repeat(_chest_amount + _prize_amount)
+	if GameCont.area != 100 repeat(_chest_amount + _prize_amount)
 	{
 		if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
 		{
@@ -271,7 +271,7 @@
 		}
 	}
 
-	if _curse_amount > 0 // guaranteed cursed chest spawn in caves + extra cursed chest from crowns
+	if GameCont.area != 100 && _curse_amount > 0 // guaranteed cursed chest spawn in caves + extra cursed chest from crowns
 	{
 		repeat(_curse_amount)
 		{
@@ -299,10 +299,10 @@
 	with BecomeScrapBoss instance_delete(self)
 
 	var floors        = instances_matching(Floor, mod_current, undefined),
-		_printer_amount = choose(1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 3) * (1 + mod_variable_get("mod", "main", "doubleShrines")) * (GameCont.area = 100)
+		_printer_amount = choose(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3) * (1 + mod_variable_get("mod", "main", "doubleShrines")) * (GameCont.area = 100)
 		  _other_amount = choose(2, 2, 2, 3, 3) * (1 + mod_variable_get("mod", "main", "doubleShrines"))
 
-	for(i = 0; i < _printer_amount; i++)
+	if GameCont.area != 100 for(i = 0; i < _printer_amount; i++)
 	{
 		var my_floor = floors[irandom(array_length(floors) - 1)];
 	  with obj_create(my_floor.x, my_floor.y, "shrine")
@@ -312,12 +312,12 @@
 		}
 	}
 
-	for(i = 0; i < _other_amount; i++)
+	if GameCont.area != 100 for(i = 0; i < _other_amount; i++)
 	{
 		var my_floor = floors[irandom(array_length(floors) - 1)];
 		with obj_create(my_floor.x, my_floor.y, "shrine")
 		{
-			index = choose(2, 5, 6, 8, 11, 12, 13, 15, 15, 16, 16)
+			index = choose(2, 14, 6, 8, 11, 12, 13, 14, 14, 14, 14, 14, 15, 15, 16, 16)
 			shrine_setup()
 		}
 	}
@@ -570,14 +570,9 @@
 	{
 		if(button_pressed(index, "horn"))
 		{
-
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				with obj_create(mouse_x, mouse_y, "item"){
-					tag = "item"
-					item_index = item[? "flower"]
-					chest_setup(tag)
-				}
+				get_item(item[? "prize"], 1)
 			}
 		}
 	}
@@ -609,17 +604,11 @@
 	}
 	//inside information (more damage to IDPD and they drop more stuff)
 
-	//radi bandages (heal overtime)
+	//bandages
 	var amount = item_get_power("bandages")
 	if amount >= 1 {
-	    with (Player) {
-	        var _x = (amount * 2); if (_x >= 15) _x = 15;
-	if (global.frame == 59) global.RadiGumdropTimer += maxhealth / (48 - (_x * 2)) // <--- Change this number (32) to be higher to make regen slower
-	if (floor(global.RadiGumdropTimer) >= 1) {
-	if (my_health < maxhealth) my_health += round(global.RadiGumdropTimer)
-	if (my_health > maxhealth) my_health = maxhealth
-	 global.RadiGumdropTimer = 0;
-	}}}
+		extra_health += ceil(amount)
+	}
 	//radi bandages (heal overtime)
 
 	//Mechanical Lens (Homing)
@@ -960,7 +949,11 @@
 			var amount = item_get_power("artifact")
 			if amount >= 1
 			{
-				if instance_exists(Player) if roll_luck(10 + 15 * amount) repeat(size + 1) with instance_create(x + random_range(-5, 5), y + random_range(-5, 5), MeatExplosion) team = Player.team
+				if instance_exists(Player) if roll_luck(10 + 15 * amount)
+				{
+					repeat(size + 1) with instance_create(x + random_range(-5, 5), y + random_range(-5, 5), MeatExplosion) team = Player.team
+					sound_play_pitchvol(sndBloodLauncherExplo, random_range(1.2, 1.6), .8)
+				}
 			}
 
 			//Ammo Extractor
@@ -1130,7 +1123,7 @@
 				var amount = item_get_power("focus")
 				if amount >= 1 && instance_exists(Player)
 				{
-					if point_in_teleporter(Player) = true extra_damage += 1 + .05 * amount
+					if point_in_teleporter(Player) = true extra_damage += .15 +.1 * amount
 				}
 
 				//Rubber Projectile
@@ -1193,7 +1186,8 @@
 				var amount = item_get_power("tools")
 				if amount >= 1
 				{
-					if roll_luck(clamp(8 * amount, 0, 40)){instance_destroy()}
+					if roll_luck(clamp(8 * amount, 0, 40)){damage *= 2; team = Player.team
+					}
 				}
 			}
 		}
@@ -1262,17 +1256,6 @@
 	}
 	}
 	//Bloody Lust
-
-	//Focus
-	var amount = item_get_power("focus")
-	if amount >= 1 {
-	    with (projectile) { if team != 2 && "Focus" not in self{
-	    image_xscale = clamp(image_xscale - (amount * 0.05), .6, image_xscale - (amount * 0.05))
-	    image_yscale = clamp(image_yscale - (amount * 0.05), .6, image_yscale - (amount * 0.05))
-	    Focus = true;
-	    }}
-	}
-	//Focus
 
 	var amount = item_get_power("gumdrop")
 	if amount >= 1
@@ -2709,7 +2692,7 @@
 		case 4: sleep(50); break;
 	}
 	repeat(8 + item_index.tier * 2){with instance_create(x, y, Dust){depth = other.depth - 1; motion_add(random(360), random_range(4, 5))}}
-	with obj_create(x, y, "item"){item_index = other.item_index}
+	with obj_create(x, y, "item"){item_index = other.item_index; chest_setup("item"); x -= 8}
 
 #define itemchest_open
 	sound_play(sndAmmoChest);

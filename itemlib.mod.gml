@@ -58,7 +58,7 @@
 #macro item_mechanical_lens item[? "lens"] // ITEM 4: MECHANICAL LENS
   item_mechanical_lens = {
     name              : "Mechanical Lens",
-  	description_small : "@wBullets @sare @wslower @sand @phome",
+  	description_small : "@yprojectiles @sare @wslower @sand @phome",
   	description_large : "@sDecreases @wprojectile speed @sby @w50%#@wBullets @phome @sinto @wenemies @s up to @w16 meters @d(+16 meters per stack) away",
   	spr_index         : 4,
   	tier              : 1
@@ -88,8 +88,8 @@
 #macro item_old_bandages item[? "bandages"] // ITEM 7: OLD BANDAGES, FORMERLY RADI GUMDROP
   item_old_bandages = {
     name              : "Old Banages",
-  	description_small : "@gHeal @sover time",
-  	description_large : "@severy minute you have a chance of @w3,6% @d(+0.6% per stack) @gheal @sfor @w1 HP#@schance of @ghealing @sincreases by @w3,6% @d(+0.6% per stack) @swhen not @ghealed",
+  	description_small : "+1 @rmax HP",
+  	description_large : "-",
   	spr_index         : 7,
   	tier              : 0
 
@@ -148,7 +148,7 @@
 #macro item_golden_shot item[? "golden"] // ITEM 13: GOLDEN SHOT
   item_golden_shot = {
     name              : "Golden Shot",
-  	description_small : "@sChance to shoot @wstrong, @ygolden @wbullets",
+  	description_small : "@sChance to shoot @wstrong @yprojectiles",
   	description_large : "-",
   	spr_index         : 13,
   	tier              : 0
@@ -158,7 +158,7 @@
 #macro item_sabotage_tools item[? "tools"] // ITEM 14: SABOTAGE TOOLS
   item_sabotage_tools = {
     name              : "Sabotage Tools",
-  	description_small : "@wEnemy bullets @ssometimes get @wjammed",
+  	description_small : "@wEnemy @yprojectiles @ssometimes get @wjammed",
   	description_large : "-",
   	spr_index         : 14,
   	tier              : 2
@@ -168,7 +168,7 @@
 #macro item_bandit_mask item[? "mask"] // ITEM 15: BANDIT MASK
   item_bandit_mask = {
     name              : "Bandit Mask",
-  	description_small : "@sStart new @wareas @winvisible",
+  	description_small : "@sbecome @winvisible @swhen leaving @pportals",
   	description_large : "-",
   	spr_index         : 15,
   	tier              : 0
@@ -178,7 +178,7 @@
 #macro item_bloody_lust item[? "lust"] // ITEM 16: BLOODY LUST
   item_bloody_lust = {
     name              : "Bloody Lust",
-  	description_small : "@sGo @rBerserk @safter taking @wdamage",
+  	description_small : "@sGo @rBerserk @swhen taking @wdamage",
   	description_large : "-",
   	spr_index         : 16,
   	tier              : 1
@@ -188,7 +188,7 @@
 #macro item_rubber_rounds item[? "rubber"] // ITEM 17: RUBBER ROUNDS
   item_rubber_rounds = {
     name              : "Rubber Rounds",
-  	description_small : "Bullets @ybounce @soff of @wwalls",
+  	description_small : "@yprojectiles @wbounce @soff of @wwalls",
   	description_large : "-",
   	spr_index         : 17,
   	tier              : 0
@@ -198,7 +198,7 @@
 #macro item_liquid_nitrogen item[? "nitrogen"] // ITEM 18: LIQUID NITROGEN
   item_liquid_nitrogen = {
     name              : "Liquid Nitrogen",
-  	description_small : "@sGain an @waura @sthat deletes @wbullets",
+  	description_small : "@sGain an @waura @sthat deletes @yprojectiles",
   	description_large : "-",
   	spr_index         : 18,
   	tier              : 1
@@ -357,7 +357,7 @@
 #macro item_chaotic_brooch item[? "brooch"] // ITEM 34: CHAOTIC DICE
   item_chaotic_brooch = {
     name              : "Chaotic Brooch",
-  	description_small : "@w+2 @guncommon @witems@s, @wreorder @severy @warea",
+  	description_small : "@w+2 @guncommons@s, @wreorder @swhen leaving @pportals",
   	description_large : "-",
   	spr_index         : 34,
   	tier              : 3
@@ -407,7 +407,7 @@
 #macro item_metal_plating item[? "metal"] // ITEM 39: STEEL PLATING
   item_metal_plating = {
     name              : "Metal Plating",
-  	description_small : "@s+@w2 @yarmor @sper @warea",
+  	description_small : "@s+@w2 @yarmor @swhen leaving @pportals",
   	description_large : "-",
   	spr_index         : 39,
   	tier              : 0
@@ -485,7 +485,7 @@
 #macro item_fel_rounds item[? "fel"] // ITEM 47: FEL ROUNDS
   item_fel_rounds = {
     name              : "FEL ROUNDS",
-  	description_small : "@sBullets @smake @wenemies explde @sinto @bfel fire",
+  	description_small : "@yprojectiles @smake @wenemies explde @sinto @bfel fire",
   	description_large : "-",
   	spr_index         : 47,
   	tier              : 3
@@ -493,7 +493,7 @@
 
 #macro item_molding_clay item[? "clay"] // ITEM 48: MOLDING CLAY
   item_molding_clay = {
-    name              : "MODLING CLAY",
+    name              : "MOLDING CLAY",
   	description_small : "@wChests @scontain @wdouble @sor@w nothing",
   	description_large : "-",
   	spr_index         : 48,
@@ -530,7 +530,7 @@
 #macro item_crystal_rounds item[? "crystal"] // ITEM 52: CRYSTAL ROUNDS
   item_crystal_rounds = {
     name              : "CRYSTAL ROUNDS",
-  	description_small : "@wSharper, Faster, @bpricier @sbullets",
+  	description_small : "@better @sand @bpricier @yprojectiles",
   	description_large : "-",
   	spr_index         : 52,
   	tier              : 3
@@ -694,7 +694,7 @@
 #macro item_double_edge item[? "edge"] // ITEM 70: DOUBLE-EDGE
   item_double_edge = {
     name              : "DOUBLE-EDGE",
-    description_small : "@sDouble @wALL projectile @rdamage",
+    description_small : "@sDouble @wALL @yprojectile @rdamage",
     description_large : "-",
     spr_index         : 70,
     tier              : 3
@@ -721,7 +721,7 @@
 #macro item_medical_tweezers item[? "tweezers"] // ITEM 73: MEDICAL TWEEZERS
   item_medical_tweezers = {
     name              : "MEDICAL TWEEZERS",
-    description_small : "@gHeal @swhen entering a new @warea",
+    description_small : "@gHeal @swhen leaving @pportals",
     description_large : "-",
     spr_index         : 73,
     tier              : 0
