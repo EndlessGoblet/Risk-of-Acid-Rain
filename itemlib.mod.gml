@@ -727,6 +727,15 @@
     tier              : 0
   };
 
+#macro item_stone_dagger item[? "dagger"] // ITEM 74: STONE DAGGER
+  item_stone_dagger = {
+    name              : "STONE DAGGER",
+    description_small : "@sThe @wmore enemies, @sthe @wmore damage.",
+    description_large : "@sDeal @w+1% damage@d (x1.5 per stack) @sfor each @wenemy alive",
+    spr_index         : 74,
+    tier              : 0
+  };
+
 #define items_finalize()
   var keys = ds_map_keys(global.ItemDirectory),
       len  = array_length(keys),

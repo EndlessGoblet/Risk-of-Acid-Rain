@@ -572,7 +572,7 @@
 		{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				get_item(item[? "prize"], 1)
+				get_item(item[? "dagger"], 1)
 			}
 		}
 	}
@@ -1159,6 +1159,14 @@
 					friction /= (1 + (.12 * amount))
 					speed *= 1.15
 				}
+
+				//Stone Dagger
+				var amount = item_get_power("dagger")
+				if amount >= 1
+				{
+            	var bonus = 1 + ( instance_number(enemy) )*(amount / 2) / 100 // +1% damage per enemy, with 50% increase per stack
+				damage *= bonus
+				}	
 
 				//Gun God's Blessing
 				var amount = item_get_power("blessing")
@@ -2323,17 +2331,22 @@
 			var _nl = string_width(string_upper(global.PlayerItems[i].name))
 			draw_set_font(fntSmall)
 			var _dl = string_width(string_upper(global.PlayerItems[i].description_small)) - string_count("@",global.PlayerItems[i].description_small) * string_width("@@") + 3
+			if(button_check(0, "horn")) var _dl = string_width(string_upper(global.PlayerItems[i].description_large)) - string_count("@",global.PlayerItems[i].description_large) * string_width("@@") + 3
 			draw_set_font(fntM)
 			var _boxwidth = _nl if _dl > _nl _boxwidth = _dl
+			if(button_check(0, "horn")) var _boxwidth = _dl + 60
 
 			if point_in_rectangle(mouse_x, mouse_y, cx + (itemx * 21) - 20, cy + 44 + (20 * (line + 1)) - 18, cx + (itemx * 21), cy + 45 + (20 * (line + 1))) //description on hover
 			{
 				_hover = true;
 				var _biglength = clamp(cx + (itemx * 21) - 20, 0, view_xview + game_width - _boxwidth - 3)
-
-				draw_backdrop(_biglength - 1, cy + 55 + (20 * (maxline + 1)), _biglength - 2 + _boxwidth, cy + 54 + (20 * (maxline + 1)) + string_height(string_upper(global.PlayerItems[i].name)) + string_height(string_upper(global.PlayerItems[i].description_small)), string_upper(global.PlayerItems[i].name))
+				var _extraheight = 0
+				if(button_check	(0, "horn")) _extraheight = 8
+				draw_backdrop(_biglength - 1, cy + 55 + (20 * (maxline + 1)), _biglength - 2 + _boxwidth, cy + 54 + (_extraheight) + (20 * (maxline + 1)) + string_height(string_upper(global.PlayerItems[i].name)) + string_height(string_upper(global.PlayerItems[i].description_small)), string_upper(global.PlayerItems[i].name))
 				draw_set_font(fntSmall)
-				draw_text_nt(_biglength + 2, cy + 64 + (20 * (maxline + 1)), string_upper(global.PlayerItems[i].description_small))
+				if(button_check	(0, "horn")) draw_text_nt(_biglength + 2, cy + 64 + (20 * (maxline + 1)), string_upper(global.PlayerItems[i].description_large)) else {
+				draw_text_nt(_biglength + 2, cy + 64 + (20 * (maxline + 1)), string_upper(global.PlayerItems[i].description_small))	
+				}
 			}
 			draw_sprite_ext(global.sprItems, global.PlayerItems[i].spr_index, cx + (itemx * 21) - 1, cy + 45 + (20 * (line + 1)) - _hover, 1, 1, 0, merge_colour(c_black, c_white, .9 + _hover * .1), 1) //sprUltraLevel
 			draw_set_font(fntSmall)
