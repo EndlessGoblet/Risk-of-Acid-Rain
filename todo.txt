@@ -8,8 +8,6 @@
 
 * Overhaul armor visuals, perhaps pur them on the hp bars instead of next to them
 
-* Oasis Boss is really hard in the early game
-
 * Completely overhaul shrines
 
 * Exiting Scrapyard for the first time makes you enter Scrapyard again
@@ -30,3 +28,9 @@
 * Fix teleporter activation in scrapyards crashing the game sometimes
 
 * Add passive items/traits for each character
+
+* Box for mode descriptions does not fit the text correctly
+
+* Add items to the pause screen?
+
+* Recharge after boss is killed should be slower IMO, but increase enemy spawns from the teleporter in the meantime or something to keep the player interested

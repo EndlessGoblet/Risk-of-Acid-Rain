@@ -76,7 +76,7 @@
 	global.popoChance = 0;
 
 	global.CommonItems   = [item[? "info"]      , item[? "tweezers"], item[? "gumdrop"] , item[? "bandages"], item[? "fruit"]    , item[? "golden"] , item[? "rubber"]  , item[? "focus"]     , item[? "mush"]   , item[? "grease"] , item[? "boots"]   , item[? "chopper"] , item[? "locket"]   , item[? "metal"]  , item[? "mask"], item[? "dagger"]]
-	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"], item[? "fern"], item[? "accolade"]] //To-Do: Horror In a Bottle
+	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"], item[? "fern"], item[? "accolade"], item[? "magnet"]] //To-Do: Horror In a Bottle
 	global.RareItems     = [item[? "artifact"]  , item[? "slosher"] , item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"] , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]]
 	global.CursedItems   = [item[? "brooch"]    , item[? "heater"]  , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]		  , item[? "edge"]] // Todo: None
 	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "flask"]]
@@ -1097,124 +1097,6 @@
 			}
 		}
 
-	// On create effects go here
-	with instances_matching_ne(enemy, "roar_check_create", true)
-		{
-			roar_check_create = true;
-
-			//Binky
-			var amount = item_get_power("binky")
-			if amount >= 1
-			{
-				if roll_luck(4 + 3 * amount)
-				{
-					image_xscale /= 1.5
-					image_yscale /= 1.5
-					my_health /= 2.5
-					maxhealth /= 2.5
-				}
-			}
-
-			// Radiating Core
-			var amount = item_get_power("core")
-			if amount >= 1
-			{
-				raddrop += roll(amount);
-			}
-
-			if GameCont.level - global.StartLevel > 0
-			{
-				raddrop -= (GameCont.level - global.StartLevel)
-			}
-		}
-
-  // On projectile create effects go here
-	with instances_matching_ne(instances_matching_ne(projectile, "noproc", true), "roar_check_projectile", true)
-		{
-			roar_check_projectile = true;
-			if team = 2 // player projectiles
-			{
-				// Focus
-				var amount = item_get_power("focus")
-				if amount >= 1 && instance_exists(Player)
-				{
-					if point_in_teleporter(Player) = true extra_damage += .15 +.1 * amount
-				}
-
-				//Rubber Projectile
-				var amount = item_get_power("rubber")
-				if amount >= 1
-				{
-					if "extra_bounce" not in self extra_bounce = ceil(amount)
-				}
-
-				//Slosher
-				var amount = item_get_power("slosher")
-				if amount >= 1 && "sacred" not in self and "blessed" not in self
-				{
-					var direct = direction
-					repeat(roll(amount)) with instance_create(x, y, EnemyBullet2)
-					{
-						sacred = true;
-						damage = 2
-						motion_set(direct + random_range(-50, 50),16)
-						image_angle = direction
-						friction = random_range(1.5, 1.65)
-						var roll2 = random_range(0.5, 1)
-						image_xscale = roll2
-						image_yscale = roll2
-						team = Player.team;
-					}
-				}
-
-				//Bullet Grease
-				var amount = item_get_power("grease")
-				if amount >= 1
-				{
-					friction /= (1 + (.12 * amount))
-					speed *= 1.15
-				}
-
-				//Stone Dagger
-				var amount = item_get_power("dagger")
-				if amount >= 1
-				{
-            	var bonus = 1 + ( instance_number(enemy) )*(amount / 2) / 100 // +1% damage per enemy, with 50% increase per stack
-				damage *= bonus
-				}
-
-				//Gun God's Blessing
-				var amount = item_get_power("blessing")
-				if amount >= 1
-				{
-					if "blessed" not in self && "sacred" not in self
-					{
-						if roll_luck((1 - 1/(.15 * amount + 1))*100) with instance_create(x,y,object_index) // hyperbolic item stacking
-						{
-							motion_set(other.direction,other.speed*1.2)
-							image_angle = direction
-							team = other.team;
-							sprite_index = other.sprite_index
-							sound_play_pitch(sndPopgun, random_range(.8, 1.2))
-							sound_play_pitchvol(sndPopPop, random_range(.8, 1.2), .3)
-							blessed = 1
-						}
-						blessed = 1;
-					}
-				}
-			}
-			else // enemy projectiles
-			{
-				//Sabotage Tools
-				var amount = item_get_power("tools")
-				if amount >= 1
-				{
-					if roll_luck(clamp(8 * amount, 0, 40)){damage *= 2; team = Player.team
-					}
-				}
-			}
-		}
-
 	//Growth Fungus
 	var amount = item_get_power("fungus")
 	if amount >= 1 {
@@ -1366,7 +1248,7 @@
 	Player.firewoodCharge += (amount)
 	Player.firewoodKills++
 	}
-	with (Player) if my_health < lsthealth {
+	with (Player) if my_health < lsthealth && instance_number(Portal) == 0 {
 	repeat(Player.firewoodCharge) with instance_create(Player.x, Player.y, FlameShell) {
 	direction = random_range(1, 360)
 	speed = random_range(10, 15)
@@ -1607,6 +1489,20 @@
 		}
 	}
 
+	//Large Magnet
+	var amount = item_get_count("magnet");
+	with(SmallGenerator)
+	{
+		if amount >= 1 && mod_variable_get("mod", "main", "teleporter") == true && point_in_circle(Player.x, Player.y, x - 4, y, mod_variable_get("mod", "main", "radi")) {
+			with(Pickup){
+				if(object_index != WepPickup){
+					x += lengthdir_x(amount, point_direction(x,y,other.x,other.y));
+					y += lengthdir_y(amount, point_direction(x,y,other.x,other.y));
+				}
+			}
+		}
+	}
+
 	//Stat changes
 
 	if instance_exists(Player)
@@ -1641,6 +1537,128 @@
 
 	if instance_exists(Player) Player.lsthealth = Player.my_health
 
+	if !instance_exists(global.step){
+		global.step = script_bind_step(custom_step, 0);
+	}
+
+#define custom_step
+	// On create effects go here
+	with instances_matching_ne(enemy, "roar_check_create", true)
+		{
+			roar_check_create = true;
+
+			//Binky
+			var amount = item_get_power("binky")
+			if amount >= 1
+			{
+				if roll_luck(4 + 3 * amount)
+				{
+					image_xscale /= 1.5
+					image_yscale /= 1.5
+					my_health /= 2.5
+					maxhealth /= 2.5
+				}
+			}
+
+			// Radiating Core
+			var amount = item_get_power("core")
+			if amount >= 1
+			{
+				raddrop += roll(amount);
+			}
+
+			if GameCont.level - global.StartLevel > 0
+			{
+				raddrop -= (GameCont.level - global.StartLevel)
+			}
+		}
+
+    // On projectile create effects go here
+	with instances_matching_ne(instances_matching_ne(projectile, "noproc", true), "roar_check_projectile", true)
+		{
+			roar_check_projectile = true;
+			if team = 2 // player projectiles
+			{
+				// Focus
+				var amount = item_get_power("focus")
+				if amount >= 1 && instance_exists(Player)
+				{
+					if point_in_teleporter(Player) = true extra_damage += .15 +.1 * amount
+				}
+
+				//Rubber Projectile
+				var amount = item_get_power("rubber")
+				if amount >= 1
+				{
+					if "extra_bounce" not in self extra_bounce = ceil(amount)
+				}
+
+				//Slosher
+				var amount = item_get_power("slosher")
+				if amount >= 1 && "sacred" not in self and "blessed" not in self
+				{
+					var direct = direction
+					repeat(roll(amount)) with instance_create(x, y, EnemyBullet2)
+					{
+						sacred = true;
+						damage = 2
+						motion_set(direct + random_range(-50, 50),16)
+						image_angle = direction
+						friction = random_range(1.5, 1.65)
+						var roll2 = random_range(0.5, 1)
+						image_xscale = roll2
+						image_yscale = roll2
+						team = Player.team;
+					}
+				}
+
+				//Bullet Grease
+				var amount = item_get_power("grease")
+				if amount >= 1
+				{
+					friction /= (1 + (.12 * amount))
+					speed *= 1.15
+				}
+
+				//Stone Dagger
+				var amount = item_get_power("dagger")
+				if amount >= 1
+				{
+            	var bonus = 1 + ( instance_number(enemy) )*(amount / 2) / 100 // +1% damage per enemy, with 50% increase per stack
+				damage *= bonus
+				}
+
+				//Gun God's Blessing
+				var amount = item_get_power("blessing")
+				if amount >= 1
+				{
+					if "blessed" not in self && "sacred" not in self
+					{
+						if roll_luck((1 - 1/(.15 * amount + 1))*100) with instance_create(x,y,object_index) // hyperbolic item stacking
+						{
+							motion_set(other.direction,other.speed*1.2)
+							image_angle = direction
+							team = other.team;
+							sprite_index = other.sprite_index
+							sound_play_pitch(sndPopgun, random_range(.8, 1.2))
+							sound_play_pitchvol(sndPopPop, random_range(.8, 1.2), .3)
+							blessed = 1
+						}
+						blessed = 1;
+					}
+				}
+			}
+			else // enemy projectiles
+			{
+				//Sabotage Tools
+				var amount = item_get_power("tools")
+				if amount >= 1
+				{
+					if roll_luck(clamp(8 * amount, 0, 40)){damage *= 2; team = Player.team
+					}
+				}
+			}
+		}
 
 /// ITEM-RELATED FUNCTIONS ///
 
@@ -2312,6 +2330,7 @@
 	}
 
 #define draw_pause
+	draw_set_visible_all(true);
 	draw_armor(view_xview_nonsync, view_yview_nonsync)
 
 	// dont make item collection draw when not on the main pause screen

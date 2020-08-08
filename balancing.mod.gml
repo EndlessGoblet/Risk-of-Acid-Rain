@@ -20,3 +20,10 @@ if (GameCont.area = 2) with (FrogQueenBall) if "Balanced" not in self {
     Balanced = true;
     if (roll > 1) instance_delete(self);
 }
+
+with (OasisBoss) {
+	with(projectile) if "Balanced" not in self {
+		Balanced = true;
+		if(creator == other){speed /= 2; if(!irandom(2)){instance_destroy()}}
+	}
+}

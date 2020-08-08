@@ -811,6 +811,15 @@
     spr_index         : 74,
     tier              : 0
   };
+  
+#macro item_large_magnet item[? "magnet"]
+item_large_magnet = {
+  name              : "LARGE MAGNET",
+	description_small : "@sPulls items @wtowards @wthe teleporter",
+	description_large : "-",
+	spr_index         : 75,
+	tier              : 1
+};
 
 #define items_finalize()
   var keys = ds_map_keys(global.ItemDirectory),
