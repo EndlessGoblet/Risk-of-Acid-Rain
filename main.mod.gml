@@ -241,14 +241,14 @@
 	if (GameCont.area == 2) DWall = 8
 	if (GameCont.area == 3) DWall = 4
 	DWall = round(DWall*m)
-	if (GameCont.area == 2) && DWall < 2 DWall = 2 //Scrapyard always has at least 2 traps
+	if (GameCont.area == 3) && DWall < 2 DWall = 2 //Scrapyard always has at least 2 traps
 	for(i = 1; i < DWall; i++) {
-	var variety_y = round(random_range(1,13))
-	var variety_x = round(random_range(1,23))
-	_x = round(random_range(9808 + 16*variety_x,9808 + 16*variety_x))
-	_y = round(random_range(9824 + 16*variety_y, 9824 + 16*variety_y)) //Draw random walls
-	instance_create(_x, _y, Wall)
-	if (GameCont.area = 3) instance_create(_x, _y, Trap)
+		var variety_y = round(random_range(1,13))
+		var variety_x = round(random_range(1,23))
+		_x = round(random_range(9808 + 16*variety_x,9808 + 16*variety_x))
+		_y = round(random_range(9824 + 16*variety_y, 9824 + 16*variety_y)) //Draw random walls
+		instance_create(_x, _y, Wall)
+		if (GameCont.area = 3) instance_create(_x, _y, Trap)
 	}
 	//creating props
 	var DProp = 3;
@@ -589,26 +589,12 @@
 			case 103: background_color = 15921390; break;
 			case 104: background_color =  2333951; break;
 		}
-
-		if GameCont.subarea = 2{
-			if GameCont.area = 3{
-				GameCont.area = 4;
-			}
-			if GameCont.area = 5{
-				GameCont.area = 6	;
-			}
-			if GameCont.area = 7{
-				GameCont.area = 1	;
-				GameCont.loops++;
-			}
-			GameCont.subarea = 1;
-		}
 	}
 	if GameCont.area = 100 && Player.mask_index = mskNone{
 		GameCont.area = GameCont.lastarea++;
-		if GameCont.aera > 100 GameCont.aera -= 100
+		if GameCont.area > 100 GameCont.area -= 100
 		if GameCont.area = 8{
-			GameCont.aera = 1;
+			GameCont.area = 1;
 			GameCont.loops++;
 		}
 	}
@@ -678,7 +664,7 @@
 		 if instance_exists(Player)
 		 {
 			 if (Player.portalTimer > 0) Player.portalTimer--
-			 if (Player.portalTimer = 0) && global.BossesLeft == 0
+			 if (Player.portalTimer <= 0) && global.BossesLeft == 0
 			 {
 				 var f_ = instance_find(Floor, irandom(instance_number(Floor) - 1));
 				 GameCont.subarea = 3;

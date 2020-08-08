@@ -3,7 +3,7 @@
 * Level generation:
   - Fix cursed chests spawning without meeting requirements
   - Fix Chests spawning where they shouldnt
-  - redo shrine poulation
+  - redo shrine poulation (make sure they can't spawn on the teleporter)
   - add level specific generation bias, like only large or gold chests in palace
 
 * Overhaul armor visuals, perhaps pur them on the hp bars instead of next to them
@@ -31,6 +31,8 @@
 
 * Box for mode descriptions does not fit the text correctly
 
-* Add items to the pause screen?
+* Recharge after boss is killed should be slower IMO (half speed?), but increase enemy spawns from the teleporter in the meantime or something to keep the player interested
 
-* Recharge after boss is killed should be slower IMO, but increase enemy spawns from the teleporter in the meantime or something to keep the player interested
+* Boss end sound loops
+
+* Should the teleporter be hittable? The hitbox feels odd rn

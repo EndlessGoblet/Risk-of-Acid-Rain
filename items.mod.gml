@@ -8,6 +8,7 @@
 	global.coinGet = 0;
 	global.forceSave = 0;
 	global.cheats = false;
+	global.step = -4;
 
 	global.sprBigInfo      = false;
 
@@ -97,6 +98,22 @@
 			global.newLevel = 0;
 			mod_variable_set("mod", "main", "AreaStart", true);
 			level_start();
+		}
+		if(instance_exists(Portal) && Portal.timer == 0 || instance_exists(BigPortal) && BigPortal.timer == 0){
+			if GameCont.area = 1{
+				GameCont.subarea = 3;
+			}
+			if GameCont.area = 3{
+				GameCont.subarea = 3;
+			}
+			if GameCont.area = 5{
+				GameCont.subarea = 3;
+			}trace(GameCont.area);
+			if GameCont.area = 7{
+				GameCont.area = 0;
+				GameCont.subarea = 1;
+				GameCont.loops++;
+			}
 		}
 		var hadGenCont = global.hasGenCont;
 		global.hasGenCont = instance_exists(GenCont);
@@ -1502,6 +1519,13 @@
 			}
 		}
 	}
+	
+	// Focus
+	var amount = item_get_power("focus")
+	if amount >= 1 && instance_exists(Player)
+	{
+		if point_in_teleporter(Player) = true extra_damage += .15 +.1 * amount
+	}
 
 	//Stat changes
 
@@ -1579,13 +1603,6 @@
 			roar_check_projectile = true;
 			if team = 2 // player projectiles
 			{
-				// Focus
-				var amount = item_get_power("focus")
-				if amount >= 1 && instance_exists(Player)
-				{
-					if point_in_teleporter(Player) = true extra_damage += .15 +.1 * amount
-				}
-
 				//Rubber Projectile
 				var amount = item_get_power("rubber")
 				if amount >= 1
@@ -2848,12 +2865,12 @@
 		grow_speed *= .86
 		image_yscale = image_xscale / 2
 	}
-	if lifetime > 0 lifetime-- else instance_destroy()
+	if lifetime > 0 lifetime-- else instance_destroy();
 
-	#define bulb_step
+#define bulb_step
 	if lifetime > 0{lifetime -= current_time_scale}else{instance_delete(self)}
 
-	#define bulb_hit
+#define bulb_hit
 	if projectile_canhit(other) && instance_is(other, enemy) with other
 	{
 		my_health -= other.damage;
