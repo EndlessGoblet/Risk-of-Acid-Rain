@@ -1,4 +1,3 @@
-
 #define init
   _init()
   items_finalize()
@@ -10,6 +9,9 @@
       description_small : "THIS SHOULDNT APPEAR",
   }
 
+#macro c_stack  merge_color(c_dkgray, c_aqua, .5);
+#macro c_speed  merge_color(c_white , c_aqua, .5);
+#macro c_debuff merge_color(c_orange,  c_red,.35);
 #macro item global.ItemDirectory
 
   // ITEM 0: NO ITEM (JUST IN CASE)
@@ -18,7 +20,8 @@
     name              : "NO ITEM", // item name
   	description_small : "THIS SHOULDNT APPEAR", // item description for the popup
   	description_large : "THIS SHOUDLN'T APPEAR#IF IT DOES#PLEASE CONTACT GOBLET ABOUT IT", // more detailed description for the pause menu
-  	spr_index         : 0,  // index of the frame of the sprite for items
+    description_width : 0, // width of the large descripton, relevant letters
+    spr_index         : 0,  // index of the frame of the sprite for items
   	tier              : -1,  // -1 = untiered, 0 = common, 1 = uncommon, 2 = rare, 3 = cursed, 4 = unique, 5 = garbage, 6 = purified
     key               : "none"
 
@@ -29,7 +32,8 @@
   item_ancient_armor_plate = {
     name              : "Ancient Armor Plate",
   	description_small : "@s+@w2 @yarmor@s, less @wcontact damage @staken",
-  	description_large : "@sTake @w50% @d(+50 per stack) from @wtouch damage",
+  	description_large : `@sGain @w2 @yArmor@s,#reduce @wtouch damage @sby @w50%@(color:${c_stack})(+50% per stack)`,
+    description_width : 42,
   	spr_index         : 1,
   	tier              : 1
 
@@ -40,7 +44,8 @@
     name              : "Inside Information",
   	description_small : "@bIDPD @sare @wweaker @sand drop @wmore",
   	description_large : "@sIncreases @wdamage @sdealt to @bIDPD @smembers by @w20% @d(+20% per stack)#@sand gives them a @w25% @d(+25% per stack)@schance for them to drop an @yammo pickup",
-  	spr_index         : 2,
+    description_width : 0,
+    spr_index         : 2,
   	tier              : 0
 
   };
@@ -50,6 +55,7 @@
     name              : "Horror in a bottle",
   	description_small : "@wEnemies @screate @gmini horrors @son @wdeath",
   	description_large : "finish this item mr. gobletto",
+    description_width : 0,
   	spr_index         : 3,
   	tier              : 1
 
@@ -60,7 +66,8 @@
     name              : "Mechanical Lens",
   	description_small : "@yprojectiles @sare @wslower @sand @phome",
   	description_large : "@sDecreases @wprojectile speed @sby @w50%#@wBullets @phome @sinto @wenemies @s up to @w16 meters @d(+16 meters per stack) away",
-  	spr_index         : 4,
+    description_width : 0,
+    spr_index         : 4,
   	tier              : 1
 
   };
@@ -69,8 +76,9 @@
   item_incendiary_rounds = {
     name              : "Incendiary Rounds",
   	description_small : "@wEnemies @scatch @rfire @supon taking @wdamage",
-  	description_large : "@wBullets @sput @wenemies @son @rFire, dealing @w0.04 damage @d(+0.04 damage per stack)",
-  	spr_index         : 5,
+  	description_large : `@sYour @yprojectiles @sapply the @rburning @(color:${c_debuff})debuff@s,#@rburning @wenemies @stake @w9.45@(color:${c_stack})(+7.55 per stack) @rdamage`,
+    description_width : 49,
+    spr_index         : 5,
   	tier              : 1
 
   };
@@ -80,7 +88,8 @@
     name              : "Pre-War Light Bulb",
   	description_small : "@sGain a damaging @waura of light",
   	description_large : "@wEnemies 25 meters @d(+10.5 meters per stack)@saway from you#take @w0.1 damage @d(+0.05 damage per stack)",
-  	spr_index         : 6,
+    description_width : 0,
+    spr_index         : 6,
   	tier              : 1
 
   };
@@ -88,8 +97,9 @@
 #macro item_old_bandages item[? "bandages"] // ITEM 7: OLD BANDAGES, FORMERLY RADI GUMDROP
   item_old_bandages = {
     name              : "Old Banages",
-  	description_small : "+1 @rmax HP",
-  	description_large : "-",
+  	description_small : "@s+@w1 @rmax HP",
+  	description_large : `@sGain @w1@(color:${c_stack})(+1 per stack) @rmax HP`,
+    description_width : 27,
   	spr_index         : 7,
   	tier              : 0
 
@@ -99,8 +109,9 @@
   item_occult_artifact = {
     name              : "Occult Artifact",
   	description_small : "@wEnemies @sexplode in @rblood @son @wdeath",
-  	description_large : "@wEnemies @shave a chance of @w50% @d(+50% per stack) @sto create @w3 @rBLOOD EXPLOSIONS",
-  	spr_index         : 8,
+  	description_large : `@wEnemies @shave a chance of @w50%@(color:${c_stack})(+50% per stack) @sto create a @rBLOOD EXPLOSION`,
+    description_width : 72,
+    spr_index         : 8,
   	tier              : 2
 
   };
@@ -109,7 +120,8 @@
   item_slosher = {
     name              : "Slosher",
   	description_small : "@wShoot @sadditional @wshots",
-  	description_large : "@sAll your @yprojectiles @sshoot @w2 @d(+2 per stack) @g slosher pelletes @s dealing @w1 damage @seach",
+  	description_large : `@sAll your @yprojectiles @sshoot @w2@(color:${c_stack})(+2 per stack) @gslosher pellets`,
+    description_width : 58,
   	spr_index         : 9,
   	tier              : 2
 
@@ -119,7 +131,8 @@
   item_growth_fungus = {
     name              : "Growth Fungus",
   	description_small : "@wstronger@s, larger @yprojectiles",
-  	description_large : "kinda gave up starting here since its not really used sorry#-Karmelyth, 2019",
+  	description_large : `@sIncreases @rdamage @sby @w50%@s,#@wprojectile size @sby @w20%@(color:${c_stack})(+20% per stack)@s,#@sand @wprojectile speed @sby @w10%`,
+    description_width : 39,
   	spr_index         : 10,
   	tier              : 2
 
@@ -130,6 +143,7 @@
     name              : "R-Wing",
   	description_small : "@sTake less @wdamage @sfrom @wheavy hits",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 11,
   	tier              : 2
 
@@ -140,6 +154,7 @@
     name              : "Radiated Fruit",
   	description_small : "@gRads @smay @gheal @syou",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 12,
   	tier              : 0
 
@@ -149,7 +164,8 @@
   item_golden_shot = {
     name              : "Golden Shot",
   	description_small : "@sChance to shoot @wstrong @yprojectiles",
-  	description_large : "-",
+  	description_large : "-1-1-1-1-1-1-1-1-1-1-1-1-1-1",
+    description_width : 0,
   	spr_index         : 13,
   	tier              : 0
 
@@ -160,6 +176,7 @@
     name              : "Sabotage Tools",
   	description_small : "@wEnemy @yprojectiles @ssometimes get @wjammed",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 14,
   	tier              : 2
 
@@ -168,8 +185,9 @@
 #macro item_bandit_mask item[? "mask"] // ITEM 15: BANDIT MASK
   item_bandit_mask = {
     name              : "Bandit Mask",
-  	description_small : "@sbecome @winvisible @swhen leaving @pportals",
-  	description_large : "-",
+  	description_small : "@sbecome @wstealthed @swhen leaving @pportals",
+  	description_large : `@sbecome @wstealthed @sfor @w5@(color:${c_stack})(+4 per stack) @wseconds @swhen leaving @pportals`,
+    description_width : 65,
   	spr_index         : 15,
   	tier              : 0
 
@@ -178,8 +196,9 @@
 #macro item_bloody_lust item[? "lust"] // ITEM 16: BLOODY LUST
   item_bloody_lust = {
     name              : "Bloody Lust",
-  	description_small : "@sGo @rBerserk @swhen taking @wdamage",
+  	description_small : "@sGo @rBerserk @swhen taking @rdamage",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 16,
   	tier              : 1
 
@@ -189,8 +208,9 @@
   item_rubber_rounds = {
     name              : "Rubber Rounds",
   	description_small : "@yprojectiles @wbounce @soff of @wwalls",
-  	description_large : "-",
-  	spr_index         : 17,
+  	description_large : `@sAll of your @yprojectiles @wbounce @sof off walls @w1@(color:${c_stack})(+1 per stack) @stime`,
+    description_width : 64,
+    spr_index         : 17,
   	tier              : 0
 
   };
@@ -200,6 +220,7 @@
     name              : "Liquid Nitrogen",
   	description_small : "@sGain an @waura @sthat deletes @yprojectiles",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 18,
   	tier              : 1
   };
@@ -208,8 +229,9 @@
   item_focus = {
     name              : "Focus",
   	description_small : "@wDamage up @snear active @rteleporters",
-  	description_large : "-",
-  	spr_index         : 19,
+  	description_large : `@sIncrease @rteleporter @wrange @sby @w10%@s,#increase @rdamage @sby @w25%@(color:${c_stack})(+10% per stack)`,
+    description_width : 38,
+    spr_index         : 19,
   	tier              : 0
 
   };
@@ -219,6 +241,7 @@
     name              : "Binky",
   	description_small : "@wEnemies @smay turn into @bbabies",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 20,
   	tier              : 1
 
@@ -228,7 +251,8 @@
   item_cryo_rounds = {
     name              : "Cryo Rounds",
   	description_small : "@wEnemies @sget @bstunned @supon taking @wdamage",
-  	description_large : "-",
+  	description_large : `@sYour @yprojectiles @sapply the @bfrozen @(color:${c_debuff})debuff @sfor @w1@(color:${c_stack})(+1 per stack) @wsecond@s,#@bfrozen @wenemies @sact more slowly`,
+    description_width : 68,
   	spr_index         : 21,
   	tier              : 1
 
@@ -238,7 +262,8 @@
   item_forgotten_gift = {
     name              : "Forgotten Gift",
   	description_small : "+@w3 @scommon @witems!",
-  	description_large : "-",
+  	description_large : "@sdrops @w3 common @sitems when picked up",
+    description_width : 35,
   	spr_index         : 22,
   	tier              : 1
 
@@ -248,7 +273,8 @@
   item_mini_mush = {
     name              : "Mini-Mush",
   	description_small : "@sOne makes you @bsmall",
-  	description_large : "-",
+  	description_large : `Gain @w2 @(color:${c_speed})speed@s,#reduce @wsize @sby @w25%@(color:${c_stack})(-25% per stack)`,
+    description_width : 34,
   	spr_index         : 23,
   	tier              : 0
 
@@ -259,6 +285,7 @@
     name              : "Perfect Prize",
   	description_small : "@sTake no @wdamage@s, get @yrewarded",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 24,
   	tier              : 2
 
@@ -269,6 +296,7 @@
     name              : "Gun God's Blessing",
   	description_small : "@sOccasional free @ypop pops",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 25,
   	tier              : 2
 
@@ -278,7 +306,8 @@
   item_gun_boots = {
     name              : "Gun Boots",
   	description_small : "@wPanic run @safter getting @whit",
-  	description_large : "-",
+  	description_large : `@sGain @w1 @(color:${c_speed})speed@s,#when @whit @sgain @w4 @(color:${c_speed})speed @sand shoot @yshells @sfor @w2@(color:${c_stack})(+.5 per stack) @wseconds`,
+    description_width : 67,
   	spr_index         : 26,
   	tier              : 0
 
@@ -287,8 +316,9 @@
 #macro item_teleporter_siphon item[? "siphon"] // ITEM 27: TELEPORTER SIPHON
   item_teleporter_siphon = {
     name              : "Teleporter Siphon",
-  	description_small : " @wReload @sfaster @snear active @rteleporters",
-  	description_large : "-",
+  	description_small : "@wReload @sfaster @snear active @rteleporters",
+  	description_large : `@sIncrease @rteleporter @wrange @sby @w10%@s,#increase @wreload speed @sby @w30%@(color:${c_stack})(+20% per stack)`,
+    description_width : 44,
   	spr_index         : 27,
   	tier              : 1
 
@@ -297,8 +327,9 @@
 #macro item_bullet_grease item[? "grease"] // ITEM 28: BULLET GREASE
   item_bullet_grease = {
     name              : "Bullet Grease",
-  	description_small : "@sDecreases @wprojectile friction",
+  	description_small : "@sDecreases @yprojectile @wfriction",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 28,
   	tier              : 0
 
@@ -307,8 +338,9 @@
 #macro item_ammo_extractor item[? "extractor"] // ITEM 29: AMMO EXTRACTOR
   item_ammo_extractor = {
     name              : "Ammo Extractor",
-  	description_small : "@wEnemies @sdrop @yinfammo packs",
+  	description_small : "@wEnemies @smay drop @yinfammo packs",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 29,
   	tier              : 2
 
@@ -319,6 +351,7 @@
     name              : "Firewood",
   	description_small : "@sKilling gains @ycharge@s, release @ycharge @son @whit",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 30,
   	tier              : 1
 
@@ -329,6 +362,7 @@
     name              : "Chopper",
   	description_small : "@wEnemies @sshoot out @wchoppers @son @wdeath",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 31,
   	tier              : 0
 
@@ -339,6 +373,7 @@
     name              : "Broken Locket",
   	description_small : "@wEnemies @sdrop @wrusty chests @son @wdeath",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 32,
   	tier              : 0
 
@@ -348,7 +383,8 @@
   item_anomal_energy = {
     name              : "Anomal Energy",
   	description_small : "@rTeleporters @sfinish @w10% earlier",
-  	description_large : "-",
+  	description_large : `@rTeleporters @sare fully @wcharged @sat @w90%@(color:${c_stack})(-10% per stack)@s,#finishing the @rteleporter @wevent kills @sall @wenemies`,
+    description_width : 53,
   	spr_index         : 33,
   	tier              : 4
 
@@ -358,17 +394,18 @@
   item_chaotic_brooch = {
     name              : "Chaotic Brooch",
   	description_small : "@w+2 @guncommons@s, @wreorder @swhen leaving @pportals",
-  	description_large : "-",
+  	description_large : `@sdrops @w2 @guncommon @sitems when picked up,#@wreorder @syour @witems @swhen leaving @pportals`,
+    description_width : 39,
   	spr_index         : 34,
   	tier              : 3
-
   };
 
 #macro item_soulful_heater item[? "heater"] // ITEM 35: SOULFUL HEATER
   item_soulful_heater = {
     name              : "Soulful Heater",
   	description_small : "@sTurn 3 @rmax HP @sinto @w2 @ypermanent armor",
-  	description_large : "-",
+  	description_large : `@sLose @w3@(color:${c_stack})(+3 per stack) @rmax HP@s,#Gain @w2@(color:${c_stack})(+2 per stack) @ypermanent armor`,
+    description_width : 36,
   	spr_index         : 35,
   	tier              : 3
 
@@ -378,7 +415,8 @@
   item_lucky_coin = {
     name              : "Lucky Coin",
   	description_small : "@gLuck @sis on your side",
-  	description_large : "-",
+  	description_large : `@sGain @w1@(color:${c_stack})(+1 per stack) @gluck`,
+    description_width : 25,
   	spr_index         : 36,
   	tier              : 1
 
@@ -387,8 +425,9 @@
 #macro item_glowing_fern item[? "fern"] // ITEM 37: GLOWING FERN
   item_glowing_fern = {
     name              : "Glowing Fern",
-  	description_small : "@wEnemies @sdrop @wstealth packs",
+  	description_small : "@wEnemies @smay drop @wstealth packs",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 37,
   	tier              : 1
 
@@ -399,6 +438,7 @@
     name              : "Hard Times",
   	description_small : "@sEverything is more @wdangerous",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 38,
   	tier              : 4
 
@@ -408,7 +448,8 @@
   item_metal_plating = {
     name              : "Metal Plating",
   	description_small : "@s+@w2 @yarmor @swhen leaving @pportals",
-  	description_large : "-",
+  	description_large : `@sGain @w2@(color:${c_stack})(+2 per stack) @yarmor @swhen leaving @pportals`,
+    description_width : 47,
   	spr_index         : 39,
   	tier              : 0
 
@@ -418,7 +459,8 @@
   item_cracked_gem = {
     name              : "Cracked Gem",
   	description_small : "@sYour @gluck @sis fluctuating",
-  	description_large : "At the start of an area, gain +5 or -5 luck (+/-2 per stack)",
+  	description_large : `@sAt the start of an @warea@s, gain @wOR @sloose @w5 @gluck@(color:${c_stack})(+/-2 per stack)`,
+    description_width : 66,
   	spr_index         : 40,
   	tier              : 3
 
@@ -429,6 +471,7 @@
     name              : "CELESTEEL",
   	description_small : "@s+@w5 @yarmor@s, chance to not lose @yarmor",
   	description_large : "@sGain 5 @warmor @son pickup, and have a small chance to not lose armor upon being hit",
+    description_width : 0,
   	spr_index         : 41,
   	tier              : 1
 
@@ -438,7 +481,8 @@
   item_scrap_missile = {
     name              : "SCRAP MISSILE",
   	description_small : "@s+@w8 @yarmor@s, scale @wdamage @swith @yarmor",
-  	description_large : "-",
+  	description_large : `@sGain @w8 @yArmor@s,#Increase @rdamage @sby @w7.5%@(color:${c_stack})(+2.5% per stack) @sper @yarmor`,
+    description_width : 50,
   	spr_index         : 42,
   	tier              : 2
 
@@ -447,8 +491,9 @@
 #macro item_mercenary_canteen item[? "canteen"] // ITEM 43: MERC'S CANTEEN
   item_mercenary_canteen = {
     name              : "MERC'S CANTEEN",
-  	description_small : "@wEnemies @sdrop @yarmor packs",
+  	description_small : "@wEnemies @smay drop @yarmor packs",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 43,
   	tier              : 1
 
@@ -458,7 +503,8 @@
   item_injury = {
     name              : "INJURY",
   	description_small : "@s-@w1 @rmax HP",
-  	description_large : "-",
+  	description_large : `@sLose @w1@(color:${c_stack})(+1 per stack) @rmax HP`,
+    description_width : 27,
   	spr_index         : 44,
   	tier              : 4
 
@@ -469,6 +515,7 @@
     name              : "BACKUP HEART",
   	description_small : "@sPrevent @wdeath @sonce",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 45,
   	tier              : 2
   };
@@ -478,6 +525,7 @@
     name              : "SPENT HEART",
   	description_small : "@sIt's all used up",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 46,
   	tier              : 5
   };
@@ -487,6 +535,7 @@
     name              : "FEL ROUNDS",
   	description_small : "@yprojectiles @smake @wenemies explde @sinto @bfel fire",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 47,
   	tier              : 3
   };
@@ -495,7 +544,8 @@
   item_molding_clay = {
     name              : "MOLDING CLAY",
   	description_small : "@wChests @scontain @wdouble @sor@w nothing",
-  	description_large : "-",
+  	description_large : `@wItems @shave a @w1 @sin @w2@(color:${c_stack})(+1 per stack)@schance of#giving you @w1@(color:${c_stack})(+1 per stack) @Wextra @scopy,#otherwise @witems @sgive you @wnothing`,
+    description_width : 42,
   	spr_index         : 48,
   	tier              : 3
   };
@@ -505,6 +555,7 @@
     name              : "NOTHING",
   	description_small : "@sIt's nothing",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 49,
   	tier              : 5
   };
@@ -514,6 +565,7 @@
     name              : "METAFILLINGS",
   	description_small : "@yPickups @sare @yworth @w50% @smore",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 50,
   	tier              : 2
   };
@@ -522,7 +574,8 @@
   item_small_accolade = {
     name              : "SMALL ACCOLADE",
   	description_small : "@gHeal @swhen using @wshrines",
-  	description_large : "-",
+  	description_large : `@GHeal @w2@(color:${c_stack})(+2 per stack) @swhen activating @wshrines`,
+    description_width : 44,
   	spr_index         : 51,
   	tier              : 1
   };
@@ -532,6 +585,7 @@
     name              : "CRYSTAL ROUNDS",
   	description_small : "@better @sand @bpricier @yprojectiles",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 52,
   	tier              : 3
   };
@@ -541,6 +595,7 @@
     name              : "DEATH'S SCYTHE",
   	description_small : "@sDegernate @rHP, @skilling @gheals you",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 53,
   	tier              : 3
   };
@@ -550,6 +605,7 @@
     name              : "SHARP DISC",
   	description_small : "@wEnemies @sshoot @wdiscs @son @wdeath",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 54,
   	tier              : 3
   };
@@ -559,6 +615,7 @@
     name              : "CURSED COIN",
   	description_small : "@sAmount of @pcursed coins @sgotten this run",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 55,
   	tier              : 5
   };
@@ -568,6 +625,7 @@
     name              : "SARKORA",
   	description_small : "@s+@w50% item power@s, -@w25% @gmutation @wpower",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 56,
   	tier              : 3
   };
@@ -577,6 +635,7 @@
     name              : "PAPORA",
   	description_small : "@s+@w50% @gmutation @wpower@s, -@w25% item power",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 57,
   	tier              : 3
   };
@@ -586,6 +645,7 @@
     name              : "FAUX COIN",
   	description_small : "@dCheaters@s get @wfake coins",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 58,
   	tier              : 5
   };
@@ -595,6 +655,7 @@
     name              : "RADI GUMDROP",
   	description_small : "@sChance for @grads @sto turn into @gchunks",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 59,
   	tier              : 0
 
@@ -605,6 +666,7 @@
     name              : "IDOL PARAGON",
   	description_small : "@wShrines @sare more @wpowerful",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 60,
   	tier              : 1
 
@@ -615,6 +677,7 @@
     name              : "KALIDOS",
   	description_small : "@s+@w50% item power",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 61,
   	tier              : 6
   };
@@ -624,6 +687,7 @@
     name              : "KALIAXI",
   	description_small : "@s+@w50% @gmutation @wpower",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 62,
   	tier              : 6
   };
@@ -633,6 +697,7 @@
     name              : "PRISMATIC KEY",
   	description_small : "@sFragile",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 63,
   	tier              : 5
   };
@@ -642,6 +707,7 @@
     name              : "BROKEN KEY",
   	description_small : "@sBroken, useless",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 64,
   	tier              : 5
   };
@@ -651,6 +717,7 @@
     name              : "VILE FLASK",
   	description_small : "@sApply @gblight @swith @gtoxic gas",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 65,
   	tier              : 4
   };
@@ -659,17 +726,19 @@
   item_quartz_flower = {
     name              : "QUARTZ FLOWER",
   	description_small : "@wall stats @sup, @wbreaks @son @whit",
-  	description_large : "-",
-  	spr_index         : 66,
+    description_large : `@sGain @w2 @(color:${c_speed})speed@s,#@w200%@(color:${c_stack})(+200% per stack) @rdamage@s,#@w30%@(color:${c_stack})(+30% per stack) @wreload speed@s,#@w60%@(color:${c_stack})(+60% per stack) @yaccuracy @s,#@w2@(color:${c_stack})(+2 per stack) @rmax HP@s,#@w1@(color:${c_stack})(+1 per stack) @gluck`,
+    description_width : 33,
+    spr_index         : 66,
   	tier              : 2
   };
 
 #macro item_broken_quartz_flower item[? "spent flower"] // ITEM 67: BROKEN QUARTZ FLOWER
   item_broken_quartz_flower = {
     name              : "BROKEN FLOWER",
-  	description_small : "@sUseless, @wreturns @sfixed @wnext stage",
+  	description_small : "@sUseless, @wreturns @sfixed next @warea",
   	description_large : "-",
-  	spr_index         : 67,
+    description_width : 0,
+    spr_index         : 67,
   	tier              : 5
   };
 
@@ -678,6 +747,7 @@
     name              : "DIGITAL SHIELD",
   	description_small : "@sGain a rechargable @bshield",
   	description_large : "-",
+    description_width : 0,
   	spr_index         : 68,
   	tier              : 1
   };
@@ -687,6 +757,7 @@
     name              : "NUCLEAR EXHAUST",
     description_small : "@sLose @grads @sinstead of @rhealth",
     description_large : "-",
+    description_width : 0,
     spr_index         : 69,
     tier              : 3
   };
@@ -695,7 +766,8 @@
   item_double_edge = {
     name              : "DOUBLE-EDGE",
     description_small : "@sDouble @wALL @yprojectile @rdamage",
-    description_large : "-",
+    description_large : `@sIncrease @wAll @yprojectile @rdamage @sby @w100%@(color:${c_stack})(+100% per stack)`,
+    description_width : 55,
     spr_index         : 70,
     tier              : 3
   };
@@ -704,16 +776,18 @@
   item_radiating_core = {
     name              : "RADIATING CORE",
     description_small : "@s+@w1 @grad @sper @wenemy",
-    description_large : "-",
+    description_large : `@wEnemies @sdrop @w1@(color:${c_stack})(+1 per stack) @smore @grad`,
+    description_width : 39,
     spr_index         : 71,
     tier              : 4
   };
 
 #macro item_sugilith_fragment item[? "fragment"] // ITEM 72: SUGILITH FRAGMENT
   item_sugilith_fragment = {
-    name              : "SUGILITH FRAGMENTS",
-    description_small : "@s+@w1 @rmax HP",
-    description_large : "-",
+    name              : "SUGILITH FRAGMENT",
+    description_small : "@s+@w4 @rmax HP",
+    description_large : `@sGain @w4@(color:${c_stack})(+1 per stack) @rmax HP`,
+    description_width : 27,
     spr_index         : 72,
     tier              : 4
   };
@@ -722,7 +796,8 @@
   item_medical_tweezers = {
     name              : "MEDICAL TWEEZERS",
     description_small : "@gHeal @swhen leaving @pportals",
-    description_large : "-",
+    description_large : `@gHeal @w1@(color:${c_stack})(+.5 per stack) @swhen leaving @pportals`,
+    description_width : 42,
     spr_index         : 73,
     tier              : 0
   };
@@ -730,8 +805,9 @@
 #macro item_stone_dagger item[? "dagger"] // ITEM 74: STONE DAGGER
   item_stone_dagger = {
     name              : "STONE DAGGER",
-    description_small : "@sThe @wmore enemies, @sthe @wmore damage.",
-    description_large : "@sDeal @w+1% damage@d (x1.5 per stack) @sfor each @wenemy alive",
+    description_small : "@sThe more @wenemies@s, the more @wdamage",
+    description_large : `@sGain @w1%@(color:${c_stack})(+.5% per stack) @rdamage @sfor each @wenemy alive`,
+    description_width : 51,
     spr_index         : 74,
     tier              : 0
   };

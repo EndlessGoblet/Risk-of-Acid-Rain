@@ -846,7 +846,16 @@
 		if ultra_get("horror", 2) = true
 		{
 			global.AnomalyGet = true
-			get_item(item[? "energy"], 2)
+			get_item(item[? "energy"], 4)
+		}if ultra_get("horror", 1) = true
+		{
+			global.AnomalyGet = true
+			get_item(item[? "energy"], 1)
+		}
+		if ultra_get("horror", 0) = true
+		{
+			global.AnomalyGet = true
+			get_item(item[? "energy"], 1)
 		}
 	}
 	if global.FragmentGet = false && instance_exists(Player) && Player.race = "crystal"
@@ -854,7 +863,7 @@
 		if ultra_get("crystal", 1) = true || ultra_get("crystal", 2) = true
 		{
 			global.FragmentGet = true
-			get_item(item[? "fragment"], 4)
+			get_item(item[? "fragment"], 2)
 		}
 	}
 	if global.FlaskGet = false && instance_exists(Player) && Player.race = "frog"
@@ -1069,6 +1078,11 @@
 			global.charge = clamp(global.charge, 0, max(100 - item_get_count("energy") * 10, 1))
 			if global.charge >= clamp(100 - item_get_count("energy") * 10, 1, 100 - item_get_count("energy") * 10) && global.BossesLeft <= 0 && other.teledone = false // fully charged
 			{
+				if item_get_count("energy") > 0{
+					with instances_matching_ne(enemy, "tag", "god"){
+						my_health = 0;
+					}
+				}
 				other.teledone = true
 				view_shake_max_at(x, y, 64)
 				sleep(200)

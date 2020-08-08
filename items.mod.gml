@@ -9,6 +9,8 @@
 	global.forceSave = 0;
 	global.cheats = false;
 
+	global.sprBigInfo      = false;
+
 	global.sprShieldBubble = sprite_add("sprites/other/sprShieldBubble.png", 3,  24, 24);
 	global.sprBerserkFX 	 = sprite_add("sprites/other/sprBerserkFX.png", 3,  4, 4);
 	global.mskLightBulb 	 = sprite_add("sprites/other/mskLightBulb.png", 1, 32, 32);
@@ -73,11 +75,11 @@
 	global.hideDes = 0;
 	global.popoChance = 0;
 
-	global.CommonItems   = [item[? "info"]      , item[? "tweezers"], item[? "gumdrop"] , item[? "bandages"], item[? "fruit"]    , item[? "golden"] , item[? "rubber"]  , item[? "focus"]     , item[? "mush"]   , item[? "grease"] , item[? "boots"]   , item[? "chopper"] , item[? "locket"]   , item[? "metal"]  , item[? "mask"]]
+	global.CommonItems   = [item[? "info"]      , item[? "tweezers"], item[? "gumdrop"] , item[? "bandages"], item[? "fruit"]    , item[? "golden"] , item[? "rubber"]  , item[? "focus"]     , item[? "mush"]   , item[? "grease"] , item[? "boots"]   , item[? "chopper"] , item[? "locket"]   , item[? "metal"]  , item[? "mask"], item[? "dagger"]]
 	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"], item[? "fern"], item[? "accolade"]] //To-Do: Horror In a Bottle
 	global.RareItems     = [item[? "artifact"]  , item[? "slosher"] , item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"] , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]]
 	global.CursedItems   = [item[? "brooch"]    , item[? "heater"]  , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]		  , item[? "edge"]] // Todo: None
-	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "pearl"]  , item[? "Dpearl"]  , item[? "key"]       , item[? "flask"]  , item[? "fragment"]]
+	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "flask"]]
 	global.PlayerItems 	 = [item[? "none"]]
 	//set new level function
 	if instance_exists(CharSelect) CharSelect.debugSet  = false;
@@ -110,6 +112,8 @@
 #macro forceSupport    mod_variable_get("mod", "main", "forceSupport");
 #macro c_fire   merge_colour(c_orange, c_red,  .5);
 #macro c_poison merge_colour(c_lime, c_green, .35);
+#macro c_stack  merge_color(c_dkgray, c_aqua,  .5);
+#macro c_speed  merge_color(c_white , c_aqua,  .5);
 
 #define game_start
 	Player.lunarDrops = 1;
@@ -572,7 +576,18 @@
 		{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				get_item(item[? "dagger"], 1)
+				for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
+				add_item(global.UniqueItems[_i], 1)
+				}
+				for(var _i = 0; _i < array_length(global.CommonItems); _i++){
+					add_item(global.CommonItems[_i], 1)
+				}for(var _i = 0; _i < array_length(global.UncommonItems); _i++){
+					add_item(global.UncommonItems[_i], 1)
+					}for(var _i = 0; _i < array_length(global.RareItems); _i++){
+					add_item(global.RareItems[_i], 1)
+				}for(var _i = 0; _i < array_length(global.CursedItems); _i++){
+				add_item(global.CursedItems[_i], 1)
+				}
 			}
 		}
 	}
@@ -755,7 +770,7 @@
 
 	//Cryo Rounds
 	var amount = item_get_power("cryo")
-	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self {instance_nearest(x, y, enemy).freezeTime = 25 * amount}}}
+	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self {instance_nearest(x, y, enemy).freezeTime = room_speed * amount}}}
 
 	with instances_matching_ge(enemy, "freezeTime", 1)
 	{
@@ -1166,7 +1181,7 @@
 				{
             	var bonus = 1 + ( instance_number(enemy) )*(amount / 2) / 100 // +1% damage per enemy, with 50% increase per stack
 				damage *= bonus
-				}	
+				}
 
 				//Gun God's Blessing
 				var amount = item_get_power("blessing")
@@ -1494,7 +1509,7 @@
 	if amount >= 1 && instance_exists(Player)
 	{
 		extra_speed    += .2
-		extra_damage   += amount * 3
+		extra_damage   += amount * 2
 		extra_reload   += amount * .3
 		extra_accuracy += amount * .6
 		extra_health   += ceil(amount * 2)
@@ -1598,7 +1613,7 @@
 	{
 		Player.reloadspeed = Player.reloadspeed_base   + extra_reload 	 + (skill_get(mut_stress) * (1 - Player.my_health/Player.maxhealth)) + ultra_get(char_venuz, 1)   * .4
 		Player.maxspeed    = Player.speed_base         + extra_speed  	 + (skill_get(mut_extra_feet) * .5)
-		Player.maxhealth   = round((Player.health_base + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6) - item_get_count("injury") - item_get_count("heater") * 3 + ceil(item_get_count("fragment")) + (GameCont.level - 1) * 2)
+		Player.maxhealth   = round((Player.health_base + extra_health    + (skill_get(mut_rhino_skin) *  4)                                  + ultra_get(char_crystal, 1) *  6) - item_get_count("injury") - item_get_count("heater") * 3 + ceil(item_get_count("fragment") * 2) + (GameCont.level - 1) * 2)
 		Player.accuracy    = Player.accuracy_base      / (extra_accuracy + skill_get(mut_eagle_eyes) * 5 / 3 + 1)
 
 		with instances_matching(projectile, "team", Player.team)
@@ -1685,7 +1700,7 @@
 	}
 	if ITEM = item[? "fragment"] && global.ItemGetAmount > 0
 	{
-		Player.my_health++
+		Player.my_health+=2
 	}
 	var _ang = random(360),
 	    _i   = 0;
@@ -2331,22 +2346,32 @@
 			var _nl = string_width(string_upper(global.PlayerItems[i].name))
 			draw_set_font(fntSmall)
 			var _dl = string_width(string_upper(global.PlayerItems[i].description_small)) - string_count("@",global.PlayerItems[i].description_small) * string_width("@@") + 3
-			if(button_check(0, "horn")) var _dl = string_width(string_upper(global.PlayerItems[i].description_large)) - string_count("@",global.PlayerItems[i].description_large) * string_width("@@") + 3
 			draw_set_font(fntM)
 			var _boxwidth = _nl if _dl > _nl _boxwidth = _dl
-			if(button_check(0, "horn")) var _boxwidth = _dl + 60
 
 			if point_in_rectangle(mouse_x, mouse_y, cx + (itemx * 21) - 20, cy + 44 + (20 * (line + 1)) - 18, cx + (itemx * 21), cy + 45 + (20 * (line + 1))) //description on hover
 			{
 				_hover = true;
+				if button_pressed(0, "fire"){
+					switch global.sprBigInfo{
+						case  true: global.sprBigInfo = false; break;
+						case false: global.sprBigInfo =  true; break;
+					}
+				}
+				if global.sprBigInfo = true{
+					draw_set_font(fntSmall)
+					var _dl = global.PlayerItems[i].description_width * 4 + 3
+				}
+				draw_set_font(fntM)
+				_boxwidth = _nl
+				if _dl > _nl _boxwidth = _dl
+
 				var _biglength = clamp(cx + (itemx * 21) - 20, 0, view_xview + game_width - _boxwidth - 3)
 				var _extraheight = 0
-				if(button_check	(0, "horn")) _extraheight = 8
-				draw_backdrop(_biglength - 1, cy + 55 + (20 * (maxline + 1)), _biglength - 2 + _boxwidth, cy + 54 + (_extraheight) + (20 * (maxline + 1)) + string_height(string_upper(global.PlayerItems[i].name)) + string_height(string_upper(global.PlayerItems[i].description_small)), string_upper(global.PlayerItems[i].name))
+				var _string = global.sprBigInfo = true ? global.PlayerItems[i].description_large : global.PlayerItems[i].description_small
+				draw_backdrop(_biglength - 1, cy + 55 + (20 * (maxline + 1)), _biglength - 2 + _boxwidth, cy + 54 + (_extraheight) + (20 * (maxline + 1)) + string_height(string_upper(_string)) + string_height(string_upper(global.PlayerItems[i].description_small)) - 2 * (string_height(string_upper(_string)) / string_height("@")- 1), string_upper(global.PlayerItems[i].name))
 				draw_set_font(fntSmall)
-				if(button_check	(0, "horn")) draw_text_nt(_biglength + 2, cy + 64 + (20 * (maxline + 1)), string_upper(global.PlayerItems[i].description_large)) else {
-				draw_text_nt(_biglength + 2, cy + 64 + (20 * (maxline + 1)), string_upper(global.PlayerItems[i].description_small))	
-				}
+				draw_text_nt(_biglength + 2, cy + 64 + (20 * (maxline + 1)), string_upper(_string))
 			}
 			draw_sprite_ext(global.sprItems, global.PlayerItems[i].spr_index, cx + (itemx * 21) - 1, cy + 45 + (20 * (line + 1)) - _hover, 1, 1, 0, merge_colour(c_black, c_white, .9 + _hover * .1), 1) //sprUltraLevel
 			draw_set_font(fntSmall)
