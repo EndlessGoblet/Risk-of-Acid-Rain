@@ -460,7 +460,7 @@
     name              : "Cracked Gem",
   	description_small : "@sYour @gluck @sis fluctuating",
   	description_large : `@sAt the start of an @warea@s, gain @wOR @sloose @w5 @gluck@(color:${c_stack})(+/-2 per stack)`,
-    description_width : 66,
+    description_width : 61,
   	spr_index         : 40,
   	tier              : 3
 
@@ -811,8 +811,8 @@
     spr_index         : 74,
     tier              : 0
   };
-  
-#macro item_large_magnet item[? "magnet"]
+
+#macro item_large_magnet item[? "magnet"] // ITEM 75: LARGE MAGNET
 item_large_magnet = {
   name              : "LARGE MAGNET",
 	description_small : "@sPulls items @wtowards @sthe @rteleporter",

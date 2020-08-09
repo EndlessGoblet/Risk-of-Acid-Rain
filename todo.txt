@@ -1,7 +1,6 @@
 //THE TODO LIST
 
 * Level generation:
-  - Fix cursed chests spawning without meeting requirements
   - Fix Chests spawning where they shouldnt
   - redo shrine poulation (make sure they can't spawn on the teleporter)
   - add level specific generation bias, like only large or gold chests in palace
@@ -9,8 +8,6 @@
 * Overhaul armor visuals, perhaps pur them on the hp bars instead of next to them
 
 * Completely overhaul shrines
-
-* Exiting Scrapyard for the first time makes you enter Scrapyard again
 
 * Add an Item Log:
   - very low on the priority list but it would be very cool
@@ -25,11 +22,7 @@
   - Hard Times:
      give the player 1 more per loop
 
-* Fix teleporter activation in scrapyards crashing the game sometimes
-
 * Add passive items/traits for each character
-
-* Box for mode descriptions does not fit the text correctly
 
 * Recharge after boss is killed should be slower IMO (half speed?), but increase enemy spawns from the teleporter in the meantime or something to keep the player interested
 

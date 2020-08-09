@@ -593,7 +593,7 @@
 	if GameCont.area = 100 && Player.mask_index = mskNone{
 		GameCont.area = GameCont.lastarea++;
 		if GameCont.area > 100 GameCont.area -= 100
-		if GameCont.area = 8{
+		if GameCont.area = 0{
 			GameCont.area = 1;
 			GameCont.loops++;
 		}
@@ -1111,6 +1111,7 @@
 				if irandom(14) = 0 && GameCont.area != 0 && GameCont.area != 6 && GameCont.area != 7{global.areaChoice += 100}
 
 				with instance_create(_tele.x, _tele.y, Portal){if _tele.portal = "vault" {GameCont.area = 100; type = 2}else{type = 1}}
+				GameCont.subarea = 3;
 			  global.charge = 0;
 			  global.teleporter = false;
 			}

@@ -99,21 +99,11 @@
 			mod_variable_set("mod", "main", "AreaStart", true);
 			level_start();
 		}
-		if(instance_exists(Portal) && Portal.timer == 0 || instance_exists(BigPortal) && BigPortal.timer == 0){
-			if GameCont.area = 1{
-				GameCont.subarea = 3;
-			}
-			if GameCont.area = 3{
-				GameCont.subarea = 3;
-			}
-			if GameCont.area = 5{
-				GameCont.subarea = 3;
-			}trace(GameCont.area);
-			if GameCont.area = 7{
-				GameCont.area = 0;
-				GameCont.subarea = 1;
-				GameCont.loops++;
-			}
+		if(instance_exists(BigPortal) && BigPortal.timer == 1){
+			trace(1);
+			GameCont.area = 1;
+			GameCont.subarea = 0;
+			GameCont.loops++;
 		}
 		var hadGenCont = global.hasGenCont;
 		global.hasGenCont = instance_exists(GenCont);
@@ -594,7 +584,8 @@
 		{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
+				with obj_create(mouse_x, mouse_y, "item"){item_index = item[? "magnet"]; chest_setup(tag)}
+				/*for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
 				add_item(global.UniqueItems[_i], 1)
 				}
 				for(var _i = 0; _i < array_length(global.CommonItems); _i++){
@@ -605,7 +596,7 @@
 					add_item(global.RareItems[_i], 1)
 				}for(var _i = 0; _i < array_length(global.CursedItems); _i++){
 				add_item(global.CursedItems[_i], 1)
-				}
+				}*/
 			}
 		}
 		if(button_pressed(index, "key1"))
@@ -1517,7 +1508,7 @@
 	var amount = item_get_count("magnet");
 	with(SmallGenerator)
 	{
-		if amount >= 1 && mod_variable_get("mod", "main", "teleporter") == true && point_in_circle(Player.x, Player.y, x - 4, y, mod_variable_get("mod", "main", "radi")) {
+		if amount >= 1 && mod_variable_get("mod", "main", "teleporter") == true && point_in_teleporter(Player) {
 			with(Pickup){
 				if(object_index != WepPickup){
 					x += lengthdir_x(amount, point_direction(x,y,other.x,other.y));
@@ -1526,7 +1517,7 @@
 			}
 		}
 	}
-	
+
 	// Focus
 	var amount = item_get_power("focus")
 	if amount >= 1 && instance_exists(Player)
