@@ -1758,7 +1758,7 @@
 
 	 				var _boss_amount = 1,
 					    _boss        = CrownGuardianOld,
-							_bosshp      = 2;
+							_bosshp      = 1.8;
 				  other._enemy = Guardian;
 					switch GameCont.area
 					{
@@ -1779,6 +1779,7 @@
 						case   4: _boss  = HyperCrystal;
 											other._enemy = Spider;
 											sound_play_music( musBoss6);
+											_bosshp = 0.7;
 											break;
 						case 	 5: _boss  = LilHunter;
 											other._enemy = Grunt;

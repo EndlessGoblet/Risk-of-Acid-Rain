@@ -258,8 +258,9 @@
 	  }
 	}
 	ds_list_shuffle(_floorq)
-
+	
 	if GameCont.area != 100 repeat(_chest_amount + _prize_amount)
+	wait(1);
 	{
 		if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
 		{
@@ -607,9 +608,13 @@
 				}
 			}
 		}
+		if(button_pressed(index, "key1"))
+		{
+		add_item(item[? "heart"], 1)
+		}
 	}
 
-	//T imer
+	//Timer
 	global.frame += current_time_scale; if (global.frame == 60) global.frame = 0;
 	//WHAT DO ITEMS DO YOU MAY ASK???
 
@@ -1179,6 +1184,7 @@
 	}
 	//Bloody Lust
 
+	//Radi Gumdrop
 	var amount = item_get_power("gumdrop")
 	if amount >= 1
 	{
@@ -1197,6 +1203,7 @@
 			}
 		}
 	}
+	//Radi Gumdrop
 
 	//Mini-Mush
 	var amount = item_get_power("mush")
@@ -2393,6 +2400,7 @@
 						case  true: global.sprBigInfo = false; break;
 						case false: global.sprBigInfo =  true; break;
 					}
+					sound_play_pitch(sndClick, random_range(0.8,1.2))
 				}
 				if global.sprBigInfo = true{
 					draw_set_font(fntSmall)
@@ -2419,6 +2427,9 @@
 			draw_set_color(c_white);
 			if global.PlayerItems[i].count > 1 draw_text_nt(cx + (itemx * 21) - 11, cy + 45 + (20 * (line + 1)) - 4 - _hover,"x" + string(global.PlayerItems[i].count))
 	}
+draw_set_font(fntSmall)
+if (global.sprBigInfo = true) draw_text_nt(cx+150,cy+39, `@sCLICK TO TOGGLE: LARGE DESCRIPTIONS`)
+if (global.sprBigInfo = false) draw_text_nt(cx+150,cy+39, `@sCLICK TO TOGGLE: NORMAL DESCRIPTIONS`)
 
 #define draw_armor(XOFFSET, YOFFSET)
 	//Draw Armor Number
