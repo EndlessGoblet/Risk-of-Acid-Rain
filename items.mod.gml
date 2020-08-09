@@ -593,7 +593,8 @@
 		{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
+				with obj_create(mouse_x, mouse_y, "item"){item_index = item[? "magnet"]; chest_setup(tag)}
+				/*for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
 				add_item(global.UniqueItems[_i], 1)
 				}
 				for(var _i = 0; _i < array_length(global.CommonItems); _i++){
@@ -604,7 +605,7 @@
 					add_item(global.RareItems[_i], 1)
 				}for(var _i = 0; _i < array_length(global.CursedItems); _i++){
 				add_item(global.CursedItems[_i], 1)
-				}
+				}*/
 			}
 		}
 	}
@@ -1519,7 +1520,7 @@
 			}
 		}
 	}
-	
+
 	// Focus
 	var amount = item_get_power("focus")
 	if amount >= 1 && instance_exists(Player)
