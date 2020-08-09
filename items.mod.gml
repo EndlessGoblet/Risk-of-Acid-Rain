@@ -99,21 +99,11 @@
 			mod_variable_set("mod", "main", "AreaStart", true);
 			level_start();
 		}
-		if(instance_exists(Portal) && Portal.timer == 0 || instance_exists(BigPortal) && BigPortal.timer == 0){
-			if GameCont.area = 1{
-				GameCont.subarea = 3;
-			}
-			if GameCont.area = 3{
-				GameCont.subarea = 3;
-			}
-			if GameCont.area = 5{
-				GameCont.subarea = 3;
-			}trace(GameCont.area);
-			if GameCont.area = 7{
-				GameCont.area = 0;
-				GameCont.subarea = 1;
-				GameCont.loops++;
-			}
+		if(instance_exists(BigPortal) && BigPortal.timer == 1){
+			trace(1);
+			GameCont.area = 1;
+			GameCont.subarea = 0;
+			GameCont.loops++;
 		}
 		var hadGenCont = global.hasGenCont;
 		global.hasGenCont = instance_exists(GenCont);
@@ -1510,7 +1500,7 @@
 	var amount = item_get_count("magnet");
 	with(SmallGenerator)
 	{
-		if amount >= 1 && mod_variable_get("mod", "main", "teleporter") == true && point_in_circle(Player.x, Player.y, x - 4, y, mod_variable_get("mod", "main", "radi")) {
+		if amount >= 1 && mod_variable_get("mod", "main", "teleporter") == true && point_in_teleporter(Player) {
 			with(Pickup){
 				if(object_index != WepPickup){
 					x += lengthdir_x(amount, point_direction(x,y,other.x,other.y));
