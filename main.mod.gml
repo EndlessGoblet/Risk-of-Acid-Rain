@@ -438,7 +438,7 @@
 				addframes = room_speed * 2;
 				currad    = 0;
 				radius    = 0;
-				maxradius = 100 * (1 + (item_get_count("focus") > 0 ? .1 : 0) + (item_get_count("siphon") > 0 ? .1 : 0));
+				maxradius = 85 * (1 + (item_get_count("focus") > 0 ? .1 : 0) + (item_get_count("siphon") > 0 ? .1 : 0) + (item_get_count("magnet") > 0 ? .1 : 0));
 
 				spr_idle   = global.sprTeleporterIdle
 				spr_hurt   = global.sprTeleporterIdle
@@ -489,13 +489,13 @@
 			case   4: _place = global.spwCaves;
 								_cost  = global.cosCaves;     break;
 			case   5: _place = global.spwIce;
-								_cost  = global.cosIce;    		break;
+								_cost  = global.cosIce;    	  break;
 			case   6: _place = global.spwLabs;
 								_cost  = global.cosLabs;      break;
 			case   7: _place = global.spwPalace;
 								_cost  = global.cosPalace;    break;
 			case   0: _place = global.spwNight;
-								_cost  = global.cosNight;    	break;
+								_cost  = global.cosNight;     break;
 			case 100: _place = global.spwPalace;
 								_cost  = global.cosPalace;    break;
 			case 101: _place = global.spwOasis;
@@ -767,7 +767,7 @@
 	for(i = 0; i < 5; i++){
 				var _speed_hardmode = global.Gamemode = 1 ? 1 : 0,
 				    _speed_times    = .15 * item_get_count("times"),
-						_speed_boss     = "boss_buff" in self ? 1 : 0;
+						_speed_boss     = "boss_buff" in self ? .2 : 0;
 						_speed_other    = (instance_is(self, FrogQueen) || instance_is(self, OasisBoss)) ? -.6 : 0;
 				if(alarm_get(i) > 2){
 					alarm_set(i, alarm_get(i) - (_speed_hardmode + _speed_times + _speed_boss + _speed_other));
@@ -775,8 +775,8 @@
 			}
 
 	if "convert" not in self && global.Gamemode = 1 {
-		    var _roll = round(max(random_range(1, 7.25 - .25 * item_get_count("times")), 1))
-		    if (_roll == 1) {
+		    var _roll = round(max(random_range(0, 7.25 - .25 * item_get_count("times")), 1))
+		    if (_roll <= 1) {
 		if (object_index == Scorpion) {
 		instance_create(x, y, GoldScorpion);
 		instance_delete(self);
@@ -966,7 +966,7 @@
 	//TIME SYSTEM END
 
 	//DIFFICULTY INCREASING TIMER
-	if !instance_exists(GenCont) && instance_exists(Player) global.time += (3 - speed) * 3 * (1 + item_get_count("times") * 1.4)
+	if !instance_exists(GenCont) && instance_exists(Player) global.time += (3 - speed) * 3 * (1 + item_get_count("times") * .5)
 	if global.time >= global.timeControl && global.difficulty != 8 { //increases every 2 minutes	 //11520(?)
 	global.time = 0;
 	global.difficulty++ //difficulty increase

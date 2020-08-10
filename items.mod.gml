@@ -80,7 +80,7 @@
 	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"], item[? "fern"], item[? "accolade"], item[? "magnet"]] //To-Do: Horror In a Bottle
 	global.RareItems     = [item[? "artifact"]  , item[? "slosher"] , item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"] , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]]
 	global.CursedItems   = [item[? "brooch"]    , item[? "heater"]  , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]		  , item[? "edge"]] // Todo: None
-	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "flask"]]
+	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "flask"]  , item[? "fragment"]]
 	global.PlayerItems 	 = [item[? "none"]]
 	//set new level function
 	if instance_exists(CharSelect) CharSelect.debugSet  = false;
@@ -248,7 +248,7 @@
 	  }
 	}
 	ds_list_shuffle(_floorq)
-	
+
 	if GameCont.area != 100 repeat(_chest_amount + _prize_amount)
 	wait(1);
 	{
@@ -584,8 +584,7 @@
 		{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				with obj_create(mouse_x, mouse_y, "item"){item_index = item[? "magnet"]; chest_setup(tag)}
-				/*for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
+				for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
 				add_item(global.UniqueItems[_i], 1)
 				}
 				for(var _i = 0; _i < array_length(global.CommonItems); _i++){
@@ -596,7 +595,7 @@
 					add_item(global.RareItems[_i], 1)
 				}for(var _i = 0; _i < array_length(global.CursedItems); _i++){
 				add_item(global.CursedItems[_i], 1)
-				}*/
+				}
 			}
 		}
 		if(button_pressed(index, "key1"))
@@ -1205,7 +1204,6 @@
 		  var _size = amount * 0.075; if (_size > .6) _size = .6
 		  image_xscale = 1 - _size
 		  image_yscale = 1 - _size
-			size -= _size * .25
 			extra_speed += .2
 		}
 	}
@@ -1482,7 +1480,7 @@
 			}
 			if CanShield > 0
 			{
-				with instances_matching_le(enemy, "my_health", 0){other.CanShield -= max(1, size)}
+				with instances_matching_le(enemy, "my_health", 0){other.CanShield--}
 				if CanShield <= 0
 				{
 					CanShield = 0
