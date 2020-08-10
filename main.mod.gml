@@ -284,20 +284,41 @@
 	if _roll = 4 _prop = WeaponChest
 	}
 		if (GameCont.area == 4) {
-			DProp = 24;
-	_prop = Cactus
+			DProp = 12;
+			_roll = round(random_range(1,16))
+	_prop = CrystalProp
+	if _roll >= 1 && _roll <= 4 _prop = InvCrystal
+	if _roll = 5 _prop = AmmoChest
+	if _roll = 6 _prop = BigCursedChest
+	if _roll >= 7 && _roll <= 9 _prop = Cocoon
 	}
 		if (GameCont.area == 5) {
-			DProp = 24;
-	_prop = Cactus
+			DProp = 4;
+			_roll = round(random_range(1,6))
+	_prop = SnowMan
+	if _roll == 1 _prop = SodaMachine
+	if _roll == 2 _prop = Hydrant
+	if _roll == 3 _prop = StreetLight
+	if _roll == 4 _prop = AmmoChest
+	if _roll == 5 _prop = WeaponChest
 	}
 		if (GameCont.area == 6) {
-			DProp = 24;
-	_prop = Cactus
+			DProp = 12;
+			_roll = round(random_range(1,4))
+	_prop = Tube
+	if _roll == 1 _prop = MutantTube
+	if _roll == 2 _prop = Terminal
+	if _roll == 3 _prop = Server
+	if _roll == 4 _prop = RadChest
 	}
 		if (GameCont.area == 7) {
-			DProp = 24;
-	_prop = Cactus
+			DProp = 6;
+			_roll = round(random_range(1,4))
+	_prop = Pillar
+	if _roll == 1 _prop = SmallGenerator
+	if _roll == 2 _prop = RadChest
+	if _roll == 4 _prop = AmmoChest
+	if _roll == 4 _prop = WeaponChest
 	}
 
 	DProp = round(DProp*m)
@@ -669,6 +690,7 @@
 				 var f_ = instance_find(Floor, irandom(instance_number(Floor) - 1));
 				 GameCont.subarea = 3;
 				 instance_create(f_.x, f_.y, Portal)
+				 trace("Portal Created!")
 			 }
 			 if instance_exists(Portal) || instance_exists(SpiralCont)Player.portalTimer = (room_speed * 10)
 		 }
@@ -1770,7 +1792,7 @@
 						case   2: _boss  = FrogQueen;
 											other._enemy = FastRat;
 									  	sound_play_music( musBoss5);
-											_bosshp = .6;
+											_bosshp = -.6;
 									  	break;
 						case   3: _boss  = ScrapBoss;
 											other._enemy = Raven;
@@ -1780,12 +1802,12 @@
 						case   4: _boss  = HyperCrystal;
 											other._enemy = Spider;
 											sound_play_music( musBoss6);
-											_bosshp = 0.7;
+											_bosshp = -0.3;
 											break;
 						case 	 5: _boss  = LilHunter;
 											other._enemy = Grunt;
 											sound_play_music( musBoss3);
-											_bosshp = 0.8;
+											_bosshp = -0.2;
 											break;
 						case 	 6: _boss  = TechnoMancer;
 											other._enemy = Freak;

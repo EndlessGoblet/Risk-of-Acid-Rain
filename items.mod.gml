@@ -250,7 +250,7 @@
 	ds_list_shuffle(_floorq)
 	
 	if GameCont.area != 100 repeat(_chest_amount + _prize_amount)
-	wait(1);
+	
 	{
 		if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
 		{
