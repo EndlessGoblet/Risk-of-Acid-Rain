@@ -82,6 +82,8 @@
 	global.CursedItems   = [item[? "brooch"]    , item[? "heater"]  , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]		  , item[? "edge"]] // Todo: None
 	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "flask"]]
 	global.PlayerItems 	 = [item[? "none"]]
+	global.ItemDict = {};
+	
 	//set new level function
 	if instance_exists(CharSelect) CharSelect.debugSet  = false;
 	if instance_exists(CharSelect) CharSelect.debug 		= false;
@@ -334,6 +336,13 @@
 
 #define step
 
+	global.ItemDict = {};
+	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {
+		if("count" in global.PlayerItems[i]){
+			lq_set(global.ItemDict, global.PlayerItems[i].key, global.PlayerItems[i].count);
+		}
+	}
+
 	with instances_matching_ne(Debris, "team", 2){team = 2}
   if instance_exists(Menu){global.descriptionTimer = 0}
 
@@ -582,7 +591,8 @@
 		{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
+				with obj_create(mouse_x, mouse_y, "item"){item_index = item[? "magnet"]; chest_setup(tag)}
+				/*for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
 				add_item(global.UniqueItems[_i], 1)
 				}
 				for(var _i = 0; _i < array_length(global.CommonItems); _i++){
@@ -593,7 +603,7 @@
 					add_item(global.RareItems[_i], 1)
 				}for(var _i = 0; _i < array_length(global.CursedItems); _i++){
 				add_item(global.CursedItems[_i], 1)
-				}
+				}*/
 			}
 		}
 	}
@@ -1853,9 +1863,10 @@
 	}
 
 #define item_get_count(ITEM)
-	var _amount = 0;
-	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM {_amount = global.PlayerItems[i].count; break}}
-	return _amount;
+	return lq_defget(global.ItemDict, ITEM, 0);
+	//var _amount = 0;
+	//for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM {_amount = global.PlayerItems[i].count; break}}
+	//return _amount;
 
 #define item_get_power(ITEM)
 	var _amount = 0;
