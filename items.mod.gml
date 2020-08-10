@@ -82,6 +82,8 @@
 	global.CursedItems   = [item[? "brooch"]    , item[? "heater"]  , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]		  , item[? "edge"]] // Todo: None
 	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "flask"]]
 	global.PlayerItems 	 = [item[? "none"]]
+	global.ItemDict = {};
+	
 	//set new level function
 	if instance_exists(CharSelect) CharSelect.debugSet  = false;
 	if instance_exists(CharSelect) CharSelect.debug 		= false;
@@ -100,7 +102,6 @@
 			level_start();
 		}
 		if(instance_exists(BigPortal) && BigPortal.timer == 1){
-			trace(1);
 			GameCont.area = 1;
 			GameCont.subarea = 0;
 			GameCont.loops++;
@@ -335,6 +336,13 @@
 	}
 
 #define step
+
+	global.ItemDict = {};
+	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {
+		if("count" in global.PlayerItems[i]){
+			lq_set(global.ItemDict, global.PlayerItems[i].key, global.PlayerItems[i].count);
+		}
+	}
 
 	with instances_matching_ne(Debris, "team", 2){team = 2}
   if instance_exists(Menu){global.descriptionTimer = 0}
@@ -1862,9 +1870,10 @@
 	}
 
 #define item_get_count(ITEM)
-	var _amount = 0;
-	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM {_amount = global.PlayerItems[i].count; break}}
-	return _amount;
+	return lq_defget(global.ItemDict, ITEM, 0);
+	//var _amount = 0;
+	//for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {if global.PlayerItems[i].key == ITEM {_amount = global.PlayerItems[i].count; break}}
+	//return _amount;
 
 #define item_get_power(ITEM)
 	var _amount = 0;

@@ -420,7 +420,7 @@
 
 	global.respawn = irandom_range(6, 12) * (crown_current = 7 ? 2 : 1) // double enemies with cob
 	//Spawn invincible anti-portal maggot
-	if (GameCont.area != 100) with instance_create(Player.x-500, Player.y-500, Maggot) {
+	if (GameCont.area != 100) with instance_create(Player.x-1000, Player.y-1000, Maggot) {
 	    visible = false;
 	    image_xscale = 0;
 	    image_yscale = 0;
@@ -548,7 +548,43 @@
 		// Chests
 		var  _floorq = ds_list_create(), // put all available floor tiles into a list
 			   _i = 0;
-
+		//Guarantee that at least one floor tile is valid. Also, make sure that it probably has enough space.
+		with(Player){
+			with(instance_furthest(x,y,Floor)){
+				var _x = x;
+				var _y = y;
+				x=other.x;
+				y=other.y;
+				_floorq[| _i] = self; // add eligible floor tiles to the list
+				_i++;
+				with(instance_furthest(x,y,Floor)){
+					var _x2 = x;
+					var _y2 = y;
+					x=other.x;
+					y=other.y;
+					_floorq[| _i] = self; // add eligible floor tiles to the list
+					_i++;
+					with(instance_furthest(x,y,Floor)){
+						var _x3 = x;
+						var _y3 = y;
+						x=other.x;
+						y=other.y;
+						_floorq[| _i] = self; // add eligible floor tiles to the list
+						_i++;
+						with(instance_furthest(x,y,Floor)){
+							_floorq[| _i] = self; // add eligible floor tiles to the list
+							_i++;
+						}
+						x = _x3;
+						y = _y3;
+					}
+					x = _x2;
+					y = _y2;
+				}
+				x = _x;
+				y = _y;
+			}
+		}
 		with Floor // get a list of all "unoccupied" Floors
 		{
 			var _d = 0;
@@ -570,20 +606,21 @@
 			global.wavetimer -= current_time_scale
 			if global.wavetimer <= 0{
 				global.wavetimer = 30 * irandom_range(6, 10)
-
+				var tries = global.spawnCredits;
 				do{
 					if !is_undefined(_floorq[| 0]) with instance_create(_floorq[| 0].x, _floorq[| 0].y, enemyChoice)
 					{
 						repeat(3) instance_create(x, y, Smoke);
 						global.spawnCredits -= enemyCost;
-						if place_meeting(x, y, Wall) || place_meeting(x, y, FloorExplo) || !place_meeting(x, y, Floor) || distance_to_object(Player) <= 32
+						if place_meeting(x, y, Wall)/* || place_meeting(x, y, FloorExplo)/* || !place_meeting(x, y, Floor) || distance_to_object(Player) <= 32*/
 						{
 
 							instance_delete(self)
 							exit
 						}
 					}
-				}until enemyCost > global.spawnCredits
+					tries--;
+				}until enemyCost > global.spawnCredits || tries <= 0
 			}
 		}
 	}
@@ -904,7 +941,7 @@
 	}
 
 	//enemy Spawner
-	with (enemy)
+	/*with (enemy)
 	{
 		if distance_to_object(Player) <= 450
 		{
@@ -915,7 +952,7 @@
 	    Close = "false"
 	  }
 		if place_meeting(x, y, Wall) || !place_meeting(x, y, Floor) Close = "true"
-	}
+	}*/
 
 	/*var AMOUNT = 0;
 	with (enemy) if (Close == "true") && instance_exists(self) AMOUNT++
