@@ -10,8 +10,6 @@
 
 * Completely overhaul shrines
 
-* Exiting Scrapyard for the first time makes you enter Scrapyard again
-
 * Add an Item Log:
   - very low on the priority list but it would be very cool
 

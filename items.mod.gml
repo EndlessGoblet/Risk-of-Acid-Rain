@@ -100,7 +100,6 @@
 			level_start();
 		}
 		if(instance_exists(BigPortal) && BigPortal.timer == 1){
-			trace(1);
 			GameCont.area = 1;
 			GameCont.subarea = 0;
 			GameCont.loops++;
