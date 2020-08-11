@@ -622,6 +622,19 @@
 			extra_accuracy  = 0,
 			extra_damage    = 0;
 
+
+	//Mutant Stat Balancing
+
+	//Melting Balancing
+	if instance_exists(Player) && Player.race = ("melting") {
+	extra_health -= (GameCont.level - 1)
+	}
+
+	//Crystal Balancing
+	if instance_exists(Player) && Player.race = ("crystal") {
+	extra_health += (GameCont.level - 1)
+	}
+
 	//inside information (more damage to IDPD and they drop more stuff)
 	var amount = item_get_power("info")
 	var IDPD = [Grunt, Shielder, Inspector, EliteGrunt, EliteShielder, EliteInspector, Van, Last]
@@ -794,7 +807,7 @@
 
 	with instances_matching_ge(enemy, "freezeTime", 1)
 	{
-		if "freezeTime" in self && object_index != BanditBoss && object_index != ScrapBoss && object_index != OasisBoss && object_index != Nothing && object_index != Nothing2 && object_index != HyperCrystal && object_index != FrogQueen && object_index != TechnoMancer && object_index != LilHunter
+		if "freezeTime" in self && object_index != BanditBoss && object_index != LaserCrystal && object_index != ScrapBoss && object_index != OasisBoss && object_index != Nothing && object_index != Nothing2 && object_index != HyperCrystal && object_index != FrogQueen && object_index != TechnoMancer && object_index != LilHunter
 		{
 			freezeTime--
 			if freezeTime > 0

@@ -631,6 +631,19 @@
 		team = Player.team
 	}
 
+	//More ammo to balance for more enemies
+	with instances_matching_le(enemy, "my_health", 0) {
+		chance = round(random_range(1, 8))
+		if (chance == 8) instance_create(x,y, AmmoPickup)
+	}
+
+	//Rebel Balancing
+	if instance_exists(Player) && Player.race = ("rebel") { //Rebel spends 20% health to spawn an ally on top of the regular -2 penalty
+		if (Player.my_health - 2 <= (Player.maxhealth / 5)) Player.canspec = false else Player.canspec = true
+		if button_pressed(Player.index, "spec") && (Player.my_health - 2 >= (Player.maxhealth / 5)) Player.my_health = floor(Player.my_health - Player.maxhealth / 4)
+	}
+
+
 	if global.AreaStart = true{
 		global.AreaStart = false;
 		// force some area changes
@@ -1829,12 +1842,12 @@
 						case   2: _boss  = FrogQueen;
 											other._enemy = FastRat;
 									  	sound_play_music( musBoss5);
-											_bosshp = -.6;
+											_bosshp = -0.3;
 									  	break;
 						case   3: _boss  = ScrapBoss;
 											other._enemy = Raven;
 									  	sound_play_music( musBoss2);
-											_bosshp = 1.6;
+											_bosshp = 1.2;
 									  	break;
 						case   4: _boss  = HyperCrystal;
 											other._enemy = Spider;
