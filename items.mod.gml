@@ -123,7 +123,7 @@
 #macro c_stack  merge_color(c_dkgray, c_aqua,  .5);
 #macro c_speed  merge_color(c_white , c_aqua,  .5);
 
-#define game_start
+ #define game_start
 	Player.lunarDrops = 1;
 	global.PlayerItems = [item[? "none"]]
 
@@ -157,7 +157,7 @@
 	Player.fx_celesteel = 0;
 	Player.shakeText    = 0;
 
-#define level_start
+ #define level_start
 
 	global.RustedChests = 0;
 	global.StartLevel = GameCont.level;
@@ -268,6 +268,7 @@
 
 	if _prize_amount > 0 // 1/2 of perfect prize's effect. repeat(0) executes the the code inside the repeat once
 	{
+		if is_undefined(_floorq[| 0]){exit}
 		repeat(_prize_amount)
 		{
 			if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
@@ -335,7 +336,7 @@
 		}
 	}
 
-#define step
+ #define step
 
 	global.ItemDict = {};
 	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {
@@ -592,7 +593,7 @@
 		{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				/*for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
+				for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
 				add_item(global.UniqueItems[_i], 1)
 				}for(var _i = 0; _i < array_length(global.CommonItems); _i++){
 					add_item(global.CommonItems[_i], 1)
@@ -602,7 +603,7 @@
 					add_item(global.RareItems[_i], 1)
 				}for(var _i = 0; _i < array_length(global.CursedItems); _i++){
 				add_item(global.CursedItems[_i], 1)
-				}*/
+				}
 			}
 		}
 		if(button_pressed(index, "key1"))
@@ -2438,8 +2439,7 @@
 			if global.PlayerItems[i].count > 1 draw_text_nt(cx + (itemx * 21) - 11, cy + 45 + (20 * (line + 1)) - 4 - _hover,"x" + string(global.PlayerItems[i].count))
 	}
 draw_set_font(fntSmall)
-if (global.sprBigInfo = true) draw_text_nt(cx+150,cy+39, `@sCLICK TO TOGGLE: LARGE DESCRIPTIONS`)
-if (global.sprBigInfo = false) draw_text_nt(cx+150,cy+39, `@sCLICK TO TOGGLE: NORMAL DESCRIPTIONS`)
+draw_text_nt(cx+105,cy+39, `@sCLICK TO TOGGLE DESCRIPTIONS`)
 
 #define draw_armor(XOFFSET, YOFFSET)
 	//Draw Armor Number

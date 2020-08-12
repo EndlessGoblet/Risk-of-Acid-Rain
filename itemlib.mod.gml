@@ -64,9 +64,9 @@
 #macro item_mechanical_lens item[? "lens"] // ITEM 4: MECHANICAL LENS
   item_mechanical_lens = {
     name              : "Mechanical Lens",
-  	description_small : "@yprojectiles @sare @wslower @sand @phome",
-  	description_large : "@sDecreases @wprojectile speed @sby @w50%#@wBullets @phome @sinto @wenemies @s up to @w16 meters @d(+16 meters per stack) away",
-    description_width : 0,
+  	description_small : "@yprojectiles @sare @wslower @sand @phome", // meters = pixel / 4
+  	description_large : `@sDecreases @wprojectile speed @sby @w50%#@wBullets @phome @sinto @wenemies @s up to @w4@(color:${c_stack})(+1 meter per stack) meters away`,
+    description_width : 64,
     spr_index         : 4,
   	tier              : 1
 
@@ -153,7 +153,7 @@
   item_radiated_fruit = {
     name              : "Radiated Fruit",
   	description_small : "@gRads @smay @gheal @syou",
-  	description_large : `@sEvery @w1 @sin @w250@(color:${c_stack})(/2 per stack)@g rads @gheals @w1#@sRads @gheal @wtwice as often@s for each @rmax HP`,
+  	description_large : `@sEvery @w1 @sin @w250@(color:${c_stack})(/2 per stack)@g rads @gheals @w1#@gRads heal @wtwice as often@s for each @rmax HP`,
     description_width : 41,
   	spr_index         : 12,
   	tier              : 0
@@ -240,8 +240,8 @@
   item_binky = {
     name              : "Binky",
   	description_small : "@wEnemies @smay turn into @bbabies",
-  	description_large : `@wEnemies @shave a @w4%@(color:${c_stack})(+3% per stack)@s chance to have,#@w-50% @(color:${c_speed})size@s,#@w-50% @rHealth`,
-    description_width : 48,
+  	description_large : `@wEnemies @shave a @w4%@(color:${c_stack})(+3% per stack)@s chance to have#@w-50% @(color:${c_speed})size@s,#@w-50% @rHealth`,
+    description_width : 47,
   	spr_index         : 20,
   	tier              : 1
 
@@ -251,8 +251,8 @@
   item_cryo_rounds = {
     name              : "Cryo Rounds",
   	description_small : "@wEnemies @sget @bstunned @supon taking @wdamage",
-  	description_large : `@sYour @yprojectiles @sapply the @bfrozen @(color:${c_debuff})debuff @sfor @w1@(color:${c_stack})(+1 per stack) @wsecond @swith a @w7% chance@s,#@bfrozen @wenemies @scannot @gact @sor @wmove`,
-    description_width : 68,
+  	description_large : `@sYour @yprojectiles @sapply the @bfrozen @(color:${c_debuff})debuff @sfor @w1@(color:${c_stack})(+1 per stack) @wsecond#@swith a @w7% chance#@bfrozen @wenemies @scannot @gact @sor @wmove`,
+    description_width : 67,
   	spr_index         : 21,
   	tier              : 1
 
@@ -350,8 +350,8 @@
   item_firewood = {
     name              : "Firewood",
   	description_small : "@sKilling gains @ycharge@s, release @ycharge @son @whit",
-  	description_large : `@sTaking @wdamage @sadds @y1 charge@(color:${c_stack})(+1 per stack) @sUpon taking#@wdamage, @srelease @yfire shells@s in random directions for each @ycharge.`,
-    description_width : 65,
+  	description_large : `@sTaking @wdamage @sadds @y1 charge@(color:${c_stack})(+1 per stack) @sUpon taking#@wdamage, @srelease @yfire shells@s in random directions for each @ycharge`,
+    description_width : 64,
   	spr_index         : 30,
   	tier              : 1
 
@@ -361,7 +361,7 @@
   item_chopper = {
     name              : "Chopper",
   	description_small : "@wEnemies @sshoot out @ychoppers @son @wdeath",
-  	description_large : `@wEnemies @shave an @w8% chance@s to shoot out @w1@s to @w2@(color:${c_stack})(+1 per stack)#@wspinning @ychoppers@s on @wdeath,#@ychoppers @spierce through @w1@(color:${c_stack})(+1 per stack)@s enemies`,
+  	description_large : `@wEnemies @shave an @w8% chance@s to shoot out @w1@s to @w2@(color:${c_stack})(+1 per stack)#@wspinning @ychoppers@s on @wdeath@s,#@ychoppers @spierce through @w1@(color:${c_stack})(+1 per stack)@s enemies`,
     description_width : 59,
   	spr_index         : 31,
   	tier              : 0
@@ -372,8 +372,8 @@
   item_broken_locket = {
     name              : "Broken Locket",
   	description_small : "@wEnemies @sdrop @wrusty chests @son @wdeath",
-  	description_large : `@wEnemies @shave a @w6%@(color:${c_stack})(+2% per stack) @schance to drop a @wrusty chest @supon death.#@wRusty chests @scontain mostly @wcommon @sitems`,
-    description_width : 73,
+  	description_large : `@wEnemies @shave a @w6%@(color:${c_stack})(+2% per stack) @schance to drop a @wrusty chest @supon death#@wRusty chests @scontain mostly @wcommon @sitems`,
+    description_width : 72,
   	spr_index         : 32,
   	tier              : 0
 
@@ -654,8 +654,8 @@
   item_radi_gumdrop = {
     name              : "RADI GUMDROP",
   	description_small : "@sChance for @grads @sto turn into @gchunks",
-  	description_large : `@gRads @shave a @w1%@(color:${c_stack})(+1% chance per stack) @wchance @sto turn into @grad chunks`,
-    description_width : 67,
+  	description_large : `@gRads @shave a @w1%@(color:${c_stack})(+1% per stack) @wchance @sto turn into @grad chunks`,
+    description_width : 61,
   	spr_index         : 59,
   	tier              : 0
 
@@ -746,7 +746,7 @@
   item_digital_shield = {
     name              : "DIGITAL SHIELD",
   	description_small : "@sGain a rechargable @bshield",
-  	description_large : `@sGain a rechargable @bshield @sthat blocks @wALL @rdamage @w1@(color:${c_stack})(+1 per stack) @stime#Recharges by @wkilling @w16@(color:${c_stack})(-1 per stack) @wenemies#`,
+  	description_large : `@sGain a rechargable @bshield @sthat blocks @wALL @rdamage @w1@(color:${c_stack})(+1 per stack) @stime#Recharges by @wkilling @w16 enemies#`,
     description_width : 69,
   	spr_index         : 68,
   	tier              : 1
@@ -786,7 +786,7 @@
   item_crystal_fragment = {
     name              : "CRYSTAL FRAGMENT",
     description_small : "@s+@w4 @rmax HP",
-    description_large : `@sGain @w4@(color:${c_stack})(+1 per stack) @rmax HP`,
+    description_large : `@sGain @w4@(color:${c_stack})(+4 per stack) @rmax HP`,
     description_width : 27,
     spr_index         : 72,
     tier              : 4
@@ -814,7 +814,7 @@
   
 #macro item_large_magnet item[? "magnet"] // ITEM 75: LARGE MAGNET
 item_large_magnet = {
-  name              : "LARGE MAGNET",
+	name              : "LARGE MAGNET",
 	description_small : "@sPulls items @wtowards @wthe teleporter",
 	description_large : "@yPickups@s are pulled @wtowards @sthe @rteleporter",
 	description_width : 41,
@@ -824,10 +824,10 @@ item_large_magnet = {
 
 #macro item_hazmat_gear item[? "gear"] // ITEM 76: HAZMAT GEAR (placeholder bro dont mind it)
 item_hazmat_gear = {
-  name              : "HAZMAT GEAR",
+	name              : "HAZMAT GEAR",
 	description_small : "@s+@w6 @rmax HP@s, immunity @sto @blightning@s, @rfire @sand @gtoxic gas",
 	description_large : "-",
-  description_width : 1,
+	description_width : 1,
 	spr_index         : 76,
 	tier              : 2
 };

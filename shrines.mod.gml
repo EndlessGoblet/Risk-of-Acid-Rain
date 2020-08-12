@@ -23,9 +23,9 @@
 #macro PlayerItems	 mod_variable_get("mod", "items"  , "PlayerItems"  );
 #macro c_gold $86C9DF
 
-#define step 
+ #define step 
 
-#define shrine_create(X, Y)
+ #define shrine_create(X, Y)
 	var _s = instance_create(X, Y, CustomObject);
 	with _s
 	{
@@ -77,7 +77,7 @@
 	}
 	return _s;
 
-#define shrine_setup()
+ #define shrine_setup()
 	switch index
 	{
 		// Shrine of Death
@@ -216,7 +216,7 @@
 	}
 	mask_index = mskBanditBoss;
 
-#define shrine_step
+ #define shrine_step
 	if place_meeting(x, y, Player){near = true}else{near = false}
 	canuse = false;
 
@@ -236,10 +236,10 @@
 
 		switch cost
 		{
-			case -1: _costvar = -4;  							         								break;
-			case  0: _costvar = GameCont.rad;             								break;
-			case  1: _costvar = Player.my_health;   									    break;
-			case  2: _costvar = -4;                 									  	break;
+			case -1: _costvar = -4;  							          break;
+			case  0: _costvar = GameCont.rad;             				  break;
+			case  1: _costvar = Player.my_health;   					  break;
+			case  2: _costvar = -4;                 					  break;
 			case  3: _costvar = mod_variable_get("mod", "main", "coins"); break;
 		}
 		if canuse = false
@@ -272,7 +272,6 @@
 			view_shake_max_at(x, y, 8);
 			repeat(12) with instance_create(x, y, Dust) {motion_add(random(360), random_range(3, 6))}
 			if cost = 2{get_item(item[? "injury"], 2)}
-			if uses <= 0 instance_destroy();
 
 			// Small Accolade
 			var _amount = item_get_power("accolade") > 0 ? item_get_power("accolade") * 2 : 0;
@@ -300,20 +299,23 @@
 					}
 				}
 			}
+			
+			
+			if uses <= 0 instance_destroy();
 		}
 	}
 
-#define shrine_destroy
+ #define shrine_destroy
 	with instance_create(x, y, ChestOpen){sprite_index = other.sprite_broke}
 	view_shake_at(x, y, 16);
 	sleep(15);
 
-#define death_interact// 2: Shrine of Death
+ #define death_interact// 2: Shrine of Death
 	has_purchased = true;
 	uses--;
 	timer = originaltimer + item_get_power("paragon") * 4 * room_speed;
 
-#define guns_interact // 5: Shrine of Guns
+ #define guns_interact // 5: Shrine of Guns
 	has_purchased = true;
 	weapon_upgrade(Player.wep)
 	if upgrade[0] = -4
@@ -573,13 +575,11 @@
 				}
 			}
 		} else {
-		draw_set_alpha(0.2)
-		draw_sprite(global.shrineIcons, iconNum, x+6-1, y-19+1)
-		draw_sprite(global.shrineIcons, iconNum, x+6-1, y-21+1)
-		draw_sprite(global.shrineIcons, iconNum, x+6+1, y-19+1)
-		draw_sprite(global.shrineIcons, iconNum, x+6+1, y-21+1)
-		draw_set_alpha(1)
-		draw_sprite(global.shrineIcons, iconNum, x+6, y-20+1)
+		d3d_set_fog(true, c_black, 0, 0);
+		draw_sprite(global.shrineIcons, iconNum, x+7, y-20)
+		draw_sprite(global.shrineIcons, iconNum, x+6, y-19)
+		d3d_set_fog(false, c_white, 0, 0);
+		draw_sprite(global.shrineIcons, iconNum, x+6, y-20)
 		}
 		if index = crwn_protection
 		{

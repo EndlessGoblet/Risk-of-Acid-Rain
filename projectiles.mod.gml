@@ -306,8 +306,8 @@
   direction += random_range(-6,6)
   with instance_create(x,y,DiscBounce) sprite_index = other.spr_bounce
   image_angle = direction
-  sleep(damage);
-  view_shake_at(x, y, damage / 2)
+  sleep(damage / 15);
+  view_shake_at(x, y, damage / 25 - 2)
   sound_play_pitch(sndDiscBounce,random_range(.9,1.1)+((speed/4)-1)*.2)
   sound_play_pitch(sndBouncerBounce,random_range(1,1))
   if dist > 250{instance_destroy();exit}

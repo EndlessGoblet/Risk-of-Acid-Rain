@@ -619,7 +619,7 @@
 		     enemyChoice = _place[_n],
 				 enemyCost   = _cost[_n];
 
-			global.spawnCredits += current_time_scale * (.8 + global.difficulty / 100 - global.teleporter * .35 + item_get_power("times") * .1);
+			global.spawnCredits += current_time_scale * (.8 + global.difficulty / 100 - (global.BossesLeft > 0 ? 1 : 0) * .35 + item_get_power("times") * .1);
 
 			global.wavetimer -= current_time_scale
 			if global.wavetimer <= 0{
@@ -639,9 +639,8 @@
 					}
 					if irandom(14) = 0{
 							global.wavetimer = 30;
-							global.credits += 20;
+							global.spawnCredits += 20;
 							exit;
-						}
 					}
 					tries--;
 				}until enemyCost > global.spawnCredits || tries <= 0
@@ -1210,7 +1209,7 @@
 		draw_sprite(global.sprTeleporterSiphon, portal = "vault" ? 1 : 0, x, y)
 	}
 
-#define teleporter_step
+ #define teleporter_step
 	if movecheck = false{
 		with instances_matching_ne([chestprop, WepPickup], "tag", "item") if distance_to_object(other) < 48{
 			motion_add(point_direction(other.x, other.y, x, y), 1)
@@ -1250,29 +1249,29 @@
 				{
 					case 106: global.areaChoice = 7;
 										break;
-					case 105: global.areaChoice = 6
+					case 105: global.areaChoice = 6;
 										break;
-					case 104: global.areaChoice = 5
+					case 104: global.areaChoice = 5;
 										break;
-					case 103: global.areaChoice = 4
+					case 103: global.areaChoice = 4;
 										break;
-					case 102: global.areaChoice = 3
+					case 102: global.areaChoice = 3;
 										break;
-				  case 101: global.areaChoice = 2
+				    case 101: global.areaChoice = 2;
 										break;
-					case   1: global.areaChoice = 2
+					case   1: global.areaChoice = 2;
 										break;
-					case   2: global.areaChoice = 3
+					case   2: global.areaChoice = 3;
 										break;
-					case   3: global.areaChoice = 4
+					case   3: global.areaChoice = 4;
 										break;
-				  case   4: global.areaChoice = 5
+				    case   4: global.areaChoice = 5;
 										break;
-				  case   5: global.areaChoice = 6
+				    case   5: global.areaChoice = 6;
 										break;
-				  case   6: global.areaChoice = 7
+				    case   6: global.areaChoice = 7;
 										break;
-					case   7: global.areaChoice = 1
+					case   7: global.areaChoice = 1;
 										break;
 
 				}
