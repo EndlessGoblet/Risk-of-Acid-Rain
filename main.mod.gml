@@ -637,6 +637,12 @@
 							exit
 						}
 					}
+					if irandom(14) = 0{
+							global.wavetimer = 30;
+							global.credits += 20;
+							exit;
+						}
+					}
 					tries--;
 				}until enemyCost > global.spawnCredits || tries <= 0
 			}
@@ -925,15 +931,19 @@
 	global.timeControl = (minutes_ * 2) * (60 * 60)
 
 	//Hard Mode
-	if (item_get_count("times") > 0) {
+	if (item_get_count("times") >= 0) {
 	with (enemy) {
 	for(i = 0; i < 5; i++){
 				var _speed_hardmode = global.Gamemode = 1 ? 1 : 0,
 				    _speed_times    = .15 * item_get_count("times"),
-						_speed_boss     = "boss_buff" in self ? .2 : 0;
-						_speed_other    = (instance_is(self, FrogQueen) || instance_is(self, OasisBoss)) ? -.6 : 0;
+					_speed_boss     = "boss_buff" in self ? .2 : 0,
+					_speed_other    = (instance_is(self, FrogQueen) || instance_is(self, OasisBoss)) ? -.6 : 0,
+					_speed_cryo     = ("freezeTime" in self && freezeTime > 0) ? 0 : 1,
+					_speed_invis    = (mod_variable_get("mod", "items", "InvisibleTimer") > 0 && instance_exists(Player)) ? 0 : 1,
+					_speed_pause    = (_speed_cryo = 0 || _speed_invis = 0) ? 0 : 1;
+						
 				if(alarm_get(i) > 2){
-					alarm_set(i, alarm_get(i) - (_speed_hardmode + _speed_times + _speed_boss + _speed_other));
+					alarm_set(i, alarm_get(i) - (_speed_hardmode + _speed_times + _speed_boss + _speed_other) * _speed_cryo * _speed_invis + (1 - _speed_pause) * 2);
 				}
 			}
 
@@ -1113,7 +1123,7 @@
 	speed = (0) + (room_speed / 28)
 
 	//TIME SYSTEM
-	if instance_exists(Player) && !instance_exists(GenCont) global.frame += speed * current_time_scale
+	if instance_exists(Player) && !instance_exists(GenCont) && !instance_exists(mutbutton) global.frame += speed * current_time_scale
 	if global.frame == room_speed {
 	    global.frame = 0
 	    global.seconds++

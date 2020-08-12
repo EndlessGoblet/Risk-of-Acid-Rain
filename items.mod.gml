@@ -64,13 +64,13 @@
 	global.descriptionTimer = 0;
 
 	global.RadiatedSnackCounter = 0;
-	global.InvisibleTimer 			= 0;
-	global.BloodCounter 				= 0;
-	global.GemCoeff 						= choose(-1, 1)
-	global.MinusRad             = 0;
-	global.RustedChests         = 0;
-	global.StartLevel           = 0;
-	global.hurtFloor 						= false;
+	global.InvisibleTimer = 0;
+	global.BloodCounter	= 0;
+	global.GemCoeff = choose(-1, 1)
+	global.MinusRad = 0;
+	global.RustedChests = 0;
+	global.StartLevel = 0;
+	global.hurtFloor = false;
 
 	global.PlusItems = 0;
 	global.hideDes = 0;
@@ -86,7 +86,7 @@
 	
 	//set new level function
 	if instance_exists(CharSelect) CharSelect.debugSet  = false;
-	if instance_exists(CharSelect) CharSelect.debug 		= false;
+	if instance_exists(CharSelect) CharSelect.debug = false;
 	if instance_exists(CharSelect) CharSelect.closeInfo = true;
 	global.doubleChests  = false;
 	global.doubleShrines = false;
@@ -592,23 +592,22 @@
 		{
 		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
 			{
-				for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
+				/*for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
 				add_item(global.UniqueItems[_i], 1)
-				}
-				for(var _i = 0; _i < array_length(global.CommonItems); _i++){
+				}for(var _i = 0; _i < array_length(global.CommonItems); _i++){
 					add_item(global.CommonItems[_i], 1)
 				}for(var _i = 0; _i < array_length(global.UncommonItems); _i++){
 					add_item(global.UncommonItems[_i], 1)
-					}for(var _i = 0; _i < array_length(global.RareItems); _i++){
+				}for(var _i = 0; _i < array_length(global.RareItems); _i++){
 					add_item(global.RareItems[_i], 1)
 				}for(var _i = 0; _i < array_length(global.CursedItems); _i++){
 				add_item(global.CursedItems[_i], 1)
-				}
+				}*/
 			}
 		}
 		if(button_pressed(index, "key1"))
 		{
-		add_item(item[? "heart"], 1)
+		add_item(item[? "cryo"], 1)
 		}
 	}
 
@@ -669,26 +668,23 @@
 			{
 	    	if (forceSupport == true) || object_index != CustomProjectile
 				{
-	       	if "slowed" not in self
-				 	{
-	          speed /= (1 + .5 / amount);
-	          slowed = 1;
-	        }
-					var q = instance_nearest(x ,y , enemy)
-			    if instance_exists(q)
+	       		if "slowed" not in self
+				{
+		          speed /= (1 + .5 / amount);
+		          slowed = 1;
+	        	}
+				var q = instance_nearest(x ,y , enemy)
+			    if instance_exists(q) && speed > 0
+				{
+			      if distance_to_object(q) < (12 + amount * 4)
 					{
-			      if distance_to_object(q) < (speed + 12)
+						if distance_to_object(q) <= speed
 						{
-			        var dir = point_direction(x,y,q.x,q.y),
-							    spd = min(current_time_scale * speed * .1 + amount * 1.5, point_distance(x, y, q.x, q.y) + 4);
-			        x += lengthdir_x(spd, dir)
-			        y += lengthdir_y(spd, dir)
-							if "originalspeed" not in self originalspeed = speed
-							if distance_to_object(q) <= speed {x = q.x - lengthdir_x(speed / 2, dir); y = q.y - lengthdir_y(speed / 2, dir); speed /= 4}
-			      }
-						else{if "originalspeed" in self speed = originalspeed}
+							x = q.x - hspeed
+							y = q.y - vspeed
+						}
+			    	}
 			    }
-					else{if "originalspeed" in self speed = originalspeed}
 				}
 			}
 		}
@@ -803,7 +799,7 @@
 
 	//Cryo Rounds
 	var amount = item_get_power("cryo")
-	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self {instance_nearest(x, y, enemy).freezeTime = room_speed * amount}}}
+	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self && roll_luck(6) = true {instance_nearest(x, y, enemy).freezeTime = room_speed * (2 + amount)}}}
 
 	with instances_matching_ge(enemy, "freezeTime", 1)
 	{
@@ -812,9 +808,10 @@
 			freezeTime--
 			if freezeTime > 0
 			{
-				for(i = 0; i < 10; i++){alarm_set(i,alarm_get(i) + (freezeTime / 2))}
 				f_var = freezeTime * 2; if f_var > 100 f_var = 100
-				image_blend = merge_color(c_blue, c_white, (1 - (f_var / 100)))
+				image_blend = merge_color(c_aqua, c_white, (1 - (f_var / 100)))
+				image_index = 0;
+				speed = 0;
 			}
 		}
 	}

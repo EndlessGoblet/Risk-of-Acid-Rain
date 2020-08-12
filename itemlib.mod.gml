@@ -251,7 +251,7 @@
   item_cryo_rounds = {
     name              : "Cryo Rounds",
   	description_small : "@wEnemies @sget @bstunned @supon taking @wdamage",
-  	description_large : `@sYour @yprojectiles @sapply the @bfrozen @(color:${c_debuff})debuff @sfor @w1@(color:${c_stack})(+1 per stack) @wsecond@s,#@bfrozen @wenemies @sact more slowly`,
+  	description_large : `@sYour @yprojectiles @sapply the @bfrozen @(color:${c_debuff})debuff @sfor @w1@(color:${c_stack})(+1 per stack) @wsecond @swith a @w7% chance@s,#@bfrozen @wenemies @scannot @gact @sor @wmove`,
     description_width : 68,
   	spr_index         : 21,
   	tier              : 1
@@ -782,9 +782,9 @@
     tier              : 4
   };
 
-#macro item_sugilith_fragment item[? "fragment"] // ITEM 72: SUGILITH FRAGMENT
-  item_sugilith_fragment = {
-    name              : "SUGILITH FRAGMENT",
+#macro item_crystal_fragment item[? "fragment"] // ITEM 72: CRYSTAL FRAGMENT
+  item_crystal_fragment = {
+    name              : "CRYSTAL FRAGMENT",
     description_small : "@s+@w4 @rmax HP",
     description_large : `@sGain @w4@(color:${c_stack})(+1 per stack) @rmax HP`,
     description_width : 27,
