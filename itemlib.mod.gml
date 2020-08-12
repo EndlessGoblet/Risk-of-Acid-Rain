@@ -88,7 +88,7 @@
     name              : "Pre-War Light Bulb",
   	description_small : "@sGain a damaging @waura of light",
   	description_large : "@wEnemies 25 meters @d(+10.5 meters per stack)@saway from you#take @w0.1 damage @d(+0.05 damage per stack)",
-    description_width : 0,
+    description_width : 55,
     spr_index         : 6,
   	tier              : 1
 
@@ -175,8 +175,8 @@
   item_sabotage_tools = {
     name              : "Sabotage Tools",
   	description_small : "@wEnemy @yprojectiles @ssometimes get @wjammed",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : `@wEnemy @yprojectiles @shave an @w8%@(color:${c_stack})(+8% per stack)@s chance to become the @gplayers team`,
+    description_width : 77,
   	spr_index         : 14,
   	tier              : 2
 
@@ -197,8 +197,8 @@
   item_bloody_lust = {
     name              : "Bloody Lust",
   	description_small : "@sGo @rBerserk @swhen taking @rdamage",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : `@sWhen you lose @rhealth, @wgain@s,#@(color:${c_speed})1 @wspeed@s,#@w33% @rdamage@s,#@w30% @wreload speed@s,#@sFor @w3 seconds@(color:${c_stack})(+1 second per stack)`,
+    description_width : 34,
   	spr_index         : 16,
   	tier              : 1
 
@@ -219,8 +219,8 @@
   item_liquid_nitrogen = {
     name              : "Liquid Nitrogen",
   	description_small : "@sGain an @waura @sthat deletes @yprojectiles",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : `@sGain an @waura @sthat has a @wchance @sto delete enemy @yprojectiles@s,#@(color:${c_stack})(Deletions more common each stack)`,
+    description_width : 59,
   	spr_index         : 18,
   	tier              : 1
   };
@@ -240,8 +240,8 @@
   item_binky = {
     name              : "Binky",
   	description_small : "@wEnemies @smay turn into @bbabies",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : `@wEnemies @shave a @w4%@(color:${c_stack})(+3% per stack)@s chance to have,#@w-50% @(color:${c_speed})size@s,#@w-50% @rHealth`,
+    description_width : 48,
   	spr_index         : 20,
   	tier              : 1
 
@@ -328,8 +328,8 @@
   item_bullet_grease = {
     name              : "Bullet Grease",
   	description_small : "@sDecreases @yprojectile @wfriction",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : `@sIncreases @yprojectile @wspeed@s by @w15%@s,#@sDecreases @yprojectile @wfriction @sby @w15%@(color:${c_stack})(+15% per stack)`,
+    description_width : 52,
   	spr_index         : 28,
   	tier              : 0
 
@@ -350,8 +350,8 @@
   item_firewood = {
     name              : "Firewood",
   	description_small : "@sKilling gains @ycharge@s, release @ycharge @son @whit",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : `@sTaking @wdamage @sadds @y1 charge@(color:${c_stack})(+1 per stack) @sUpon taking#@wdamage, @srelease @yfire shells@s in random directions for each @ycharge.`,
+    description_width : 65,
   	spr_index         : 30,
   	tier              : 1
 
@@ -372,8 +372,8 @@
   item_broken_locket = {
     name              : "Broken Locket",
   	description_small : "@wEnemies @sdrop @wrusty chests @son @wdeath",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : `@wEnemies @shave a @w6%@(color:${c_stack})(+2% per stack) @schance to drop a @wrusty chest @supon death.#@wRusty chests @scontain mostly @wcommon @sitems`,
+    description_width : 73,
   	spr_index         : 32,
   	tier              : 0
 
@@ -426,8 +426,8 @@
   item_glowing_fern = {
     name              : "Glowing Fern",
   	description_small : "@wEnemies @smay drop @wstealth packs",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : `@wEnemies @shave a chance to drop @wstealth packs@s,#@wStealth packs @sgrant @w+5 seconds @sof @ystealth#@(color:${c_stack})(Chance increases per stack)`,
+    description_width : 44,
   	spr_index         : 37,
   	tier              : 1
 
@@ -524,8 +524,8 @@
   item_backup_heart_spent = {
     name              : "SPENT HEART",
   	description_small : "@sIt's all used up",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : "@sWas once a @wBackup Heart, @sbut you died and now it's @dused",
+    description_width : 55,
   	spr_index         : 46,
   	tier              : 5
   };
@@ -564,8 +564,8 @@
   item_metafillings = {
     name              : "METAFILLINGS",
   	description_small : "@yPickups @sare @yworth @w50% @smore",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : `@wAll @ypickups @sgrant @w50%@(color:${c_stack})(+50% per stack) @smore benefits`,
+    description_width : 51,
   	spr_index         : 50,
   	tier              : 2
   };
@@ -644,8 +644,8 @@
   item_Fcurrency = {
     name              : "FAUX COIN",
   	description_small : "@dCheaters@s get @wfake coins",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : "@swhen @rcheats @sare enabled, these drop instead of @pcursed coins.",
+    description_width : 60,
   	spr_index         : 58,
   	tier              : 5
   };
@@ -665,8 +665,8 @@
   item_idol_paragon = {
     name              : "IDOL PARAGON",
   	description_small : "@wShrines @sare more @wpowerful",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : `@wShrines @sare each uniquely more @wpowerful#@(color:${c_stack})(Increased power per stack)`,
+    description_width : 39,
   	spr_index         : 60,
   	tier              : 1
 
@@ -736,8 +736,8 @@
   item_broken_quartz_flower = {
     name              : "BROKEN FLOWER",
   	description_small : "@sUseless, @wreturns @sfixed next @warea",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : "@sWas once a @rQuartz Flower, @sbut you got @whit, @sand you @wbroke it.#@sWill return to a @rquartz flower@w next area.",
+    description_width : 60,
     spr_index         : 67,
   	tier              : 5
   };

@@ -360,9 +360,9 @@
 		{
 			var      _g = mod_variable_get("mod", "main", "Gamemode"),
 					_chance = 0;
-			if (_g == 0) _chance = round(random_range(1, 500 * Player.lunarDrops))
-			if (_g == 1) _chance = round(random_range(1, 250 * Player.lunarDrops))
-			if (_g == 2) _chance = round(random_range(1, 500))
+			if (_g == 0) _chance = round(random_range(1, 250 * Player.lunarDrops))
+			if (_g == 1) _chance = round(random_range(1, 125 * Player.lunarDrops))
+			if (_g == 2) _chance = round(random_range(1, 250))
 			if _chance = 1
 			{
 				Player.lunarDrops++
@@ -621,6 +621,19 @@
 			extra_accuracy  = 0,
 			extra_damage    = 0;
 
+
+	//Mutant Stat Balancing
+
+	//Melting Balancing
+	if instance_exists(Player) && Player.race = ("melting") {
+	extra_health -= (GameCont.level - 1)
+	}
+
+	//Crystal Balancing
+	if instance_exists(Player) && Player.race = ("crystal") {
+	extra_health += (GameCont.level - 1)
+	}
+
 	//inside information (more damage to IDPD and they drop more stuff)
 	var amount = item_get_power("info")
 	var IDPD = [Grunt, Shielder, Inspector, EliteGrunt, EliteShielder, EliteInspector, Van, Last]
@@ -790,7 +803,7 @@
 
 	with instances_matching_ge(enemy, "freezeTime", 1)
 	{
-		if "freezeTime" in self && object_index != BanditBoss && object_index != ScrapBoss && object_index != OasisBoss && object_index != Nothing && object_index != Nothing2 && object_index != HyperCrystal && object_index != FrogQueen && object_index != TechnoMancer && object_index != LilHunter
+		if "freezeTime" in self && object_index != BanditBoss && object_index != LaserCrystal && object_index != ScrapBoss && object_index != OasisBoss && object_index != Nothing && object_index != Nothing2 && object_index != HyperCrystal && object_index != FrogQueen && object_index != TechnoMancer && object_index != LilHunter
 		{
 			freezeTime--
 			if freezeTime > 0
@@ -1613,7 +1626,7 @@
 
 				//Slosher
 				var amount = item_get_power("slosher")
-				if amount >= 1 && "sacred" not in self and "blessed" not in self
+				if amount >= 1 && instance_exists(Player) && "sacred" not in self and "blessed" not in self
 				{
 					var direct = direction
 					repeat(roll(amount)) with instance_create(x, y, EnemyBullet2)
@@ -2245,7 +2258,7 @@
 	//Drawing Boss Health Bar
 	if bossBars = true
 	{
-		var Boss = [BanditBoss, HyperCrystal, FrogQueen, OasisBoss, LilHunter, Nothing2, Nothing, ScrapBoss, TechnoMancer, Turtle, SuperFireBaller],
+		var Boss = [BanditBoss, HyperCrystal, FrogQueen, OasisBoss, LilHunter, Nothing2, Nothing, ScrapBoss, TechnoMancer, Turtle, SuperFireBaller, Guardian],
 		    _mxh = 0,
 				_myh = 0,
 				_amo = 0,
@@ -2254,6 +2267,7 @@
 		{
 			if instance_exists(Boss[i]) && instance_exists(Player)
 			{
+				Player.portalTimer = room_speed * 11
 				with Boss[i] if "tag" in self && tag = "boss"
 				{
 					_myh += my_health;
@@ -2271,8 +2285,9 @@
 					case Nothing2       : _nam = "THRONE II"    ; break;
 					case ScrapBoss      : _nam = "BIG DOG"      ; break;
 					case TechnoMancer   : _nam = "TECHNOMANCER" ; break;
-					case Turtle         : _nam = "SEWER TURTLE" ; break;
+					case Turtle         : _nam = "TURTLE GANG" ; break;
 					case SuperFireBaller: _nam = "MANSION GANG" ; break;
+					case Guardian       : _nam = "SHADOW GUARDIAN" ; break;
 					default: _nam = "BOSS"; break;
 				}
 			}
