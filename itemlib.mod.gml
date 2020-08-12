@@ -524,8 +524,8 @@
   item_backup_heart_spent = {
     name              : "SPENT HEART",
   	description_small : "@sIt's all used up",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : "@sWas once a @wBackup Heart, @sbut you died and now it's @dused",
+    description_width : 55,
   	spr_index         : 46,
   	tier              : 5
   };

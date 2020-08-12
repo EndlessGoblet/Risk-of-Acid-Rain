@@ -146,6 +146,7 @@
 
 	if (global.Gamemode == 2) {
 		global.perfected = true
+	if (GameCont.area == 7) instance_create(Player.x + random_range(-100, 100), Player.y + random_range(-100, 100), IDPDSpawn)
 	//Arena mode setup
 	wait(1);
 	var template = "regular"
@@ -240,6 +241,10 @@
 	if (GameCont.area == 101) DWall = 12
 	if (GameCont.area == 2) DWall = 8
 	if (GameCont.area == 3) DWall = 4
+	if (GameCont.area == 4) DWall = 8
+	if (GameCont.area == 5) DWall = 12
+	if (GameCont.area == 6) DWall = 4
+	if (GameCont.area == 7) DWall = 8
 	DWall = round(DWall*m)
 	if (GameCont.area == 3) && DWall < 2 DWall = 2 //Scrapyard always has at least 2 traps
 	for(i = 1; i < DWall; i++) {
@@ -401,6 +406,19 @@
 					}
 	global.BossesLeft++
 	if (GameCont.area == 1) GameCont.subarea = 1;
+
+	with instances_matching(CustomObject, "name", "shrine") if distance_to_object(Floor) >= 20 {
+			 var FloorChoice = instance_find(Floor, irandom(instance_number(Floor) - 1));
+			 x = FloorChoice.x
+			 y = FloorChoice.y
+		 }
+
+	/*with instances_matching(CustomObject, "name", "shrine") if distance_to_object(Wall) <= 20 {
+			instance_delete(self)
+		 }*/
+	with instances_matching(CustomObject, "name", "shrine") instance_delete(self) //For now, no shrines in Boss Rush
+
+
 	}
 
 	if (Player.fancy == 1) global.fancy = 1
@@ -627,6 +645,14 @@
 
 #define step
 
+/*	if button_check(0, "key1") { trace_color("AREA: 1 (Desert)", c_yellow); GameCont.area = 1; } //Lazy Debug
+	if button_check(0, "key2") { trace_color("AREA: 2 (Sewers)", c_green); GameCont.area = 2; }
+	if button_check(0, "key3") { trace_color("AREA: 3 (Scrapyard)", c_gray); GameCont.area = 3; }
+	if button_check(0, "key4") { trace_color("AREA: 4 (Crystal Caves)", c_purple); GameCont.area = 4; }
+	if button_check(0, "key5") { trace_color("AREA: 5 (Ice City)", c_white); GameCont.area = 5; }
+	if button_check(0, "key6") { trace_color("AREA: 6 (Labs)", c_blue); GameCont.area = 6; }
+	if button_check(0, "key7") { trace_color("AREA: 7 (Palace)", c_lime); GameCont.area = 7; } */
+
 	if instance_exists(Player) with instances_matching_ne(Corpse, "team", Player.team){
 		team = Player.team
 	}
@@ -640,7 +666,7 @@
 	//Rebel Balancing
 	if instance_exists(Player) && Player.race = ("rebel") { //Rebel spends 20% health to spawn an ally on top of the regular -2 penalty
 		if (Player.my_health - 2 <= (Player.maxhealth / 5)) Player.canspec = false else Player.canspec = true
-		if button_pressed(Player.index, "spec") && (Player.my_health - 2 >= (Player.maxhealth / 5)) Player.my_health = floor(Player.my_health - Player.maxhealth / 4)
+		if button_pressed(Player.index, "spec") && (Player.my_health - 2 > (Player.maxhealth / 5)) Player.my_health = floor(Player.my_health - Player.maxhealth / 4)
 	}
 
 
@@ -683,25 +709,86 @@
 	 //Boss Rush stuff
  	 if global.Gamemode == 2 && instance_exists(Player)
 	 {
+		 _boss = instances_matching(enemy, "tag", "boss")
+		 trace(Player.portalTimer)
+			var _text = "error"
+			if (Player.portalTimer == room_speed * 1) _text = "1"
+			if (Player.portalTimer == room_speed * 2) _text = "2"
+			if (Player.portalTimer == room_speed * 3) _text = "3"
+			if (Player.portalTimer == room_speed * 4) _text = "4"
+			if (Player.portalTimer == room_speed * 5) _text = "5"
+			if (Player.portalTimer == room_speed * 6) _text = "6"
+			if (Player.portalTimer == room_speed * 7) _text = "7"
+			if (Player.portalTimer == room_speed * 8) _text = "8"
+			if (Player.portalTimer == room_speed * 9) _text = "9"
+			if (Player.portalTimer == room_speed * 10) _text = "10"
+			if _text != "error" {
+				with instance_create(Player.x, Player.y, PopupText) {
+					text = string(_text)
+				}
+			}
+
+		 wait(2)with (IDPDSpawn) if distance_to_object(Floor) >= 20 {
+			 var FloorChoice = instance_find(Floor, irandom(instance_number(Floor) - 1));
+			 x = FloorChoice.x
+			 y = FloorChoice.y
+		 }
 	 	 //Guardian Boss
+		  if (GameCont.area == 7 && global.Gamemode == 2) {
+			  with (enemy) {
+			  for(i = 0; i < 5; i++){
+				if(alarm_get(i) > 2){
+					alarm_set(i, alarm_get(i) - (1));
+				}}}
+
+		  }
 	 	 with (Guardian)
 		 {
 		   if ("tag" in self) && (tag == "boss")
 			 {
+
+				 with (projectile) {
+				if (team != 2) speed *= 1.05
+				 if distance_to_object(other) <= 20 {
+					 if (team = 2) {
+					sound_play_pitch(sndLaserCrystalHit,random_range(0.9,1.1))
+					 team = 1;
+					 direction *= -1
+					 image_angle = direction	
+					 other.Reflect = room_speed / 4
+					 }
+					 
+				 }
+				 }
 				 if ('GuardianBuff' not in self)
 				 {
 					 GuardianBuff = true;
-					 team = 2;
-					 maxhealth = 800;
-					 image_blend = merge_color(c_blue, c_white, 0.5)
+					 //team = 2;
+					 maxhealth = 1200;
+					 my_health = 1200;
+					 image_blend = merge_color(c_black, c_white, 0.5)
+					 Reflect = 0;
 				 }
-				 for(i = 0; i < 5; i++){alarm_set(i, alarm_get(i) + 1)}
+				// for(i = 0; i < 5; i++){alarm_set(i, alarm_get(i) + 1)}
+				for(i = 0; i < 5; i++){
+				if(alarm_get(i) > 2){
+					alarm_set(i, alarm_get(i) - (2));
+				}}
 				 with instances_matching_le(enemy,"my_health",0)
 				 {
+					 with instance_create(x + random_range(-8, 8), y + random_range(-8, 8), BulletHit)
+			{
+				motion_set(90, 2)
+				image_speed = 1
+				image_xscale = .5
+				image_yscale = .5
+				depth = other.depth - 1
+				sprite_index = sprSmoke
+			}
 				 	 with instances_matching(Guardian, "tag", "boss") my_health -= 50;
 				 }
-				 _roll = irandom_range(1,5)
-				 if (_roll = 1)with instance_create(x + random_range(-25, 25), y+random_range(-25,25), Smoke){image_blend = merge_color(c_blue, c_white, 0.5)}
+				 _roll = irandom_range(1,3)
+				 if (_roll = 1)with instance_create(x + random_range(-25, 25), y+random_range(-25,25), Smoke){image_blend = merge_color(c_green, c_white, 0.5)}
 			 }
 	   }
 
@@ -739,10 +826,9 @@
 			 {
 				 var f_ = instance_find(Floor, irandom(instance_number(Floor) - 1));
 				 GameCont.subarea = 3;
-				 instance_create(f_.x, f_.y, Portal)
-				 trace("Portal Created!")
+				instance_create(f_.x, f_.y, Portal)
 			 }
-			 if instance_exists(Portal) || instance_exists(SpiralCont)Player.portalTimer = (room_speed * 10)
+			if (instance_exists(Portal)) Player.portalTimer = (room_speed * 100)
 		 }
 	 }
 
@@ -776,7 +862,7 @@
 				case 2: BossRushModifier = 150; break;
 				case 3: BossRushModifier = 10; break;
 				}
-		if (GameCont.area == 7) && (GameCont.subarea = 1) BossRushModifier = 0.5
+		if (GameCont.area == 7) && (GameCont.subarea = 1) BossRushModifier = 0
 	}
 	//if irandom(instance_number(enemy) + (BossRushModifier * 20) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
 	if !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
@@ -794,6 +880,7 @@
 	{
 		if my_health <= 0
 		{
+			if (global.Gamemode == 2) && (Player.race == "rogue") instance_create(x, y, RoguePickup) //Bosses drop portal strike charge in boss rush
 			if global.Gamemode == 2 && global.perfected == true
 			{
 				with instance_create(Player.x, Player.y, PopupText)
@@ -1076,7 +1163,7 @@
 	}}
 
 #define game_start
-	Player.portalTimer = (room_speed * 5)
+    Player.portalTimer = 3290;
 	if (global.Gamemode == 2) 	Player.bossKilled = false
 
 	save_save()
@@ -1799,6 +1886,15 @@
 	draw_timehud(view_xview_nonsync, view_yview_nonsync);
 
 #define draw
+//Guardian Boss Reflect Circle
+with (Guardian) if "Reflect" in self && Reflect > 0 {
+				 	 draw_set_color(c_lime)
+					 draw_set_alpha(Reflect / 10)
+					 draw_circle(x, y-5, 20, false)
+					 draw_set_alpha(1)
+					 Reflect--	
+			 }
+
 	draw_set_halign(fa_center)
 	with instances_matching(CustomProp, "name", "Teleporter")
 	{
@@ -1962,6 +2058,7 @@
 		{
 			boss_buff = 1 + item_get_count("times") * .1 + global.Gamemode
 			maxhealth *= boss_buff + _bosshp
+			if (object_index = FrogQueen) && (global.Gamemode == 2) maxhealth *= 0.3 
 			my_health = maxhealth
 		}
 	}

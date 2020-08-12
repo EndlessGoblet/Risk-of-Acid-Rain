@@ -4,6 +4,8 @@
 	global.sprMaxHPSplat  = sprite_add("sprites/other/sprMaxHPSplat.png"  , 1, 0, 0);
 	global.sprHealthSplat = sprite_add("sprites/other/sprHealthSplat.png" , 1, 0, 0);
 
+	global.shrineIcons = sprite_add("sprites/shrines/shrineIcons.png", 16, 13, 13)
+
 	global.sprItems = sprite_add("sprites/items/sprItems.png", 101, 17, 17);
 
 	global.mskShrineGuns = sprite_add("sprites/other/mskShrineGuns.png", 1, 21, 16);
@@ -20,6 +22,8 @@
 #macro CursedItems   mod_variable_get("mod", "items"  , "CursedItems"  );
 #macro PlayerItems	 mod_variable_get("mod", "items"  , "PlayerItems"  );
 #macro c_gold $86C9DF
+
+#define step 
 
 #define shrine_create(X, Y)
 	var _s = instance_create(X, Y, CustomObject);
@@ -80,6 +84,7 @@
 		case   2: case "death":  	on_interact  = death_interact;
 													  	sprite_index = sprThroneStatue;
 															sprite_broke = sprThroneStatueDead;
+														iconNum = 10;
 													  	cost    = 0;
 													  	costval = 50 * GameCont.level;
 
@@ -93,6 +98,7 @@
 		case   5: case "guns":    on_interact  = guns_interact;
 															sprite_index = sprThroneStatue;
 															sprite_broke = sprThroneStatueDead;
+															iconNum = 9;
 															cost    = 0;
 															costval = 40 * GameCont.level;
 
@@ -108,6 +114,7 @@
 		case   6: case "hatred":  on_interact  = hatred_interact;
 														  sprite_index = global.sprShrineHatred;
 															sprite_broke = sprThroneStatueDead;
+															iconNum = 14;
 														  cost    = 3;
 														  costval = 1;
 
@@ -119,6 +126,7 @@
 															sprite_broke = sprThroneStatueDead;
 															cost    = 3;
 															costval = 1;
+															iconNum = 5;
 
 															subname = "DESTINY"
 															uses = 1 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") + 1 : 0);
@@ -129,13 +137,14 @@
 															sprite_broke = sprThroneStatueDead;
 															cost    = 3;
 															costval = 1;
-
+															iconNum = 15;
 															subname = "LUCK"
 															break;
 		// Shrine of Curses
 		case 11: case "curses":   on_interact  = curses_interact;
 															sprite_index = sprThroneStatue;
 															sprite_broke = sprThroneStatueDead;
+															iconNum = 8;
 															cost    = 3;
 															costval = 1;
 
@@ -146,6 +155,7 @@
 		case 12: case "risk":     on_interact  = risk_interact;
 															sprite_index = sprThroneStatue;
 															sprite_broke = sprThroneStatueDead;
+															iconNum = 13;
 															cost    = 2;
 															costval = 2;
 
@@ -155,6 +165,7 @@
 		case 13: case "protection": on_interact  = protection_interact;
 																sprite_index = sprThroneStatue;
 																sprite_broke = sprThroneStatueDead;
+																iconNum = 4;
 																cost    = 0;
 																costval = 30 * GameCont.level;
 
@@ -171,6 +182,7 @@
 		case 14: case "printer":  on_interact  = printer_interact;
 													    sprite_index = sprThroneStatue;
 															sprite_broke = sprThroneStatueDead;
+															iconNum = 6;
 													    cost    = -1;
 													    costval = 1;
 
@@ -185,6 +197,7 @@
 		case 15: case "energizer": on_interact  = energizer_interact;
 															 sprite_index = sprThroneStatue;
 															 sprite_broke = sprThroneStatueDead;
+															 iconNum = 7;
 															 cost    =  0;
 															 costval = 20 * GameCont.level;
 
@@ -194,6 +207,7 @@
 		case 16: case "challenger": on_interact  = challenger_interact;
 																sprite_index = sprThroneStatue;
 																sprite_broke = sprThroneStatueDead;
+																iconNum = 3;
 																cost    =  4;
 																costval =  0;
 
@@ -500,6 +514,7 @@
 				draw_text_nt(x, y - 30, subname);
 				draw_sprite(sprEPickup, 0, x, y - 7)
 				draw_sprite(_splat, 0, x - sprite_get_width(_splat)/2, y)
+				draw_set_color(c_white)
 				if cost != 4 && cost != -1 draw_text(x - sprite_get_width(_splat)/2 + 20, y + 6, string(costval))
 			}
 			else
@@ -557,6 +572,14 @@
 					draw_text_nt(x, y - sprite_get_height(weapon_get_sprite(Player.wep)) + sprite_get_yoffset(weapon_get_sprite(Player.wep)) - _ymargin - 16, "CANNOT UPGRADE")
 				}
 			}
+		} else {
+		draw_set_alpha(0.2)
+		draw_sprite(global.shrineIcons, iconNum, x+6-1, y-19+1)
+		draw_sprite(global.shrineIcons, iconNum, x+6-1, y-21+1)
+		draw_sprite(global.shrineIcons, iconNum, x+6+1, y-19+1)
+		draw_sprite(global.shrineIcons, iconNum, x+6+1, y-21+1)
+		draw_set_alpha(1)
+		draw_sprite(global.shrineIcons, iconNum, x+6, y-20+1)
 		}
 		if index = crwn_protection
 		{
