@@ -709,8 +709,12 @@
 	 //Boss Rush stuff
  	 if global.Gamemode == 2 && instance_exists(Player)
 	 {
+		 with (FrogEgg) if "FrogNerf" not in self {
+			 maxhealth *= 0.5
+			 myhealth *= 0.5
+			 FrogNerf = true
+		 }
 		 _boss = instances_matching(enemy, "tag", "boss")
-		 trace(Player.portalTimer)
 			var _text = "error"
 			if (Player.portalTimer == room_speed * 1) _text = "1"
 			if (Player.portalTimer == room_speed * 2) _text = "2"
