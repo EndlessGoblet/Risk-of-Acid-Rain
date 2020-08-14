@@ -1,6 +1,6 @@
 #macro item mod_variable_get("mod", "itemlib", "ItemDirectory");
 
-#define init
+ #define init
 	// --- META DATA ---
 	global.version = "1.7";
 	global.released = false;
@@ -141,7 +141,7 @@
 #macro c_fel $FF271C;
 #macro c_inv merge_colour(merge_colour(c_aqua, c_blue, .35), c_white, .3);
 
-#define level_start
+ #define level_start
 	global.BossesLeft = 0; // 0 at level start, after teleport activation = amount of boss enemies, at 0 again spawns an item
 
 	if (global.Gamemode == 2) {
@@ -512,7 +512,7 @@
 		global.teleporter = false;
 	}
 
-#define enemySpawn
+ #define enemySpawn
 	if instance_exists(Player)
 	{
 		var _place = -4,
@@ -648,7 +648,7 @@
 		}
 	}
 
-#define step
+ #define step
 
 /*	if button_check(0, "key1") { trace_color("AREA: 1 (Desert)", c_yellow); GameCont.area = 1; } //Lazy Debug
 	if button_check(0, "key2") { trace_color("AREA: 2 (Sewers)", c_green); GameCont.area = 2; }
@@ -1175,7 +1175,7 @@
 	   if (roll >= 7) image_blend = merge_color(c_green, c_white, 1);
 	}}
 
-#define game_start
+ define game_start
     Player.portalTimer = 3290;
 	if (global.Gamemode == 2) 	Player.bossKilled = false
 
@@ -1206,7 +1206,7 @@
 	global.MenuIndex = -1;
 	//global.Gamemode  = 0;
 
-#define teleporter_draw
+ #define teleporter_draw
 	draw_self()
 	if item_get_count("siphon") > 0
 	{
@@ -1255,7 +1255,7 @@
 										break;
 					case   2:case 102: global.areaChoice = 3;
 										break;
-					case   3:case 103 global.areaChoice = 4;
+					case   3:case 103: global.areaChoice = 4;
 										break;
 				    case   4:case 104: global.areaChoice = 5;
 										break;
