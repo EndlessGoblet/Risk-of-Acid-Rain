@@ -2274,22 +2274,22 @@
 					_myh += my_health;
 					_mxh += maxhealth;
 					_amo++;
-				}
-				switch Boss[i]
-				{
-					case BanditBoss     : _nam = "BIG BANDIT"   ; break;
-					case HyperCrystal   : _nam = "HYPER CRYSTAL"; break;
-					case FrogQueen      : _nam = "MOM"          ; break;
-					case OasisBoss      : _nam = "BIG FISH"     ; break;
-					case LilHunter      : _nam = "LIL HUNTER"   ; break;
-					case Nothing        : _nam = "THRONE"       ; break;
-					case Nothing2       : _nam = "THRONE II"    ; break;
-					case ScrapBoss      : _nam = "BIG DOG"      ; break;
-					case TechnoMancer   : _nam = "TECHNOMANCER" ; break;
-					case Turtle         : _nam = "TURTLE GANG" ; break;
-					case SuperFireBaller: _nam = "MANSION GANG" ; break;
-					case Guardian       : _nam = "SHADOW GUARDIAN" ; break;
-					default: _nam = "BOSS"; break;
+					switch Boss[i]
+					{
+						case BanditBoss     : _nam = "BIG BANDIT"   ; break;
+						case HyperCrystal   : _nam = "HYPER CRYSTAL"; break;
+						case FrogQueen      : _nam = "MOM"          ; break;
+						case OasisBoss      : _nam = "BIG FISH"     ; break;
+						case LilHunter      : _nam = "LIL HUNTER"   ; break;
+						case Nothing        : _nam = "THRONE"       ; break;
+						case Nothing2       : _nam = "THRONE II"    ; break;
+						case ScrapBoss      : _nam = "BIG DOG"      ; break;
+						case TechnoMancer   : _nam = "TECHNOMANCER" ; break;
+						case Turtle         : _nam = "TURTLE GANG" ; break;
+						case SuperFireBaller: _nam = "MANSION GANG" ; break;
+						case Guardian       : _nam = "SHADOW GUARDIAN" ; break;
+						default: _nam = "BOSS"; break;
+					}
 				}
 			}
 			if _myh != 0

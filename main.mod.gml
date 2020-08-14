@@ -1228,7 +1228,7 @@
 		if !instance_exists(Spiral) && instance_exists(Player) && global.teleporter = true && point_in_circle(Player.x, Player.y, _tele.x - 4, _tele.y, _tele.radius)
 		{
 			global.chargeF++
-			if global.chargeF >= round(room_speed - (global.BossesLeft > 0 ? 0 : 45)) // 22
+			if global.chargeF >= round(room_speed - (global.BossesLeft > 0 ? 0 : 22))
 			{
 				global.chargeF = 0;
 				global.charge++; //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
@@ -1251,29 +1251,17 @@
 
 				switch GameCont.area
 				{
-					case 106: global.areaChoice = 7;
+					case   1:case 101: global.areaChoice = 2;
 										break;
-					case 105: global.areaChoice = 6;
+					case   2:case 102: global.areaChoice = 3;
 										break;
-					case 104: global.areaChoice = 5;
+					case   3:case 103 global.areaChoice = 4;
 										break;
-					case 103: global.areaChoice = 4;
+				    case   4:case 104: global.areaChoice = 5;
 										break;
-					case 102: global.areaChoice = 3;
+				    case   5:case 105: global.areaChoice = 6;
 										break;
-				    case 101: global.areaChoice = 2;
-										break;
-					case   1: global.areaChoice = 2;
-										break;
-					case   2: global.areaChoice = 3;
-										break;
-					case   3: global.areaChoice = 4;
-										break;
-				    case   4: global.areaChoice = 5;
-										break;
-				    case   5: global.areaChoice = 6;
-										break;
-				    case   6: global.areaChoice = 7;
+				    case   6:case 106: global.areaChoice = 7;
 										break;
 					case   7: global.areaChoice = 1;
 										break;
