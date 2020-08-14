@@ -1175,7 +1175,7 @@
 	   if (roll >= 7) image_blend = merge_color(c_green, c_white, 1);
 	}}
 
- define game_start
+ #define game_start
     Player.portalTimer = 3290;
 	if (global.Gamemode == 2) 	Player.bossKilled = false
 
