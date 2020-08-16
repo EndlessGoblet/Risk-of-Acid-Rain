@@ -2079,6 +2079,7 @@
 	}
 
 	draw_set_blend_mode(bm_add)
+	draw_set_colour(c_white)
 	var amount = item_get_power("bulb") //PRE WAR LIGHT BULBS
 	var _light = 30 * (1 + item_get_power("fungus") * .2) + random(2);
 	if amount >= 1 && instance_exists(Player)
