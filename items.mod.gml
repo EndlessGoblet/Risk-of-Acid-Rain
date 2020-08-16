@@ -591,7 +591,7 @@
 	{
 		if(button_pressed(index, "horn"))
 		{
-		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
+		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet" || string_lower(player_get_alias(0)) = "golden epsilon"
 			{
 				for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
 				add_item(global.UniqueItems[_i], 1)
@@ -1535,6 +1535,12 @@
 		}
 	}
 
+	//Hazmat Gear 1/2
+	var amount = item_get_count("gear");
+	if amount >= 1 {
+		extra_health += amount * 6;
+	}
+
 	// Focus
 	var amount = item_get_power("focus")
 	if amount >= 1 && instance_exists(Player)
@@ -1583,114 +1589,192 @@
 #define custom_step
 	// On create effects go here
 	with instances_matching_ne(enemy, "roar_check_create", true)
+	{
+		roar_check_create = true;
+
+		//Binky
+		var amount = item_get_power("binky")
+		if amount >= 1
 		{
-			roar_check_create = true;
-
-			//Binky
-			var amount = item_get_power("binky")
-			if amount >= 1
+			if roll_luck(4 + 3 * amount)
 			{
-				if roll_luck(4 + 3 * amount)
-				{
-					image_xscale /= 1.5
-					image_yscale /= 1.5
-					my_health /= 2.5
-					maxhealth /= 2.5
-				}
-			}
-
-			// Radiating Core
-			var amount = item_get_power("core")
-			if amount >= 1
-			{
-				raddrop += roll(amount);
-			}
-
-			if GameCont.level - global.StartLevel > 0
-			{
-				raddrop -= (GameCont.level - global.StartLevel)
+				image_xscale /= 1.5
+				image_yscale /= 1.5
+				my_health /= 2.5
+				maxhealth /= 2.5
 			}
 		}
+
+		// Radiating Core
+		var amount = item_get_power("core")
+		if amount >= 1
+		{
+			raddrop += roll(amount);
+		}
+
+		if GameCont.level - global.StartLevel > 0
+		{
+			raddrop -= (GameCont.level - global.StartLevel)
+		}
+	}
 
     // On projectile create effects go here
 	with instances_matching_ne(instances_matching_ne(projectile, "noproc", true), "roar_check_projectile", true)
+	{
+		roar_check_projectile = true;
+		if team = 2 // player projectiles
 		{
-			roar_check_projectile = true;
-			if team = 2 // player projectiles
+			//Rubber Projectile
+			var amount = item_get_power("rubber")
+			if amount >= 1
 			{
-				//Rubber Projectile
-				var amount = item_get_power("rubber")
-				if amount >= 1
-				{
-					if "extra_bounce" not in self extra_bounce = ceil(amount)
-				}
+				if "extra_bounce" not in self extra_bounce = ceil(amount)
+			}
 
-				//Slosher
-				var amount = item_get_power("slosher")
-				if amount >= 1 && instance_exists(Player) && "sacred" not in self and "blessed" not in self
+			//Slosher
+			var amount = item_get_power("slosher")
+			if amount >= 1 && instance_exists(Player) && "sacred" not in self and "blessed" not in self
+			{
+				var direct = direction
+				repeat(roll(amount)) with instance_create(x, y, EnemyBullet2)
 				{
-					var direct = direction
-					repeat(roll(amount)) with instance_create(x, y, EnemyBullet2)
-					{
-						sacred = true;
-						damage = 2
-						motion_set(direct + random_range(-50, 50),16)
-						image_angle = direction
-						friction = random_range(1.5, 1.65)
-						var roll2 = random_range(0.5, 1)
-						image_xscale = roll2
-						image_yscale = roll2
-						team = Player.team;
-					}
-				}
-
-				//Bullet Grease
-				var amount = item_get_power("grease")
-				if amount >= 1
-				{
-					friction /= (1 + (.12 * amount))
-					speed *= 1.15
-				}
-
-				//Stone Dagger
-				var amount = item_get_power("dagger")
-				if amount >= 1
-				{
-            	var bonus = 1 + ( instance_number(enemy) )*(amount / 2) / 100 // +1% damage per enemy, with 50% increase per stack
-				damage *= bonus
-				}
-
-				//Gun God's Blessing
-				var amount = item_get_power("blessing")
-				if amount >= 1
-				{
-					if "blessed" not in self && "sacred" not in self
-					{
-						if roll_luck((1 - 1/(.15 * amount + 1))*100) with instance_create(x,y,object_index) // hyperbolic item stacking
-						{
-							motion_set(other.direction,other.speed*1.2)
-							image_angle = direction
-							team = other.team;
-							sprite_index = other.sprite_index
-							sound_play_pitch(sndPopgun, random_range(.8, 1.2))
-							sound_play_pitchvol(sndPopPop, random_range(.8, 1.2), .3)
-							blessed = 1
-						}
-						blessed = 1;
-					}
+					sacred = true;
+					damage = 2
+					motion_set(direct + random_range(-50, 50),16)
+					image_angle = direction
+					friction = random_range(1.5, 1.65)
+					var roll2 = random_range(0.5, 1)
+					image_xscale = roll2
+					image_yscale = roll2
+					team = Player.team;
 				}
 			}
-			else // enemy projectiles
+
+			//Bullet Grease
+			var amount = item_get_power("grease")
+			if amount >= 1
 			{
-				//Sabotage Tools
-				var amount = item_get_power("tools")
-				if amount >= 1
+				friction /= (1 + (.12 * amount))
+				speed *= 1.15
+			}
+
+			//Stone Dagger
+			var amount = item_get_power("dagger")
+			if amount >= 1
+			{
+        	var bonus = 1 + ( instance_number(enemy) )*(amount / 2) / 100 // +1% damage per enemy, with 50% increase per stack
+			damage *= bonus
+			}
+
+			//Gun God's Blessing
+			var amount = item_get_power("blessing")
+			if amount >= 1
+			{
+				if "blessed" not in self && "sacred" not in self
 				{
-					if roll_luck(clamp(8 * amount, 0, 40)){damage *= 2; team = Player.team
+					if roll_luck((1 - 1/(.15 * amount + 1))*100) with instance_create(x,y,object_index) // hyperbolic item stacking
+					{
+						motion_set(other.direction,other.speed*1.2)
+						image_angle = direction
+						team = other.team;
+						sprite_index = other.sprite_index
+						sound_play_pitch(sndPopgun, random_range(.8, 1.2))
+						sound_play_pitchvol(sndPopPop, random_range(.8, 1.2), .3)
+						blessed = 1
+					}
+					blessed = 1;
+				}
+			}
+		}
+		else // enemy projectiles
+		{
+			//Sabotage Tools
+			var amount = item_get_power("tools")
+			if amount >= 1
+			{
+				if roll_luck(clamp(8 * amount, 0, 40)){damage *= 2; team = Player.team
+				}
+			}
+		}
+	}
+	//Hazmat Gear 2/2
+	var amount = item_get_count("gear");
+	if amount >= 1 {
+		with([Flame, TrapFire, Lightning, ToxicGas]){
+			with(self){
+				//Yoinked from yokin's hitbounce detection
+				if(friction_raw != 0 && speed_raw != 0){
+					speed_raw -= min(abs(speed_raw), friction_raw) * sign(speed_raw);
+				}
+				if(gravity_raw != 0){
+					hspeed_raw += lengthdir_x(gravity_raw, gravity_direction);
+					vspeed_raw += lengthdir_y(gravity_raw, gravity_direction);
+				}
+				if(speed_raw != 0){
+					x += hspeed_raw;
+					y += vspeed_raw;
+				}
+				if(distance_to_object(Player) <= 16){
+					
+					with(instances_matching_le(instances_matching_ge(instances_matching_le(instances_matching_ge(Player, "bbox_right", bbox_left - 16), "bbox_left", bbox_right + 16), "bbox_bottom", bbox_top - 16), "bbox_top", bbox_bottom + 16)){
+						var _break = false;
+						
+						if(friction_raw != 0 && speed_raw != 0){
+							speed_raw -= min(abs(speed_raw), friction_raw) * sign(speed_raw);
+						}
+						if(gravity_raw != 0){
+							hspeed_raw += lengthdir_x(gravity_raw, gravity_direction);
+							vspeed_raw += lengthdir_y(gravity_raw, gravity_direction);
+						}
+						if(speed_raw != 0){
+							x += hspeed_raw;
+							y += vspeed_raw;
+						}
+						
+						if(place_meeting(x, y, other)){
+							var	_x = x,
+								_y = y;
+								
+							_break = true;
+							
+							with(other){
+								mask_index = mskNone;
+								instance_destroy();
+							}
+						}
+						
+						if(speed_raw != 0){
+							x -= hspeed_raw;
+							y -= vspeed_raw;
+						}
+						if(gravity_raw != 0){
+							hspeed_raw -= lengthdir_x(gravity_raw, gravity_direction);
+							vspeed_raw -= lengthdir_y(gravity_raw, gravity_direction);
+						}
+						if(friction_raw != 0 && speed_raw != 0){
+							speed_raw += min(abs(speed_raw), friction_raw) * sign(speed_raw);
+						}
+						
+						if(_break) break;
+					}
+				}
+				if(instance_exists(self)){
+					if(speed_raw != 0){
+						x -= hspeed_raw;
+						y -= vspeed_raw;
+					}
+					if(gravity_raw != 0){
+						hspeed_raw -= lengthdir_x(gravity_raw, gravity_direction);
+						vspeed_raw -= lengthdir_y(gravity_raw, gravity_direction);
+					}
+					if(friction_raw != 0 && speed_raw != 0){
+						speed_raw += min(abs(speed_raw), friction_raw) * sign(speed_raw);
 					}
 				}
 			}
 		}
+	}
+
 
 /// ITEM-RELATED FUNCTIONS ///
 
