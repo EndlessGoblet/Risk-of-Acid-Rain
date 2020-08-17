@@ -1540,6 +1540,14 @@
 	if amount >= 1 {
 		extra_health += amount * 6;
 	}
+	
+	//Heal Thingy 1/2
+	var amount = item_get_count("heal");
+	if amount >= 1 {
+		with(Player){
+			HealThingyOldHP = my_health;
+		}
+	}
 
 	// Focus
 	var amount = item_get_power("focus")
@@ -1771,6 +1779,16 @@
 						speed_raw += min(abs(speed_raw), friction_raw) * sign(speed_raw);
 					}
 				}
+			}
+		}
+	}
+	//Heal Thingy 2/2
+	var amount = item_get_count("heal");
+	if amount >= 1 {
+		with(Player){
+			if(HealThingyOldHP < my_health){
+				my_health += amount;
+				my_health = min(my_health, maxhealth);
 			}
 		}
 	}
