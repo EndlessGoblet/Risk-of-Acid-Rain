@@ -1275,11 +1275,13 @@
 				if irandom(14) == 0 && GameCont.area != 0 && GameCont.area != 6 && GameCont.area != 7{global.areaChoice += 100}
 
 				if GameCont.area == 100{
-					GameCont.area = GameCont.lastarea;
+					global.areaChoice = GameCont.lastarea;
 				}
-				with instance_create(_tele.x, _tele.y, Portal){if _tele.portal = "vault" {GameCont.area = 100; type = 2}else{type = 1}}
-				if(GameCont.area != 100){
+				with instance_create(_tele.x, _tele.y, Portal){if _tele.portal = "vault" {global.areaChoice = 100; type = 2}else{type = 1}}
+				if(GameCont.area != < 100){
 					GameCont.area = global.areaChoice - 1;
+				}else{
+					GameCont.area = global.areaChoice;
 				}
 				if(is_real(GameCont.area) && GameCont.area < 100 && GameCont.area > 0){GameCont.subarea = 3;}
 			  global.charge = 0;
