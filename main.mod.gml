@@ -650,7 +650,7 @@
 
 #define step
 
-/*	if button_check(0, "key1") { trace_color("AREA: 1 (Desert)", c_yellow); GameCont.area = 1; } //Lazy Debug
+/* if button_check(0, "key1") { trace_color("AREA: 1 (Desert)", c_yellow); GameCont.area = 1; } //Lazy Debug
 	if button_check(0, "key2") { trace_color("AREA: 2 (Sewers)", c_green); GameCont.area = 2; }
 	if button_check(0, "key3") { trace_color("AREA: 3 (Scrapyard)", c_gray); GameCont.area = 3; }
 	if button_check(0, "key4") { trace_color("AREA: 4 (Crystal Caves)", c_purple); GameCont.area = 4; }
