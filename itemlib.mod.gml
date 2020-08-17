@@ -832,6 +832,16 @@ item_hazmat_gear = {
 	tier              : 2
 };
 
+#macro item_heal_thingy item[? "heal"] // ITEM 77: HEAL THINGY (I'm not gonna bother being clever tbh)
+item_heal_thingy = {
+	name              : "HEAL THINGY",
+	description_small : "@s+@w1 @rHP@s from all @rhealing@s",
+	description_large : "-",
+	description_width : 1,
+	spr_index         : 77,
+	tier              : 1
+};
+
 #define items_finalize()
   var keys = ds_map_keys(global.ItemDirectory),
       len  = array_length(keys),

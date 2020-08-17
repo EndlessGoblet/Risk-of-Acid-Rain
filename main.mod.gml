@@ -702,14 +702,6 @@
 			case 104: background_color =  2333951; break;
 		}
 	}
-	if GameCont.area = 100 && Player.mask_index = mskNone{
-		GameCont.area = GameCont.lastarea++;
-		if GameCont.area > 100 GameCont.area -= 100
-		if GameCont.area = 0{
-			GameCont.area = 1;
-			GameCont.loops++;
-		}
-	}
 	with instances_matching_le(instances_matching(enemy, "tag", "boss"),"my_health",0) global.BossesLeft--
 
 	 // special horror drop
@@ -1275,13 +1267,21 @@
 										break;
 					case   7: global.areaChoice = 1;
 										break;
+					default : global.areaChoice = GameCont.area + 1;
+										break;
 
 				}
 				// determine if next area is a secret one
-				if irandom(14) = 0 && GameCont.area != 0 && GameCont.area != 6 && GameCont.area != 7{global.areaChoice += 100}
+				if irandom(14) == 0 && GameCont.area != 0 && GameCont.area != 6 && GameCont.area != 7{global.areaChoice += 100}
 
+				if GameCont.area == 100{
+					GameCont.area = GameCont.lastarea;
+				}
 				with instance_create(_tele.x, _tele.y, Portal){if _tele.portal = "vault" {GameCont.area = 100; type = 2}else{type = 1}}
-				GameCont.subarea = 3;
+				if(GameCont.area != 100){
+					GameCont.area = global.areaChoice - 1;
+				}
+				if(is_real(GameCont.area) && GameCont.area < 100 && GameCont.area > 0){GameCont.subarea = 3;}
 			  global.charge = 0;
 			  global.teleporter = false;
 			}
