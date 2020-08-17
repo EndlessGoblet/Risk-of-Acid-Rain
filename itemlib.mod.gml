@@ -816,8 +816,8 @@
 item_large_magnet = {
 	name              : "LARGE MAGNET",
 	description_small : "@sPulls items @wtowards @wthe teleporter",
-	description_large : "@yPickups@s are pulled @wtowards @sthe @rteleporter",
-	description_width : 41,
+	description_large : "@yPickups@s are pulled @wtowards @sthe @rteleporter@s. @yPickups@s near the teleporter are automatically collected.",
+	description_width : 99,
 	spr_index         : 75,
 	tier              : 1
 };

@@ -381,7 +381,7 @@
 	if invincibility > 0
 		{
 			invincibility--
-			if my_health < lsthealth
+			if nexthurt == current_frame + 5
 			{
 				my_health = lsthealth
 			}
@@ -390,7 +390,7 @@
 	}
 
 	//Check if hurt this floor--------
-	with (Player) if my_health < lsthealth && global.hurtFloor = false
+	with (Player) if nexthurt == current_frame + 5 && global.hurtFloor = false
 	{
 		global.hurtFloor = true;
 		if (item_get_count("prize") > 0) with instance_create(Player.x, Player.y, PopupText)
@@ -401,7 +401,7 @@
 	}
 
 	//Armor Mechanic
-	with (Player) if my_health < lsthealth
+	with (Player) if nexthurt == current_frame + 5
 	{
 		var damageTaken = (Player.lsthealth - Player.my_health),
 		    _ord        = damageTaken
@@ -1292,7 +1292,7 @@
 	Player.firewoodCharge += (amount)
 	Player.firewoodKills++
 	}
-	with (Player) if my_health < lsthealth && instance_number(Portal) == 0 {
+	with (Player) if nexthurt == current_frame + 5 && instance_number(Portal) == 0 {
 	repeat(Player.firewoodCharge) with instance_create(Player.x, Player.y, FlameShell) {
 	direction = random_range(1, 360)
 	speed = random_range(10, 15)
@@ -1440,7 +1440,7 @@
 		extra_accuracy += amount * .6
 		extra_health   += ceil(amount * 2)
 
-		with (Player) if my_health < lsthealth
+		with (Player) if nexthurt == current_frame + 5
 		{
 		  with instance_create(x+random_range(-8,8),y+random_range(-8,8),WepSwap)
 			{
@@ -1476,7 +1476,7 @@
 		with (Player)
 		{
 			if "KeyHealth" not in self{KeyHealth = 3}
-			if Player.my_health < Player.lsthealth
+			if nexthurt == current_frame + 5
 			{
 				KeyHealth--
 				with instance_create(x, y, PopupText)
@@ -1521,7 +1521,7 @@
 			}
 			else if shieldCount > 0
 			{
-				if my_health < lsthealth
+				if nexthurt == current_frame + 5
 				{
 					sound_play_pitch(sndLaserCrystalHit, 1.2 + random_range(-0.2, 0.2))
 					my_health = maxhealth
@@ -1535,13 +1535,18 @@
 
 	//Large Magnet
 	var amount = item_get_count("magnet");
-	with(SmallGenerator)
+	with(instances_matching(CustomProp, "name", "Teleporter"))
 	{
-		if amount >= 1 && mod_variable_get("mod", "main", "teleporter") == true && point_in_teleporter(Player) {
+		if(amount >= 1 && mod_variable_get("mod", "main", "teleporter") == true) {
 			with(Pickup){
 				if(object_index != WepPickup){
-					x += lengthdir_x(amount, point_direction(x,y,other.x,other.y));
-					y += lengthdir_y(amount, point_direction(x,y,other.x,other.y));
+					if(point_in_teleporter(self)){
+						var p = instance_nearest(x,y,Player);
+						x = p.x;
+						y = p.y;
+					}else{
+						mp_potential_step(other.x,other.y, amount+1, false);
+					}
 				}
 			}
 		}
@@ -1600,7 +1605,7 @@
 
 	with instances_matching(EnemyBullet2, "roar_check_projectile", true){if speed <= friction + 1 instance_destroy()}
 
-	if instance_exists(Player) Player.lsthealth = Player.my_health
+	//if instance_exists(Player) Player.lsthealth = Player.my_health
 
 	if !instance_exists(global.step){
 		global.step = script_bind_step(custom_step, 0);
@@ -2157,7 +2162,7 @@
 		   _blink = current_frame;
 		if global.InvisibleTimer <= room_speed * 3 {_blink = global.InvisibleTimer <= room_speed ? 2 : 4}
 		if instance_exists(Player) && global.InvisibleTimer > 15 && current_frame mod _blink = 0 draw_text_nt(Player.x, Player.y + 10, string(count));
-		if Player.my_health < Player.lsthealth
+		if Player.nexthurt == current_frame + 5
 		{
 			sleep(50)
 			view_shake_at(Player.x, Player.y, 12)
