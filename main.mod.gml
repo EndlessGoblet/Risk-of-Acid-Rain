@@ -629,7 +629,7 @@
 		     enemyChoice = _place[_n],
 				 enemyCost   = _cost[_n];
 
-			global.spawnCredits += current_time_scale * (.8 + global.difficulty / 100 - (global.BossesLeft > 0 ? 1 : 0) * .35 + item_get_power("times") * .1);
+			global.spawnCredits += current_time_scale * (.8 + global.difficulty / 100 - (global.BossesLeft > 0 ? 1 : 0) * .35 + item_get_power("times") * .05);
 
 			global.wavetimer -= current_time_scale
 			if global.wavetimer <= 0{
@@ -647,9 +647,9 @@
 							exit
 						}
 					}
-					if irandom(14) = 0{
+					if irandom(3) = 0{
 							global.wavetimer = 30;
-							global.spawnCredits += 20;
+							global.spawnCredits += irandom(4);
 							exit;
 					}
 					tries--;
@@ -660,7 +660,7 @@
 
  #define step
 
-/*	if button_check(0, "key1") { trace_color("AREA: 1 (Desert)", c_yellow); GameCont.area = 1; } //Lazy Debug
+/* if button_check(0, "key1") { trace_color("AREA: 1 (Desert)", c_yellow); GameCont.area = 1; } //Lazy Debug
 	if button_check(0, "key2") { trace_color("AREA: 2 (Sewers)", c_green); GameCont.area = 2; }
 	if button_check(0, "key3") { trace_color("AREA: 3 (Scrapyard)", c_gray); GameCont.area = 3; }
 	if button_check(0, "key4") { trace_color("AREA: 4 (Crystal Caves)", c_purple); GameCont.area = 4; }
@@ -1921,7 +1921,7 @@ with (Guardian) if "Reflect" in self && Reflect > 0 {
 					sleep(200)
 					_tele.currad = _tele.addframes;
 					sound_play(sndLevelUltra)
-					with instances_matching(CustomObject, "name", "shrine"){
+					with instances_matching(instances_matching(CustomObject, "name", "shrine"),"is_shrine",true){
 						deathtimer = distance_to_object(other) / 15;
 					}
 	        		global.teleporter = true;
@@ -2311,8 +2311,8 @@ with (Guardian) if "Reflect" in self && Reflect > 0 {
 		var _strdifficulty = "";
 		switch global.Gamemode
 		{
-			case 0: _strdifficulty = "NORMAL";		break;
-			case 1: _strdifficulty = "HARD"; 			break;
+			case 0: _strdifficulty = "NORMAL";	  break;
+			case 1: _strdifficulty = "HARD"; 	  break;
 			case 2: _strdifficulty = "BOSS RUSH"; break;
 		}
 		draw_set_halign(fa_right)

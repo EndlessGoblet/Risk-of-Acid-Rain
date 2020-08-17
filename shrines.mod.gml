@@ -216,9 +216,8 @@
 								   iconNum = 7;
 								   cost    = 0;
 								   costval = 20 * GameCont.level;
-								   is_shrine = false;
 
-								   subname = "VAULT KEY"
+								   subname = "VAULT ACCESS"
 								   break;
 		// Challenger
 		case 16: case "challenger": on_interact  = challenger_interact;

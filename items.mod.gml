@@ -217,17 +217,17 @@
 	          _floorq = ds_list_create(), // put all available floor tiles into a list
 		             _i = 0,
 		  
-	_curse_chance = 5;
+	_curse_chance = 4;
 
 	if crown_current > 1
 	{
-		_curse_chance = 20;
+		_curse_chance = 19;
 		if crown_current = 11
 		{
-			_curse_chance = 80;
+			_curse_chance = 79;
 		}
 	}
-	if roll(_curse_chance){_curse_amount++}
+	if _curse_chance > irandom(99) = true{_curse_amount++}
 
 	switch GameCont.area // area specific extra chests
 	{
@@ -542,6 +542,16 @@
 												 }
 											 }
 										 }
+										 if item_index.tier = 3{
+											 if irandom(round(20 / current_time_scale)) <= 1{
+												 with instance_create(x - random_range(0, sprite_get_width(sprite_index)), y, Curse){
+													 motion_add(90, irandom(1) + 1)
+													 friction = .1;
+													 image_speed = random_range(.3, .4)
+													 if irandom(2) > 0 {depth = other.depth -1}
+												 }
+											 }
+										 }
 											 break;
 			 case  "coin"  : image_index  = item_index.spr_index;
 			 								 y -= sin(current_frame / 10) / 4 / (room_speed / 30);
@@ -611,7 +621,11 @@
 		}
 		if(button_pressed(index, "key1"))
 		{
-		add_item(item[? "cryo"], 1)
+		with obj_create(mouse_x, mouse_y, "item"){
+				item_index = item[? "edge"]
+				tag = "item"
+				chest_setup(tag)
+			}
 		}
 	}
 
@@ -1451,7 +1465,7 @@
 			var _pitch = random_range(.9,1.1)
 			sound_play_pitch(sndHyperCrystalHurt,.8*_pitch)
 			sound_play_pitch(sndLaserCrystalHit,.7*_pitch)
-			sound_play_pitchvol(sndHyperCrystalHalfHP,2*_pitch,.4)
+			//sound_play_pitchvol(sndHyperCrystalHalfHP,2*_pitch,.4)
 			sound_play_gun(sndLaserCrystalDeath,.1,.0001)//mute action
 
 			get_item(item[? "spent flower"], item_get_count("flower"));
@@ -1611,7 +1625,7 @@
 		global.step = script_bind_step(custom_step, 0);
 	}
 
-#define custom_step
+ #define custom_step
 	// On create effects go here
 	with instances_matching_ne(enemy, "roar_check_create", true)
 	{
@@ -1715,7 +1729,7 @@
 		{
 			//Sabotage Tools
 			var amount = item_get_power("tools")
-			if amount >= 1
+			if amount >= 1 && instance_exists(Player)
 			{
 				if roll_luck(clamp(8 * amount, 0, 40)){damage *= 2; team = Player.team
 				}
@@ -1813,7 +1827,7 @@
 
 /// ITEM-RELATED FUNCTIONS ///
 
-#define get_item(ITEM ,AMOUNT)
+ #define get_item(ITEM ,AMOUNT)
 	global.itemGet = ITEM
 	if (ITEM != item[? "currency"] && ITEM != item[? "Fcurrency"]) global.descriptionTimer = room_speed * 3.5
 	if (ITEM = item[? "currency"]) {
@@ -1827,9 +1841,8 @@
 			time = 10;
 		}
 		var _p = random_range(.8, 1.2)
-		sound_play_pitch(sndExplosion, 1.5 * _p)
-		sound_play_pitchvol(sndHyperCrystalDead, 2.6 * _p, .4)
-		sound_play_pitchvol(sndCursedPickup, 1.6 * _p, .7)
+		sound_play_pitchvol(sndExplosion, 1.5 * _p, .5)
+		sound_play_pitchvol(sndCursedPickup, 1.6 * _p, .5)
 	}
 	//fx
 	var _pitch = random_range(.8, 1.2)
@@ -2414,14 +2427,14 @@
 			}
 			if _myh != 0
 			{
-				draw_X = -154 + game_width / 2
+				draw_X = -120 + game_width / 2
 				draw_Y = 220
 
-				draw_set_color(c_black);draw_rectangle(-1 + draw_X, 13 + draw_Y    , 308 + draw_X, 0 + draw_Y    , false)
-				draw_set_color(c_white);draw_rectangle( 0 + draw_X, 11 + draw_Y    , 307 + draw_X, 1 + draw_Y    , false)
-				draw_set_color(c_black);draw_rectangle( 1 + draw_X,  8 + draw_Y + 2, 306 + draw_X, 0 + draw_Y + 2, false)
+				draw_set_color(c_black);draw_rectangle(-1 + draw_X, 13 + draw_Y    , 240 + draw_X, 0 + draw_Y    , false)
+				draw_set_color(c_white);draw_rectangle( 0 + draw_X, 11 + draw_Y    , 239 + draw_X, 1 + draw_Y    , false)
+				draw_set_color(c_black);draw_rectangle( 1 + draw_X,  8 + draw_Y + 2, 238 + draw_X, 0 + draw_Y + 2, false)
 
-				global.BarLength = max(0, (_myh/ (global.BossBarMaxHP > _mxh ? global.BossBarMaxHP : _mxh) * 306)) //health * length / maxhealth
+				global.BarLength = max(0, (_myh/ (global.BossBarMaxHP > _mxh ? global.BossBarMaxHP : _mxh) * 238)) //health * length / maxhealth
 				if _myh > 0
 				{
 					draw_set_color(c_red);draw_rectangle(1 + draw_X, 10 + draw_Y, (global.BarLength) + draw_X, 3 + draw_Y, false)
