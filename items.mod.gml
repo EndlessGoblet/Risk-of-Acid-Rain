@@ -253,17 +253,19 @@
 	if GameCont.area != 100 repeat(_chest_amount + _prize_amount)
 	
 	{
-		if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
-		{
-			with other
+		if(ds_list_size(_floorq) > 0){
+			if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
 			{
-				instance_create(x, y, FloorExplo)
-				instance_destroy()
+				with other
+				{
+					instance_create(x, y, FloorExplo)
+					instance_destroy()
+				}
 			}
+			with obj_create(_floorq[| 0].x + 16, _floorq[| 0].y + 16, "ItemChest") {with instance_place(x, y, Wall){instance_delete(self)}}
+			ds_list_delete(_floorq, 0)
+			ds_list_shuffle(_floorq)
 		}
-		with obj_create(_floorq[| 0].x + 16, _floorq[| 0].y + 16, "ItemChest") {with instance_place(x, y, Wall){instance_delete(self)}}
-		ds_list_delete(_floorq, 0)
-		ds_list_shuffle(_floorq)
 	}
 
 	if _prize_amount > 0 // 1/2 of perfect prize's effect. repeat(0) executes the the code inside the repeat once
