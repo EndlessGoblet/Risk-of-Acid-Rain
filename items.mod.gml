@@ -77,7 +77,7 @@
 	global.popoChance = 0;
 
 	global.CommonItems   = [item[? "info"]      , item[? "tweezers"], item[? "gumdrop"] , item[? "bandages"], item[? "fruit"]    , item[? "golden"] , item[? "rubber"]  , item[? "focus"]     , item[? "mush"]   , item[? "grease"] , item[? "boots"]   , item[? "chopper"] , item[? "locket"]   , item[? "metal"]  , item[? "mask"], item[? "dagger"]]
-	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"], item[? "fern"], item[? "accolade"], item[? "magnet"]] //To-Do: Horror In a Bottle
+	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"], item[? "fern"], item[? "accolade"]] //To-Do: Horror In a Bottle
 	global.RareItems     = [item[? "artifact"]  , item[? "slosher"] , item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"] , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]]
 	global.CursedItems   = [item[? "brooch"]    , item[? "heater"]  , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]		  , item[? "edge"]] // Todo: None
 	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "flask"]  , item[? "fragment"]]
@@ -111,9 +111,9 @@
 		wait 1;
 	}
 
-#macro item 					 mod_variable_get("mod", "itemlib", "ItemDirectory");
+#macro item 		   mod_variable_get("mod", "itemlib", "ItemDirectory");
 #macro preformanceMode mod_variable_get("mod", "main", "preformanceMode");
-#macro hpBars					 mod_variable_get("mod", "main", "hpBars");
+#macro hpBars		   mod_variable_get("mod", "main", "hpBars");
 #macro bossBars        mod_variable_get("mod", "main", "bossBars");
 #macro doubleChests    mod_variable_get("mod", "main", "doubleChests");
 #macro doubleShrines   mod_variable_get("mod", "main", "doubleShrines");
@@ -216,17 +216,18 @@
 			_curse_amount = (GameCont.area = 104 ? 1 : 0),
 	          _floorq = ds_list_create(), // put all available floor tiles into a list
 		             _i = 0,
-		  _curse_chance = 0;
+		  
+	_curse_chance = 4;
 
 	if crown_current > 1
 	{
-		_curse_chance = 14;
+		_curse_chance = 19;
 		if crown_current = 11
 		{
-			_curse_chance = 40;
+			_curse_chance = 79;
 		}
 	}
-	if irandom(99) < _curse_chance{_curse_amount++}
+	if _curse_chance > irandom(99) = true{_curse_amount++}
 
 	switch GameCont.area // area specific extra chests
 	{
@@ -253,17 +254,19 @@
 	if GameCont.area != 100 repeat(_chest_amount + _prize_amount)
 	
 	{
-		if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
-		{
-			with other
+		if(ds_list_size(_floorq) > 0){
+			if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
 			{
-				instance_create(x, y, FloorExplo)
-				instance_destroy()
+				with other
+				{
+					instance_create(x, y, FloorExplo)
+					instance_destroy()
+				}
 			}
+			with obj_create(_floorq[| 0].x + 16, _floorq[| 0].y + 16, "ItemChest") {with instance_place(x, y, Wall){instance_delete(self)}}
+			ds_list_delete(_floorq, 0)
+			ds_list_shuffle(_floorq)
 		}
-		with obj_create(_floorq[| 0].x + 16, _floorq[| 0].y + 16, "ItemChest") {with instance_place(x, y, Wall){instance_delete(self)}}
-		ds_list_delete(_floorq, 0)
-		ds_list_shuffle(_floorq)
 	}
 
 	if _prize_amount > 0 // 1/2 of perfect prize's effect. repeat(0) executes the the code inside the repeat once
@@ -539,6 +542,16 @@
 												 }
 											 }
 										 }
+										 if item_index.tier = 3{
+											 if irandom(round(20 / current_time_scale)) <= 1{
+												 with instance_create(x - random_range(0, sprite_get_width(sprite_index)), y, Curse){
+													 motion_add(90, irandom(1) + 1)
+													 friction = .1;
+													 image_speed = random_range(.3, .4)
+													 if irandom(2) > 0 {depth = other.depth -1}
+												 }
+											 }
+										 }
 											 break;
 			 case  "coin"  : image_index  = item_index.spr_index;
 			 								 y -= sin(current_frame / 10) / 4 / (room_speed / 30);
@@ -591,7 +604,7 @@
 	{
 		if(button_pressed(index, "horn"))
 		{
-		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet"
+		if (Player.debug == true) || string_lower(player_get_alias(0)) = "karmelyth" || string_lower(player_get_alias(0)) = "endless goblet" || string_lower(player_get_alias(0)) = "golden epsilon"
 			{
 				for(var _i = 0; _i < array_length(global.UniqueItems); _i++){
 				add_item(global.UniqueItems[_i], 1)
@@ -608,7 +621,11 @@
 		}
 		if(button_pressed(index, "key1"))
 		{
-		add_item(item[? "cryo"], 1)
+		with obj_create(mouse_x, mouse_y, "item"){
+				item_index = item[? "edge"]
+				tag = "item"
+				chest_setup(tag)
+			}
 		}
 	}
 
@@ -627,6 +644,11 @@
 
 	//Melting Balancing
 	if instance_exists(Player) && Player.race = ("melting") {
+	extra_health -= (GameCont.level - 1) * 2
+	}
+	
+	//Skeleton Balancing
+	if instance_exists(Player) && Player.race = ("skeleton") {
 	extra_health -= (GameCont.level - 1)
 	}
 
@@ -800,7 +822,7 @@
 
 	//Cryo Rounds
 	var amount = item_get_power("cryo")
-	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self && roll_luck(6) = true {instance_nearest(x, y, enemy).freezeTime = room_speed * (2 + amount)}}}
+	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self && roll_luck(6) = true {instance_nearest(x, y, enemy).freezeTime = room_speed * (1 + .5 * amount)}}}
 
 	with instances_matching_ge(enemy, "freezeTime", 1)
 	{
@@ -854,10 +876,14 @@
 
 	//Incendiary Rounds
 	var amount = item_get_power("incendiary")
-	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self
+	with instances_matching(projectile, "team", 2)
 	{
-		instance_nearest(x, y, enemy).OnFire = (7 + amount * 3) * (GameCont.area = 101 ? 0 : 1)
-	}}}
+		var _a = ((instance_is(self, Flame) || instance_is(self, FlameShell) || instance_is(self, FlameBall)) ? choose(0, 0, 0, 0, 1) : 0) + amount
+		if _a > 0  && place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self
+		{
+			instance_nearest(x, y, enemy).OnFire = (7 + _a * 3) * (GameCont.area = 101 ? 0 : 1)
+		}
+	}
 
 	with instances_matching_ge(enemy, "OnFire", 1)
 	{
@@ -1439,7 +1465,7 @@
 			var _pitch = random_range(.9,1.1)
 			sound_play_pitch(sndHyperCrystalHurt,.8*_pitch)
 			sound_play_pitch(sndLaserCrystalHit,.7*_pitch)
-			sound_play_pitchvol(sndHyperCrystalHalfHP,2*_pitch,.4)
+			//sound_play_pitchvol(sndHyperCrystalHalfHP,2*_pitch,.4)
 			sound_play_gun(sndLaserCrystalDeath,.1,.0001)//mute action
 
 			get_item(item[? "spent flower"], item_get_count("flower"));
@@ -1535,6 +1561,20 @@
 		}
 	}
 
+	//Hazmat Gear 1/2
+	var amount = item_get_count("gear");
+	if amount >= 1 {
+		extra_health += amount * 6;
+	}
+	
+	//Heal Thingy 1/2
+	var amount = item_get_count("heal");
+	if amount >= 1 {
+		with(Player){
+			HealThingyOldHP = my_health;
+		}
+	}
+
 	// Focus
 	var amount = item_get_power("focus")
 	if amount >= 1 && instance_exists(Player)
@@ -1580,121 +1620,209 @@
 		global.step = script_bind_step(custom_step, 0);
 	}
 
-#define custom_step
+ #define custom_step
 	// On create effects go here
 	with instances_matching_ne(enemy, "roar_check_create", true)
+	{
+		roar_check_create = true;
+
+		//Binky
+		var amount = item_get_power("binky")
+		if amount >= 1
 		{
-			roar_check_create = true;
-
-			//Binky
-			var amount = item_get_power("binky")
-			if amount >= 1
+			if roll_luck(4 + 3 * amount)
 			{
-				if roll_luck(4 + 3 * amount)
-				{
-					image_xscale /= 1.5
-					image_yscale /= 1.5
-					my_health /= 2.5
-					maxhealth /= 2.5
-				}
-			}
-
-			// Radiating Core
-			var amount = item_get_power("core")
-			if amount >= 1
-			{
-				raddrop += roll(amount);
-			}
-
-			if GameCont.level - global.StartLevel > 0
-			{
-				raddrop -= (GameCont.level - global.StartLevel)
+				image_xscale /= 1.5
+				image_yscale /= 1.5
+				my_health /= 2.5
+				maxhealth /= 2.5
 			}
 		}
+
+		// Radiating Core
+		var amount = item_get_power("core")
+		if amount >= 1
+		{
+			raddrop += roll(amount);
+		}
+
+		if GameCont.level - global.StartLevel > 0
+		{
+			raddrop -= (GameCont.level - global.StartLevel)
+		}
+	}
 
     // On projectile create effects go here
 	with instances_matching_ne(instances_matching_ne(projectile, "noproc", true), "roar_check_projectile", true)
+	{
+		roar_check_projectile = true;
+		if team = 2 // player projectiles
 		{
-			roar_check_projectile = true;
-			if team = 2 // player projectiles
+			//Rubber Projectile
+			var amount = item_get_power("rubber")
+			if amount >= 1
 			{
-				//Rubber Projectile
-				var amount = item_get_power("rubber")
-				if amount >= 1
-				{
-					if "extra_bounce" not in self extra_bounce = ceil(amount)
-				}
+				if "extra_bounce" not in self extra_bounce = ceil(amount)
+			}
 
-				//Slosher
-				var amount = item_get_power("slosher")
-				if amount >= 1 && instance_exists(Player) && "sacred" not in self and "blessed" not in self
+			//Slosher
+			var amount = item_get_power("slosher")
+			if amount >= 1 && instance_exists(Player) && "sacred" not in self and "blessed" not in self
+			{
+				var direct = direction
+				repeat(roll(amount)) with instance_create(x, y, EnemyBullet2)
 				{
-					var direct = direction
-					repeat(roll(amount)) with instance_create(x, y, EnemyBullet2)
-					{
-						sacred = true;
-						damage = 2
-						motion_set(direct + random_range(-50, 50),16)
-						image_angle = direction
-						friction = random_range(1.5, 1.65)
-						var roll2 = random_range(0.5, 1)
-						image_xscale = roll2
-						image_yscale = roll2
-						team = Player.team;
-					}
-				}
-
-				//Bullet Grease
-				var amount = item_get_power("grease")
-				if amount >= 1
-				{
-					friction /= (1 + (.12 * amount))
-					speed *= 1.15
-				}
-
-				//Stone Dagger
-				var amount = item_get_power("dagger")
-				if amount >= 1
-				{
-            	var bonus = 1 + ( instance_number(enemy) )*(amount / 2) / 100 // +1% damage per enemy, with 50% increase per stack
-				damage *= bonus
-				}
-
-				//Gun God's Blessing
-				var amount = item_get_power("blessing")
-				if amount >= 1
-				{
-					if "blessed" not in self && "sacred" not in self
-					{
-						if roll_luck((1 - 1/(.15 * amount + 1))*100) with instance_create(x,y,object_index) // hyperbolic item stacking
-						{
-							motion_set(other.direction,other.speed*1.2)
-							image_angle = direction
-							team = other.team;
-							sprite_index = other.sprite_index
-							sound_play_pitch(sndPopgun, random_range(.8, 1.2))
-							sound_play_pitchvol(sndPopPop, random_range(.8, 1.2), .3)
-							blessed = 1
-						}
-						blessed = 1;
-					}
+					sacred = true;
+					damage = 2
+					motion_set(direct + random_range(-50, 50),16)
+					image_angle = direction
+					friction = random_range(1.5, 1.65)
+					var roll2 = random_range(0.5, 1)
+					image_xscale = roll2
+					image_yscale = roll2
+					team = Player.team;
 				}
 			}
-			else // enemy projectiles
+
+			//Bullet Grease
+			var amount = item_get_power("grease")
+			if amount >= 1
 			{
-				//Sabotage Tools
-				var amount = item_get_power("tools")
-				if amount >= 1
+				friction /= (1 + (.12 * amount))
+				speed *= 1.15
+			}
+
+			//Stone Dagger
+			var amount = item_get_power("dagger")
+			if amount >= 1
+			{
+        	var bonus = 1 + ( instance_number(enemy) )*(amount / 2) / 100 // +1% damage per enemy, with 50% increase per stack
+			damage *= bonus
+			}
+
+			//Gun God's Blessing
+			var amount = item_get_power("blessing")
+			if amount >= 1
+			{
+				if "blessed" not in self && "sacred" not in self
 				{
-					if roll_luck(clamp(8 * amount, 0, 40)){damage *= 2; team = Player.team
+					if roll_luck((1 - 1/(.15 * amount + 1))*100) with instance_create(x,y,object_index) // hyperbolic item stacking
+					{
+						motion_set(other.direction,other.speed*1.2)
+						image_angle = direction
+						team = other.team;
+						sprite_index = other.sprite_index
+						sound_play_pitch(sndPopgun, random_range(.8, 1.2))
+						sound_play_pitchvol(sndPopPop, random_range(.8, 1.2), .3)
+						blessed = 1
+					}
+					blessed = 1;
+				}
+			}
+		}
+		else // enemy projectiles
+		{
+			//Sabotage Tools
+			var amount = item_get_power("tools")
+			if amount >= 1 && instance_exists(Player)
+			{
+				if roll_luck(clamp(8 * amount, 0, 40)){damage *= 2; team = Player.team
+				}
+			}
+		}
+	}
+	//Hazmat Gear 2/2
+	var amount = item_get_count("gear");
+	if amount >= 1 {
+		with([Flame, TrapFire, Lightning, ToxicGas]){
+			with(self){
+				//Yoinked from yokin's hitbounce detection
+				if(friction_raw != 0 && speed_raw != 0){
+					speed_raw -= min(abs(speed_raw), friction_raw) * sign(speed_raw);
+				}
+				if(gravity_raw != 0){
+					hspeed_raw += lengthdir_x(gravity_raw, gravity_direction);
+					vspeed_raw += lengthdir_y(gravity_raw, gravity_direction);
+				}
+				if(speed_raw != 0){
+					x += hspeed_raw;
+					y += vspeed_raw;
+				}
+				if(distance_to_object(Player) <= 16){
+					
+					with(instances_matching_le(instances_matching_ge(instances_matching_le(instances_matching_ge(Player, "bbox_right", bbox_left - 16), "bbox_left", bbox_right + 16), "bbox_bottom", bbox_top - 16), "bbox_top", bbox_bottom + 16)){
+						var _break = false;
+						
+						if(friction_raw != 0 && speed_raw != 0){
+							speed_raw -= min(abs(speed_raw), friction_raw) * sign(speed_raw);
+						}
+						if(gravity_raw != 0){
+							hspeed_raw += lengthdir_x(gravity_raw, gravity_direction);
+							vspeed_raw += lengthdir_y(gravity_raw, gravity_direction);
+						}
+						if(speed_raw != 0){
+							x += hspeed_raw;
+							y += vspeed_raw;
+						}
+						
+						if(place_meeting(x, y, other)){
+							var	_x = x,
+								_y = y;
+								
+							_break = true;
+							
+							with(other){
+								mask_index = mskNone;
+								instance_destroy();
+							}
+						}
+						
+						if(speed_raw != 0){
+							x -= hspeed_raw;
+							y -= vspeed_raw;
+						}
+						if(gravity_raw != 0){
+							hspeed_raw -= lengthdir_x(gravity_raw, gravity_direction);
+							vspeed_raw -= lengthdir_y(gravity_raw, gravity_direction);
+						}
+						if(friction_raw != 0 && speed_raw != 0){
+							speed_raw += min(abs(speed_raw), friction_raw) * sign(speed_raw);
+						}
+						
+						if(_break) break;
+					}
+				}
+				if(instance_exists(self)){
+					if(speed_raw != 0){
+						x -= hspeed_raw;
+						y -= vspeed_raw;
+					}
+					if(gravity_raw != 0){
+						hspeed_raw -= lengthdir_x(gravity_raw, gravity_direction);
+						vspeed_raw -= lengthdir_y(gravity_raw, gravity_direction);
+					}
+					if(friction_raw != 0 && speed_raw != 0){
+						speed_raw += min(abs(speed_raw), friction_raw) * sign(speed_raw);
 					}
 				}
 			}
 		}
+	}
+	//Heal Thingy 2/2
+	var amount = item_get_count("heal");
+	if amount >= 1 {
+		with(Player){
+			if(HealThingyOldHP < my_health){
+				my_health += amount;
+				my_health = min(my_health, maxhealth);
+			}
+		}
+	}
+
 
 /// ITEM-RELATED FUNCTIONS ///
 
-#define get_item(ITEM ,AMOUNT)
+ #define get_item(ITEM ,AMOUNT)
 	global.itemGet = ITEM
 	if (ITEM != item[? "currency"] && ITEM != item[? "Fcurrency"]) global.descriptionTimer = room_speed * 3.5
 	if (ITEM = item[? "currency"]) {
@@ -1708,9 +1836,8 @@
 			time = 10;
 		}
 		var _p = random_range(.8, 1.2)
-		sound_play_pitch(sndExplosion, 1.5 * _p)
-		sound_play_pitchvol(sndHyperCrystalDead, 2.6 * _p, .4)
-		sound_play_pitchvol(sndCursedPickup, 1.6 * _p, .7)
+		sound_play_pitchvol(sndExplosion, 1.5 * _p, .5)
+		sound_play_pitchvol(sndCursedPickup, 1.6 * _p, .5)
 	}
 	//fx
 	var _pitch = random_range(.8, 1.2)
@@ -1995,6 +2122,7 @@
 	}
 
 	draw_set_blend_mode(bm_add)
+	draw_set_colour(c_white)
 	var amount = item_get_power("bulb") //PRE WAR LIGHT BULBS
 	var _light = 30 * (1 + item_get_power("fungus") * .2) + random(2);
 	if amount >= 1 && instance_exists(Player)
@@ -2274,34 +2402,34 @@
 					_myh += my_health;
 					_mxh += maxhealth;
 					_amo++;
-				}
-				switch Boss[i]
-				{
-					case BanditBoss     : _nam = "BIG BANDIT"   ; break;
-					case HyperCrystal   : _nam = "HYPER CRYSTAL"; break;
-					case FrogQueen      : _nam = "MOM"          ; break;
-					case OasisBoss      : _nam = "BIG FISH"     ; break;
-					case LilHunter      : _nam = "LIL HUNTER"   ; break;
-					case Nothing        : _nam = "THRONE"       ; break;
-					case Nothing2       : _nam = "THRONE II"    ; break;
-					case ScrapBoss      : _nam = "BIG DOG"      ; break;
-					case TechnoMancer   : _nam = "TECHNOMANCER" ; break;
-					case Turtle         : _nam = "TURTLE GANG" ; break;
-					case SuperFireBaller: _nam = "MANSION GANG" ; break;
-					case Guardian       : _nam = "SHADOW GUARDIAN" ; break;
-					default: _nam = "BOSS"; break;
+					switch Boss[i]
+					{
+						case BanditBoss     : _nam = "BIG BANDIT"   ; break;
+						case HyperCrystal   : _nam = "HYPER CRYSTAL"; break;
+						case FrogQueen      : _nam = "MOM"          ; break;
+						case OasisBoss      : _nam = "BIG FISH"     ; break;
+						case LilHunter      : _nam = "LIL HUNTER"   ; break;
+						case Nothing        : _nam = "THRONE"       ; break;
+						case Nothing2       : _nam = "THRONE II"    ; break;
+						case ScrapBoss      : _nam = "BIG DOG"      ; break;
+						case TechnoMancer   : _nam = "TECHNOMANCER" ; break;
+						case Turtle         : _nam = "TURTLE GANG" ; break;
+						case SuperFireBaller: _nam = "MANSION GANG" ; break;
+						case Guardian       : _nam = "SHADOW GUARDIAN" ; break;
+						default: _nam = "BOSS"; break;
+					}
 				}
 			}
 			if _myh != 0
 			{
-				draw_X = -154 + game_width / 2
+				draw_X = -120 + game_width / 2
 				draw_Y = 220
 
-				draw_set_color(c_black);draw_rectangle(-1 + draw_X, 13 + draw_Y    , 308 + draw_X, 0 + draw_Y    , false)
-				draw_set_color(c_white);draw_rectangle( 0 + draw_X, 11 + draw_Y    , 307 + draw_X, 1 + draw_Y    , false)
-				draw_set_color(c_black);draw_rectangle( 1 + draw_X,  8 + draw_Y + 2, 306 + draw_X, 0 + draw_Y + 2, false)
+				draw_set_color(c_black);draw_rectangle(-1 + draw_X, 13 + draw_Y    , 240 + draw_X, 0 + draw_Y    , false)
+				draw_set_color(c_white);draw_rectangle( 0 + draw_X, 11 + draw_Y    , 239 + draw_X, 1 + draw_Y    , false)
+				draw_set_color(c_black);draw_rectangle( 1 + draw_X,  8 + draw_Y + 2, 238 + draw_X, 0 + draw_Y + 2, false)
 
-				global.BarLength = max(0, (_myh/ (global.BossBarMaxHP > _mxh ? global.BossBarMaxHP : _mxh) * 306)) //health * length / maxhealth
+				global.BarLength = max(0, (_myh/ (global.BossBarMaxHP > _mxh ? global.BossBarMaxHP : _mxh) * 238)) //health * length / maxhealth
 				if _myh > 0
 				{
 					draw_set_color(c_red);draw_rectangle(1 + draw_X, 10 + draw_Y, (global.BarLength) + draw_X, 3 + draw_Y, false)

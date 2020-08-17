@@ -65,8 +65,8 @@
   item_mechanical_lens = {
     name              : "Mechanical Lens",
   	description_small : "@yprojectiles @sare @wslower @sand @phome", // meters = pixel / 4
-  	description_large : `@sDecreases @wprojectile speed @sby @w50%#@wBullets @phome @sinto @wenemies @s up to @w4@(color:${c_stack})(+1 meter per stack) meters away`,
-    description_width : 64,
+  	description_large : `@sDecreases @wprojectile speed @sby @w50%#@wBullets @phome @sinto @wenemies @s up to @w4@(color:${c_stack})(+1 per stack) @smeters away`,
+    description_width : 60,
     spr_index         : 4,
   	tier              : 1
 
@@ -87,8 +87,8 @@
   item_pre_war_light_bulb = {
     name              : "Pre-War Light Bulb",
   	description_small : "@sGain a damaging @waura of light",
-  	description_large : "@wEnemies 25 meters @d(+10.5 meters per stack)@saway from you#take @w0.1 damage @d(+0.05 damage per stack)",
-    description_width : 55,
+  	description_large : `@wEnemies 25@(color:${c_stack})(+10.5 per stack) @smeters away from you#take @w0.1@(color:${c_stack})(+0.05 per stack) @rdamage`,
+    description_width : 48,
     spr_index         : 6,
   	tier              : 1
 
@@ -251,8 +251,8 @@
   item_cryo_rounds = {
     name              : "Cryo Rounds",
   	description_small : "@wEnemies @sget @bstunned @supon taking @wdamage",
-  	description_large : `@sYour @yprojectiles @sapply the @bfrozen @(color:${c_debuff})debuff @sfor @w1@(color:${c_stack})(+1 per stack) @wsecond#@swith a @w7% chance#@bfrozen @wenemies @scannot @gact @sor @wmove`,
-    description_width : 67,
+  	description_large : `@sYour @yprojectiles @sapply the @bfrozen @(color:${c_debuff})debuff @sfor @w1.5@(color:${c_stack})(+.5 per stack) @wseconds#@swith a @w7% chance#@bfrozen @wenemies @scannot @gact @sor @wmove`,
+    description_width : 71,
   	spr_index         : 21,
   	tier              : 1
 
@@ -295,8 +295,8 @@
   item_gun_gods_blessing = {
     name              : "Gun God's Blessing",
   	description_small : "@sOccasional free @ypop pops",
-  	description_large : "-",
-    description_width : 0,
+  	description_large : `@syour @yprojectiles @shave a @w13%@(color:${c_stack})(+10% per stack) @schance of bieng @ydoubled`,
+    description_width : 67,
   	spr_index         : 25,
   	tier              : 2
 
@@ -403,7 +403,7 @@
 #macro item_soulful_heater item[? "heater"] // ITEM 35: SOULFUL HEATER
   item_soulful_heater = {
     name              : "Soulful Heater",
-  	description_small : "@sTurn 3 @rmax HP @sinto @w2 @ypermanent armor",
+  	description_small : "@sTurn @w3 @rmax HP @sinto @w2 @ypermanent armor",
   	description_large : `@sLose @w3@(color:${c_stack})(+3 per stack) @rmax HP@s,#Gain @w2@(color:${c_stack})(+2 per stack) @ypermanent armor`,
     description_width : 36,
   	spr_index         : 35,
@@ -437,7 +437,7 @@
   item_hard_times = {
     name              : "Hard Times",
   	description_small : "@sEverything is more @wdangerous",
-  	description_large : `@sIncreased @wBoss @rHealth @sby @w10%@(color:${c_stack})(+10% per stack)@s,#@wdifficulty @sincreases @w50%@(color:${c_stack})(+50% per stack) @wfaster@s,#@yElite @wenemies @sappear more Often@s,#@wEnemies @gact @w15%@(color:${c_stack})(+15% per stack) @wfaster#@sand @w10%@(color:${c_stack})(+10% per stack) @smore @wenemies @sspawn`,
+  	description_large : `@sIncreased @wBoss @rHealth @sby @w10%@(color:${c_stack})(+10% per stack)@s,#@wdifficulty @sincreases @w25%@(color:${c_stack})(+25% per stack) @wfaster@s,#@yElite @wenemies @sappear more Often@s,#@wEnemies @gact @w15%@(color:${c_stack})(+15% per stack) @wfaster#@sand @w10%@(color:${c_stack})(+10% per stack) @smore @wenemies @sspawn`,
     description_width : 48,
   	spr_index         : 38,
   	tier              : 4
@@ -459,8 +459,8 @@
   item_cracked_gem = {
     name              : "Cracked Gem",
   	description_small : "@sYour @gluck @sis fluctuating",
-  	description_large : `@sAt the start of an @warea@s, gain @wOR @sloose @w5 @gluck@(color:${c_stack})(+/-2 per stack)`,
-    description_width : 61,
+  	description_large : `@sAt the start of an @warea@s, gain @wOR @slose @w5 @gluck@(color:${c_stack})(+/-2 per stack)`,
+    description_width : 60,
   	spr_index         : 40,
   	tier              : 3
 
@@ -644,8 +644,8 @@
   item_Fcurrency = {
     name              : "FAUX COIN",
   	description_small : "@dCheaters@s get @wfake coins",
-  	description_large : "@swhen @rcheats @sare enabled, these drop instead of @pcursed coins.",
-    description_width : 60,
+  	description_large : "@swhen @rcheats @sare enabled, these drop instead of @pcursed coins",
+    description_width : 59,
   	spr_index         : 58,
   	tier              : 5
   };
@@ -746,7 +746,7 @@
   item_digital_shield = {
     name              : "DIGITAL SHIELD",
   	description_small : "@sGain a rechargable @bshield",
-  	description_large : `@sGain a rechargable @bshield @sthat blocks @wALL @rdamage @w1@(color:${c_stack})(+1 per stack) @stime#Recharges by @wkilling @w16 enemies#`,
+  	description_large : `@sGain a rechargable @bshield @sthat blocks @wALL @rdamage @w1@(color:${c_stack})(+1 per stack) @stime#Recharges by killing @w16 enemies#`,
     description_width : 69,
   	spr_index         : 68,
   	tier              : 1
@@ -830,6 +830,16 @@ item_hazmat_gear = {
 	description_width : 1,
 	spr_index         : 76,
 	tier              : 2
+};
+
+#macro item_heal_thingy item[? "heal"] // ITEM 77: HEAL THINGY (I'm not gonna bother being clever tbh)
+item_heal_thingy = {
+	name              : "HEAL THINGY",
+	description_small : "@s+@w1 @rHP@s from all @rhealing@s",
+	description_large : "-",
+	description_width : 1,
+	spr_index         : 77,
+	tier              : 1
 };
 
 #define items_finalize()

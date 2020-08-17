@@ -1,6 +1,6 @@
 #macro item mod_variable_get("mod", "itemlib", "ItemDirectory");
 
-#define init
+ #define init
 	// --- META DATA ---
 	global.version = "1.7";
 	global.released = false;
@@ -79,7 +79,7 @@
 	global.DarkCircle = false;
 	global.respawn = 0;
 	global.MenuIndex	 = -1; // -1 = no menu, 0 = modes, 1 = info, 2 = options
-	global.Gamemode  	 = 0;  // 0 = normal mode, 1 = hardmode
+	global.Gamemode  	 = 0;  // 0 = normal mode, 1 = hardmode, = boss rush
 	global.MenuXoffset = 3;
 
 	global.preformanceMode = false; // Turn on to avoid lag (recommended)
@@ -102,6 +102,9 @@
 	global.sprTeleporterIdle   = sprite_add("sprites/teleporter/sprTeleporterIdle.png"  , 1, 24, 20);
 	global.sprTeleporterSiphon = sprite_add("sprites/teleporter/sprTeleporterSiphon.png", 2, 24, 20);
 	global.mskTeleporter       = sprite_add("sprites/teleporter/mskTeleporter.png"      , 1, 24, 20);
+	global.sprTeleporterBRIdle = sprite_add("sprites/teleporter/sprTeleporterBRIdle.png", 1, 24, 20);
+	global.sprTeleporterBRIdle = sprite_add("sprites/teleporter/sprTeleporterBRIdle.png", 1,  6, 20);
+	global.mskTeleporterBRIdle = sprite_add("sprites/teleporter/mskTeleporterBRIdle.png", 1,  8, 20);
 
 	global.sprButtons  		  = sprite_add("sprites/other/sprButtons.png", 3, 12, 12);
 	global.sprButtonsSplat  = sprite_add("sprites/other/sprButtonsSplat.png", 1, 14, 14);
@@ -141,7 +144,7 @@
 #macro c_fel $FF271C;
 #macro c_inv merge_colour(merge_colour(c_aqua, c_blue, .35), c_white, .3);
 
-#define level_start
+ #define level_start
 	global.BossesLeft = 0; // 0 at level start, after teleport activation = amount of boss enemies, at 0 again spawns an item
 
 	if (global.Gamemode == 2) {
@@ -413,9 +416,6 @@
 			 y = FloorChoice.y
 		 }
 
-	/*with instances_matching(CustomObject, "name", "shrine") if distance_to_object(Wall) <= 20 {
-			instance_delete(self)
-		 }*/
 	with instances_matching(CustomObject, "name", "shrine") instance_delete(self) //For now, no shrines in Boss Rush
 
 
@@ -477,13 +477,23 @@
 				addframes = room_speed * 2;
 				currad    = 0;
 				radius    = 0;
-				maxradius = 85 * (1 + (item_get_count("focus") > 0 ? .1 : 0) + (item_get_count("siphon") > 0 ? .1 : 0) + (item_get_count("magnet") > 0 ? .1 : 0));
-
-				spr_idle   = global.sprTeleporterIdle
-				spr_hurt   = global.sprTeleporterIdle
-				spr_dead   = global.sprTeleporterIdle
-				spr_shadow = mskNone
-				mask_index   = global.mskTeleporter
+				switch global.Gamemode{
+					 case 2: maxradius = 40 * (1 + (item_get_count("focus") > 0 ? .1 : 0) + (item_get_count("siphon") > 0 ? .1 : 0) + (item_get_count("magnet") > 0 ? .1 : 0));
+							 spr_idle   = global.sprTeleporterBRIdle;
+							 spr_hurt   = global.sprTeleporterBRIdle;
+							 spr_dead   = global.sprTeleporterBRIdle;
+							 mask_index = global.mskTeleporterBR;
+							 spr_shadow = mskNone;
+							 break;
+					default: maxradius = 85 * (1 + (item_get_count("focus") > 0 ? .1 : 0) + (item_get_count("siphon") > 0 ? .1 : 0) + (item_get_count("magnet") > 0 ? .1 : 0));
+							 spr_idle   = global.sprTeleporterIdle;
+							 spr_hurt   = global.sprTeleporterIdle;
+							 spr_dead   = global.sprTeleporterIdle;
+							 mask_index = global.mskTeleporter;
+							 spr_shadow = mskNone;
+							 break;
+				}
+				
 				image_speed  = .5
 				maxhealth    = 999999999999999999999999 // yeah
 				my_health    = maxhealth
@@ -512,7 +522,7 @@
 		global.teleporter = false;
 	}
 
-#define enemySpawn
+ #define enemySpawn
 	if instance_exists(Player)
 	{
 		var _place = -4,
@@ -619,7 +629,7 @@
 		     enemyChoice = _place[_n],
 				 enemyCost   = _cost[_n];
 
-			global.spawnCredits += current_time_scale * (.8 + global.difficulty / 100 - (global.BossesLeft > 0 ? 1 : 0) * .35 + item_get_power("times") * .1);
+			global.spawnCredits += current_time_scale * (.8 + global.difficulty / 100 - (global.BossesLeft > 0 ? 1 : 0) * .35 + item_get_power("times") * .05);
 
 			global.wavetimer -= current_time_scale
 			if global.wavetimer <= 0{
@@ -637,9 +647,9 @@
 							exit
 						}
 					}
-					if irandom(14) = 0{
+					if irandom(3) = 0{
 							global.wavetimer = 30;
-							global.spawnCredits += 20;
+							global.spawnCredits += irandom(4);
 							exit;
 					}
 					tries--;
@@ -648,7 +658,7 @@
 		}
 	}
 
-#define step
+ #define step
 
 /* if button_check(0, "key1") { trace_color("AREA: 1 (Desert)", c_yellow); GameCont.area = 1; } //Lazy Debug
 	if button_check(0, "key2") { trace_color("AREA: 2 (Sewers)", c_green); GameCont.area = 2; }
@@ -692,14 +702,6 @@
 			case 104: background_color =  2333951; break;
 		}
 	}
-	if GameCont.area = 100 && Player.mask_index = mskNone{
-		GameCont.area = GameCont.lastarea++;
-		if GameCont.area > 100 GameCont.area -= 100
-		if GameCont.area = 0{
-			GameCont.area = 1;
-			GameCont.loops++;
-		}
-	}
 	with instances_matching_le(instances_matching(enemy, "tag", "boss"),"my_health",0) global.BossesLeft--
 
 	 // special horror drop
@@ -716,7 +718,7 @@
 	 {
 		 with (FrogEgg) if "FrogNerf" not in self {
 			 maxhealth *= 0.5
-			 myhealth *= 0.5
+			 my_health *= 0.5
 			 FrogNerf = true
 		 }
 		 _boss = instances_matching(enemy, "tag", "boss")
@@ -935,7 +937,7 @@
 	for(i = 0; i < 5; i++){
 				var _speed_hardmode = global.Gamemode = 1 ? 1 : 0,
 				    _speed_times    = .15 * item_get_count("times"),
-					_speed_boss     = "boss_buff" in self ? .2 : 0,
+					_speed_boss     = 0,//"boss_buff" in self ? .2 : 0,
 					_speed_other    = (instance_is(self, FrogQueen) || instance_is(self, OasisBoss)) ? -.6 : 0,
 					_speed_cryo     = ("freezeTime" in self && freezeTime > 0) ? 0 : 1,
 					_speed_invis    = (mod_variable_get("mod", "items", "InvisibleTimer") > 0 && instance_exists(Player)) ? 0 : 1,
@@ -1175,7 +1177,7 @@
 	   if (roll >= 7) image_blend = merge_color(c_green, c_white, 1);
 	}}
 
-#define game_start
+ #define game_start
     Player.portalTimer = 3290;
 	if (global.Gamemode == 2) 	Player.bossKilled = false
 
@@ -1206,7 +1208,7 @@
 	global.MenuIndex = -1;
 	//global.Gamemode  = 0;
 
-#define teleporter_draw
+ #define teleporter_draw
 	draw_self()
 	if item_get_count("siphon") > 0
 	{
@@ -1228,7 +1230,7 @@
 		if !instance_exists(Spiral) && instance_exists(Player) && global.teleporter = true && point_in_circle(Player.x, Player.y, _tele.x - 4, _tele.y, _tele.radius)
 		{
 			global.chargeF++
-			if global.chargeF >= round(room_speed - (global.BossesLeft > 0 ? 0 : 45)) // 22
+			if global.chargeF >= round(room_speed - (global.BossesLeft > 0 ? 0 : 22))
 			{
 				global.chargeF = 0;
 				global.charge++; //CHANGE HOW FAST THE TELEPORTER CHARGES-----------DEFAULT 1
@@ -1251,39 +1253,37 @@
 
 				switch GameCont.area
 				{
-					case 106: global.areaChoice = 7;
+					case   1:case 101: global.areaChoice = 2;
 										break;
-					case 105: global.areaChoice = 6;
+					case   2:case 102: global.areaChoice = 3;
 										break;
-					case 104: global.areaChoice = 5;
+					case   3:case 103: global.areaChoice = 4;
 										break;
-					case 103: global.areaChoice = 4;
+				    case   4:case 104: global.areaChoice = 5;
 										break;
-					case 102: global.areaChoice = 3;
+				    case   5:case 105: global.areaChoice = 6;
 										break;
-				    case 101: global.areaChoice = 2;
-										break;
-					case   1: global.areaChoice = 2;
-										break;
-					case   2: global.areaChoice = 3;
-										break;
-					case   3: global.areaChoice = 4;
-										break;
-				    case   4: global.areaChoice = 5;
-										break;
-				    case   5: global.areaChoice = 6;
-										break;
-				    case   6: global.areaChoice = 7;
+				    case   6:case 106: global.areaChoice = 7;
 										break;
 					case   7: global.areaChoice = 1;
+										break;
+					default : global.areaChoice = GameCont.area + 1;
 										break;
 
 				}
 				// determine if next area is a secret one
-				if irandom(14) = 0 && GameCont.area != 0 && GameCont.area != 6 && GameCont.area != 7{global.areaChoice += 100}
+				if irandom(14) == 0 && GameCont.area != 0 && GameCont.area != 6 && GameCont.area != 7{global.areaChoice += 100}
 
-				with instance_create(_tele.x, _tele.y, Portal){if _tele.portal = "vault" {GameCont.area = 100; type = 2}else{type = 1}}
-				GameCont.subarea = 3;
+				if GameCont.area == 100{
+					global.areaChoice = GameCont.lastarea;
+				}
+				with instance_create(_tele.x, _tele.y, Portal){if _tele.portal = "vault" {global.areaChoice = 100; type = 2}else{type = 1}}
+				if(GameCont.area != < 100){
+					GameCont.area = global.areaChoice - 1;
+				}else{
+					GameCont.area = global.areaChoice;
+				}
+				if(is_real(GameCont.area) && GameCont.area < 100 && GameCont.area > 0){GameCont.subarea = 3;}
 			  global.charge = 0;
 			  global.teleporter = false;
 			}
@@ -1918,12 +1918,13 @@ with (Guardian) if "Reflect" in self && Reflect > 0 {
 			{
 				if(button_pressed(index, "pick")) && global.teleporter == false //What to do when the activate teleporter
 				{
+					sleep(200)
 					_tele.currad = _tele.addframes;
 					sound_play(sndLevelUltra)
-					with instances_matching(CustomObject, "name", "shrine"){
+					with instances_matching(instances_matching(CustomObject, "name", "shrine"),"is_shrine",true){
 						deathtimer = distance_to_object(other) / 15;
 					}
-	        global.teleporter = true;
+	        		global.teleporter = true;
 					var i = 0
 					do
 					{
@@ -2310,8 +2311,8 @@ with (Guardian) if "Reflect" in self && Reflect > 0 {
 		var _strdifficulty = "";
 		switch global.Gamemode
 		{
-			case 0: _strdifficulty = "NORMAL";		break;
-			case 1: _strdifficulty = "HARD"; 			break;
+			case 0: _strdifficulty = "NORMAL";	  break;
+			case 1: _strdifficulty = "HARD"; 	  break;
 			case 2: _strdifficulty = "BOSS RUSH"; break;
 		}
 		draw_set_halign(fa_right)
