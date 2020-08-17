@@ -437,7 +437,7 @@
   item_hard_times = {
     name              : "Hard Times",
   	description_small : "@sEverything is more @wdangerous",
-  	description_large : `@sIncreased @wBoss @rHealth @sby @w10%@(color:${c_stack})(+10% per stack)@s,#@wdifficulty @sincreases @w50%@(color:${c_stack})(+50% per stack) @wfaster@s,#@yElite @wenemies @sappear more Often@s,#@wEnemies @gact @w15%@(color:${c_stack})(+15% per stack) @wfaster#@sand @w10%@(color:${c_stack})(+10% per stack) @smore @wenemies @sspawn`,
+  	description_large : `@sIncreased @wBoss @rHealth @sby @w10%@(color:${c_stack})(+10% per stack)@s,#@wdifficulty @sincreases @w25%@(color:${c_stack})(+25% per stack) @wfaster@s,#@yElite @wenemies @sappear more Often@s,#@wEnemies @gact @w15%@(color:${c_stack})(+15% per stack) @wfaster#@sand @w10%@(color:${c_stack})(+10% per stack) @smore @wenemies @sspawn`,
     description_width : 48,
   	spr_index         : 38,
   	tier              : 4
