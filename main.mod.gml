@@ -79,7 +79,7 @@
 	global.DarkCircle = false;
 	global.respawn = 0;
 	global.MenuIndex	 = -1; // -1 = no menu, 0 = modes, 1 = info, 2 = options
-	global.Gamemode  	 = 0;  // 0 = normal mode, 1 = hardmode
+	global.Gamemode  	 = 0;  // 0 = normal mode, 1 = hardmode, = boss rush
 	global.MenuXoffset = 3;
 
 	global.preformanceMode = false; // Turn on to avoid lag (recommended)
@@ -102,6 +102,9 @@
 	global.sprTeleporterIdle   = sprite_add("sprites/teleporter/sprTeleporterIdle.png"  , 1, 24, 20);
 	global.sprTeleporterSiphon = sprite_add("sprites/teleporter/sprTeleporterSiphon.png", 2, 24, 20);
 	global.mskTeleporter       = sprite_add("sprites/teleporter/mskTeleporter.png"      , 1, 24, 20);
+	global.sprTeleporterBRIdle = sprite_add("sprites/teleporter/sprTeleporterBRIdle.png", 1, 24, 20);
+	global.sprTeleporterBRIdle = sprite_add("sprites/teleporter/sprTeleporterBRIdle.png", 1,  6, 20);
+	global.mskTeleporterBRIdle = sprite_add("sprites/teleporter/mskTeleporterBRIdle.png", 1,  8, 20);
 
 	global.sprButtons  		  = sprite_add("sprites/other/sprButtons.png", 3, 12, 12);
 	global.sprButtonsSplat  = sprite_add("sprites/other/sprButtonsSplat.png", 1, 14, 14);
@@ -413,9 +416,6 @@
 			 y = FloorChoice.y
 		 }
 
-	/*with instances_matching(CustomObject, "name", "shrine") if distance_to_object(Wall) <= 20 {
-			instance_delete(self)
-		 }*/
 	with instances_matching(CustomObject, "name", "shrine") instance_delete(self) //For now, no shrines in Boss Rush
 
 
@@ -477,13 +477,23 @@
 				addframes = room_speed * 2;
 				currad    = 0;
 				radius    = 0;
-				maxradius = 85 * (1 + (item_get_count("focus") > 0 ? .1 : 0) + (item_get_count("siphon") > 0 ? .1 : 0) + (item_get_count("magnet") > 0 ? .1 : 0));
-
-				spr_idle   = global.sprTeleporterIdle
-				spr_hurt   = global.sprTeleporterIdle
-				spr_dead   = global.sprTeleporterIdle
-				spr_shadow = mskNone
-				mask_index   = global.mskTeleporter
+				switch global.Gamemode{
+					 case 2: maxradius = 40 * (1 + (item_get_count("focus") > 0 ? .1 : 0) + (item_get_count("siphon") > 0 ? .1 : 0) + (item_get_count("magnet") > 0 ? .1 : 0));
+							 spr_idle   = global.sprTeleporterBRIdle;
+							 spr_hurt   = global.sprTeleporterBRIdle;
+							 spr_dead   = global.sprTeleporterBRIdle;
+							 mask_index = global.mskTeleporterBR;
+							 spr_shadow = mskNone;
+							 break;
+					default: maxradius = 85 * (1 + (item_get_count("focus") > 0 ? .1 : 0) + (item_get_count("siphon") > 0 ? .1 : 0) + (item_get_count("magnet") > 0 ? .1 : 0));
+							 spr_idle   = global.sprTeleporterIdle;
+							 spr_hurt   = global.sprTeleporterIdle;
+							 spr_dead   = global.sprTeleporterIdle;
+							 mask_index = global.mskTeleporter;
+							 spr_shadow = mskNone;
+							 break;
+				}
+				
 				image_speed  = .5
 				maxhealth    = 999999999999999999999999 // yeah
 				my_health    = maxhealth
@@ -716,7 +726,7 @@
 	 {
 		 with (FrogEgg) if "FrogNerf" not in self {
 			 maxhealth *= 0.5
-			 myhealth *= 0.5
+			 my_health *= 0.5
 			 FrogNerf = true
 		 }
 		 _boss = instances_matching(enemy, "tag", "boss")
@@ -935,7 +945,7 @@
 	for(i = 0; i < 5; i++){
 				var _speed_hardmode = global.Gamemode = 1 ? 1 : 0,
 				    _speed_times    = .15 * item_get_count("times"),
-					_speed_boss     = "boss_buff" in self ? .2 : 0,
+					_speed_boss     = 0,//"boss_buff" in self ? .2 : 0,
 					_speed_other    = (instance_is(self, FrogQueen) || instance_is(self, OasisBoss)) ? -.6 : 0,
 					_speed_cryo     = ("freezeTime" in self && freezeTime > 0) ? 0 : 1,
 					_speed_invis    = (mod_variable_get("mod", "items", "InvisibleTimer") > 0 && instance_exists(Player)) ? 0 : 1,
@@ -1906,12 +1916,13 @@ with (Guardian) if "Reflect" in self && Reflect > 0 {
 			{
 				if(button_pressed(index, "pick")) && global.teleporter == false //What to do when the activate teleporter
 				{
+					sleep(200)
 					_tele.currad = _tele.addframes;
 					sound_play(sndLevelUltra)
 					with instances_matching(CustomObject, "name", "shrine"){
 						deathtimer = distance_to_object(other) / 15;
 					}
-	        global.teleporter = true;
+	        		global.teleporter = true;
 					var i = 0
 					do
 					{

@@ -251,8 +251,8 @@
   item_cryo_rounds = {
     name              : "Cryo Rounds",
   	description_small : "@wEnemies @sget @bstunned @supon taking @wdamage",
-  	description_large : `@sYour @yprojectiles @sapply the @bfrozen @(color:${c_debuff})debuff @sfor @w1@(color:${c_stack})(+1 per stack) @wsecond#@swith a @w7% chance#@bfrozen @wenemies @scannot @gact @sor @wmove`,
-    description_width : 67,
+  	description_large : `@sYour @yprojectiles @sapply the @bfrozen @(color:${c_debuff})debuff @sfor @w1.5@(color:${c_stack})(+.5 per stack) @wseconds#@swith a @w7% chance#@bfrozen @wenemies @scannot @gact @sor @wmove`,
+    description_width : 71,
   	spr_index         : 21,
   	tier              : 1
 

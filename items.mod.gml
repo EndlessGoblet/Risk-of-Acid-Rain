@@ -77,7 +77,7 @@
 	global.popoChance = 0;
 
 	global.CommonItems   = [item[? "info"]      , item[? "tweezers"], item[? "gumdrop"] , item[? "bandages"], item[? "fruit"]    , item[? "golden"] , item[? "rubber"]  , item[? "focus"]     , item[? "mush"]   , item[? "grease"] , item[? "boots"]   , item[? "chopper"] , item[? "locket"]   , item[? "metal"]  , item[? "mask"], item[? "dagger"]]
-	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"], item[? "fern"], item[? "accolade"], item[? "magnet"]] //To-Do: Horror In a Bottle
+	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"], item[? "fern"], item[? "accolade"]] //To-Do: Horror In a Bottle
 	global.RareItems     = [item[? "artifact"]  , item[? "slosher"] , item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"] , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]]
 	global.CursedItems   = [item[? "brooch"]    , item[? "heater"]  , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]		  , item[? "edge"]] // Todo: None
 	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "flask"]  , item[? "fragment"]]
@@ -111,9 +111,9 @@
 		wait 1;
 	}
 
-#macro item 					 mod_variable_get("mod", "itemlib", "ItemDirectory");
+#macro item 		   mod_variable_get("mod", "itemlib", "ItemDirectory");
 #macro preformanceMode mod_variable_get("mod", "main", "preformanceMode");
-#macro hpBars					 mod_variable_get("mod", "main", "hpBars");
+#macro hpBars		   mod_variable_get("mod", "main", "hpBars");
 #macro bossBars        mod_variable_get("mod", "main", "bossBars");
 #macro doubleChests    mod_variable_get("mod", "main", "doubleChests");
 #macro doubleShrines   mod_variable_get("mod", "main", "doubleShrines");
@@ -216,17 +216,18 @@
 			_curse_amount = (GameCont.area = 104 ? 1 : 0),
 	          _floorq = ds_list_create(), // put all available floor tiles into a list
 		             _i = 0,
-		  _curse_chance = 0;
+		  
+	_curse_chance = 5;
 
 	if crown_current > 1
 	{
-		_curse_chance = 14;
+		_curse_chance = 20;
 		if crown_current = 11
 		{
-			_curse_chance = 40;
+			_curse_chance = 80;
 		}
 	}
-	if irandom(99) < _curse_chance{_curse_amount++}
+	if roll(_curse_chance){_curse_amount++}
 
 	switch GameCont.area // area specific extra chests
 	{
@@ -253,7 +254,7 @@
 	if GameCont.area != 100 repeat(_chest_amount + _prize_amount)
 	
 	{
-		if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
+		if !is_undefined(_floorq[| 0]) if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
 		{
 			with other
 			{
@@ -627,6 +628,11 @@
 
 	//Melting Balancing
 	if instance_exists(Player) && Player.race = ("melting") {
+	extra_health -= (GameCont.level - 1) * 2
+	}
+	
+	//Skeleton Balancing
+	if instance_exists(Player) && Player.race = ("skeleton") {
 	extra_health -= (GameCont.level - 1)
 	}
 
@@ -800,7 +806,7 @@
 
 	//Cryo Rounds
 	var amount = item_get_power("cryo")
-	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self && roll_luck(6) = true {instance_nearest(x, y, enemy).freezeTime = room_speed * (2 + amount)}}}
+	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self && roll_luck(6) = true {instance_nearest(x, y, enemy).freezeTime = room_speed * (1 + .5 * amount)}}}
 
 	with instances_matching_ge(enemy, "freezeTime", 1)
 	{
@@ -854,10 +860,14 @@
 
 	//Incendiary Rounds
 	var amount = item_get_power("incendiary")
-	if amount >= 1{with instances_matching(projectile, "team", 2){if place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self
+	with instances_matching(projectile, "team", 2)
 	{
-		instance_nearest(x, y, enemy).OnFire = (7 + amount * 3) * (GameCont.area = 101 ? 0 : 1)
-	}}}
+		var _a = ((instance_is(self, Flame) || instance_is(self, FlameShell) || instance_is(self, FlameBall)) ? choose(0, 0, 0, 0, 1) : 0) + amount
+		if _a > 0  && place_meeting(x + hspeed, y + vspeed, enemy) && "noproc" not in self
+		{
+			instance_nearest(x, y, enemy).OnFire = (7 + _a * 3) * (GameCont.area = 101 ? 0 : 1)
+		}
+	}
 
 	with instances_matching_ge(enemy, "OnFire", 1)
 	{

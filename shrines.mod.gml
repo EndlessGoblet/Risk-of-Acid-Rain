@@ -9,6 +9,8 @@
 	global.sprItems = sprite_add("sprites/items/sprItems.png", 101, 17, 17);
 
 	global.mskShrineGuns = sprite_add("sprites/other/mskShrineGuns.png", 1, 21, 16);
+	
+	global.sprPrinter = sprite_add("sprites/shrines/sprPrinter.png", 1, 15, 12);
 
 	global.sprShrineHatred = sprThroneStatue //sprite_add("sprites/shrines/sprShrineHatred.png", 1, 16, 50);
 
@@ -29,6 +31,8 @@
 	var _s = instance_create(X, Y, CustomObject);
 	with _s
 	{
+		sprite_shadow = shd16;
+		shadow_y = 7;
 		mask_index = sprThroneStatue;
 		name   = "shrine";
 		near   = false;
@@ -38,6 +42,7 @@
 		canuse  = false; // whether or not the player has the currency for this shrine
 		uses = 1; // how many shrine uses are left before destruction
 		pause = room_speed * 1; // time buffer between successful uses
+		is_shrine = true;// whether or not this interactable is a shrine for the 'on_shrine' effects
 		deathtimer = -1;
 
 		var _i = 0;
@@ -81,45 +86,48 @@
 	switch index
 	{
 		// Shrine of Death
-		case   2: case "death":  	on_interact  = death_interact;
-													  	sprite_index = sprThroneStatue;
-															sprite_broke = sprThroneStatueDead;
-														iconNum = 10;
-													  	cost    = 0;
-													  	costval = 50 * GameCont.level;
-
-															subname 			= "DEATH"
-															uses 					= 4;
-															originaltimer = (room_speed * 7 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") * 2 : 0));
-															timer 				= 0;
-															has_purchased = true
-															break;
+		case   2: case "death": on_interact  = death_interact;
+		
+								sprite_index  = sprThroneStatue;
+								sprite_broke  = sprThroneStatueDead;
+									
+								iconNum = 10;
+								cost    = 0;
+								costval = 50 * GameCont.level;
+								subname = "DEATH"
+								uses 	= 4;
+								originaltimer = (room_speed * 7 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") * 2 : 0));
+								timer 	= 0;
+								has_purchased = true
+								break;
 		// Shrine of Guns
-		case   5: case "guns":    on_interact  = guns_interact;
-															sprite_index = sprThroneStatue;
-															sprite_broke = sprThroneStatueDead;
-															iconNum = 9;
-															cost    = 0;
-															costval = 40 * GameCont.level;
-
-															mask_index = global.mskShrineGuns
-															subname 	 = "GUNS"
-															upgrade[0] = -4;
-															upgrade[1] = -4;
-															upgrade[2] = -4;
-															has_purchased = false;
-															uses = 1 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") + 1 : 0);
-															break;
+		case   5: case "guns":  on_interact  = guns_interact;
+		
+								sprite_index = sprThroneStatue;
+								sprite_broke = sprThroneStatueDead;
+								mask_index = global.mskShrineGuns;
+								
+								conNum  = 9;
+								cost    = 0;
+								costval = 40 * GameCont.level;
+								subname = "GUNS"
+								upgrade[0] = -4;
+								upgrade[1] = -4;
+								upgrade[2] = -4;
+								has_purchased = false;
+								uses = 1 + round(item_get_power("paragon") > 0 ? item_get_power("paragon") + 1 : 0);
+								break;
 		// Shrine of Hatred
-		case   6: case "hatred":  on_interact  = hatred_interact;
-														  sprite_index = global.sprShrineHatred;
-															sprite_broke = sprThroneStatueDead;
-															iconNum = 14;
-														  cost    = 3;
-														  costval = 1;
-
-															subname = "HATRED"
-														  break;
+		case   6: case "hatred": on_interact  = hatred_interact;
+		
+								sprite_index = global.sprShrineHatred;
+								sprite_broke = sprThroneStatueDead;
+								
+								iconNum = 14;
+								cost    = 3;
+								costval = 1;
+								subname = "HATRED"
+								break;
 		// Shrine of Destiny
 		case   8:	case "destiny": on_interact  = destiny_interact;
 															sprite_index = sprThroneStatue;
@@ -163,56 +171,65 @@
 															break;
 		// Shrine of Protection
 		case 13: case "protection": on_interact  = protection_interact;
-																sprite_index = sprThroneStatue;
-																sprite_broke = sprThroneStatueDead;
-																iconNum = 4;
-																cost    = 0;
-																costval = 30 * GameCont.level;
+		
+									sprite_index = sprThroneStatue;
+									sprite_broke = sprThroneStatueDead;
+									
+									iconNum = 4;
+									cost    = 0;
+									costval = 30 * GameCont.level;
 
-																subname 		= "PROTECTION"
-																maxradius   = 79 + irandom(6);
-																radius      = 0;
-																shrinkspeed = .14;
-																maxinv      = room_speed * 5  * current_time_scale;
-																addframes   = 12;
-																currad      = 0;
-
-																break;
+									subname 		= "PROTECTION"
+									maxradius   = 79 + irandom(6);
+									radius      = 0;
+									shrinkspeed = .14;
+									maxinv      = room_speed * 5  * current_time_scale;
+									addframes   = 12;
+									currad      = 0;
+									break;
 		// Printer
-		case 14: case "printer":  on_interact  = printer_interact;
-													    sprite_index = sprThroneStatue;
-															sprite_broke = sprThroneStatueDead;
-															iconNum = 6;
-													    cost    = -1;
-													    costval = 1;
-
-															pool = CommonItems;
-															if !irandom(  		 4) pool = UncommonItems;
-															if !irandom( 			34) pool = RareItems;
-															if !irandom(99999999) pool = UniqueItems;
-															item_index = pool[round(random_range(0, array_length_1d(pool) - 1))]
-															subname = item_index.name + " PRINTER"
-													    break;
+		case 14: case "printer": on_interact  = printer_interact;
+		
+								sprite_index  = global.sprPrinter;
+								sprite_broke  = global.sprPrinter;
+								sprite_shadow = shd48;
+								shadow_y      = -5;
+								
+								iconNum =  6;
+								cost    = -1;
+								costval =  1;
+								is_shrine = false;
+								
+								pool = CommonItems;
+								if !irandom(  	   4) pool = UncommonItems;
+								if !irandom( 	  34) pool = RareItems;
+								if !irandom(99999999) pool = UniqueItems;
+								item_index = pool[round(random_range(0, array_length_1d(pool) - 1))]
+								subname = "PRINT"
+								 break;
 		// Portal ultra energizer
 		case 15: case "energizer": on_interact  = energizer_interact;
-															 sprite_index = sprThroneStatue;
-															 sprite_broke = sprThroneStatueDead;
-															 iconNum = 7;
-															 cost    =  0;
-															 costval = 20 * GameCont.level;
+		
+								   sprite_index = sprThroneStatue;
+								   sprite_broke = sprThroneStatueDead;
+								   
+								   iconNum = 7;
+								   cost    = 0;
+								   costval = 20 * GameCont.level;
+								   is_shrine = false;
 
-															 subname = "VAULT KEY"
-															 break;
+								   subname = "VAULT KEY"
+								   break;
 		// Challenger
 		case 16: case "challenger": on_interact  = challenger_interact;
-																sprite_index = sprThroneStatue;
-																sprite_broke = sprThroneStatueDead;
-																iconNum = 3;
-																cost    =  4;
-																costval =  0;
+									sprite_index = sprThroneStatue;
+									sprite_broke = sprThroneStatueDead;
+									iconNum = 3;
+									cost    = 4;
+									costval = 0;
 
-																subname = "BOSS CHALLENGE"
-																break;
+									subname = "BOSS CHALLENGE"
+									break;
 	}
 	mask_index = mskBanditBoss;
 
@@ -275,7 +292,7 @@
 
 			// Small Accolade
 			var _amount = item_get_power("accolade") > 0 ? item_get_power("accolade") * 2 : 0;
-			if _amount > 0
+			if _amount > 0 && is_shrine = true
 			{
 				var _hp = roll(_amount);
 				Player.my_health += _hp;
@@ -497,7 +514,7 @@
 		if index = "printer" || index = 14
 		{
 			draw_set_alpha(.7)
-			draw_sprite(global.sprItems, item_index.spr_index, x + sprite_get_width(global.sprItems)/2, y -32)
+			draw_sprite(global.sprItems, item_index.spr_index, x + sprite_get_width(global.sprItems)/2 - 8, y - 8)
 			draw_set_alpha(1)
 		}
 		if near = true
@@ -505,10 +522,10 @@
 			var _splat = mskNone;
 			switch cost
 			{
-				case 0: _splat = global.sprRadSplat 	; break;
+				case 0: _splat = global.sprRadSplat   ; break;
 				case 1: _splat = global.sprHealthSplat; break;
 				case 2: _splat = global.sprMaxHPSplat ; break;
-				case 3: _splat = global.sprCoinSplat	; break;
+				case 3: _splat = global.sprCoinSplat  ; break;
 			}
 			if pause <= 0
 			{
@@ -575,11 +592,13 @@
 				}
 			}
 		} else {
-		d3d_set_fog(true, c_black, 0, 0);
-		draw_sprite(global.shrineIcons, iconNum, x+7, y-20)
-		draw_sprite(global.shrineIcons, iconNum, x+6, y-19)
-		d3d_set_fog(false, c_white, 0, 0);
-		draw_sprite(global.shrineIcons, iconNum, x+6, y-20)
+		if index != "printer" && index != 14{
+			d3d_set_fog(true, c_black, 0, 0);
+			draw_sprite(global.shrineIcons, iconNum, x+7, y-20)
+			draw_sprite(global.shrineIcons, iconNum, x+6, y-19)
+			d3d_set_fog(false, c_white, 0, 0);
+			draw_sprite(global.shrineIcons, iconNum, x+6, y-20)
+			}
 		}
 		if index = crwn_protection
 		{
@@ -631,7 +650,7 @@
 	{
 		if uses > 0
 		{
-			draw_sprite(shd16, 1, x, y + 7)
+			draw_sprite(sprite_shadow, 1, x, y + shadow_y)
 		}
 	}
 	with instances_matching(CustomProjectile, "name", "dropitem")
