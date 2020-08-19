@@ -65,7 +65,7 @@
   item_mechanical_lens = {
     name              : "Mechanical Lens",
   	description_small : "@yprojectiles @sare @wslower @sand @phome", // meters = pixel / 4
-  	description_large : `@sDecreases @wprojectile speed @sby @w50%#@wBullets @phome @sinto @wenemies @s up to @w4@(color:${c_stack})(+1 per stack) @smeters away`,
+  	description_large : `@sDecreases @yprojectile @wspeed @sby @w50%#@wBullets @phome @sinto @wenemies @s up to @w4@(color:${c_stack})(+1 per stack) @smeters away`,
     description_width : 60,
     spr_index         : 4,
   	tier              : 1
@@ -415,8 +415,8 @@
   item_lucky_coin = {
     name              : "Lucky Coin",
   	description_small : "@gLuck @sis on your side",
-  	description_large : `@sGain @w1@(color:${c_stack})(+1 per stack) @gluck`,
-    description_width : 25,
+  	description_large : `@sGain @w1@(color:${c_stack})(+1 per stack) @gluck#@wreroll @sfailed rolls by the amount of @gluck @syou have`,
+    description_width : 50,
   	spr_index         : 36,
   	tier              : 1
 
@@ -448,7 +448,7 @@
   item_metal_plating = {
     name              : "Metal Plating",
   	description_small : "@s+@w2 @yarmor @swhen leaving @pportals",
-  	description_large : `@sGain @w2@(color:${c_stack})(+2 per stack) @yarmor @swhen leaving @pportals`,
+  	description_large : `@sGain @w2@(color:${c_stack})(+1 per stack) @yarmor @swhen leaving @pportals`,
     description_width : 47,
   	spr_index         : 39,
   	tier              : 0
@@ -655,7 +655,7 @@
     name              : "RADI GUMDROP",
   	description_small : "@sChance for @grads @sto turn into @gchunks",
   	description_large : `@gRads @shave a @w1%@(color:${c_stack})(+1% per stack) @wchance @sto turn into @grad chunks`,
-    description_width : 61,
+    description_width : 60,
   	spr_index         : 59,
   	tier              : 0
 
@@ -795,9 +795,9 @@
 #macro item_medical_tweezers item[? "tweezers"] // ITEM 73: MEDICAL TWEEZERS
   item_medical_tweezers = {
     name              : "MEDICAL TWEEZERS",
-    description_small : "@gHeal @swhen leaving @pportals",
-    description_large : `@gHeal @w1@(color:${c_stack})(+.5 per stack) @swhen leaving @pportals`,
-    description_width : 42,
+    description_small : "@wMedkits @gheal @smore",
+    description_large : `@gHeal @w2 @swhen leaving @pportals#@wMedkits @gheal @w1@(color:${c_stack})(+1 per stack) @smore`,
+    description_width : 33,
     spr_index         : 73,
     tier              : 0
   };
@@ -832,12 +832,12 @@ item_hazmat_gear = {
 	tier              : 2
 };
 
-#macro item_heal_thingy item[? "heal"] // ITEM 77: HEAL THINGY (I'm not gonna bother being clever tbh)
-item_heal_thingy = {
-	name              : "HEAL THINGY",
-	description_small : "@s+@w1 @rHP@s from all @rhealing@s",
-	description_large : "-",
-	description_width : 1,
+#macro item_protoplasm_bottle item[? "bottle"] // ITEM 77: PROTOPLASM BOTTLE
+item_protoplasm_bottle = {
+	name              : "PROTOPLASM BOTTLE",
+	description_small : "@s+@w1 @sto all @ghealing",
+	description_large : `@sall @ghealing heals @w1@(color:${c_stack})(+1 per stack) @smore`,
+	description_width : 38,
 	spr_index         : 77,
 	tier              : 1
 };
