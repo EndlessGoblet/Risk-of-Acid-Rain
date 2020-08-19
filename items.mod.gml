@@ -8,7 +8,8 @@
 	global.coinGet = 0;
 	global.forceSave = 0;
 	global.cheats = false;
-	global.step = -4;
+	global.beginstep = -4;
+	global.endstep = -4;
 
 	global.sprBigInfo      = false;
 
@@ -1616,10 +1617,10 @@
 	if instance_exists(Player) Player.prevHealth = Player.my_health
 
 	if !instance_exists(global.beginstep){
-		global.step = script_bind_begin_step(custom_begin_step, 0);
+		global.beginstep = script_bind_begin_step(custom_begin_step, 0);
 	}
 	if !instance_exists(global.endstep){
-		global.step = script_bind_end_step(custom_end_step, 0);
+		global.endstep = script_bind_end_step(custom_end_step, 0);
 	}
 	
  #define custom_begin_step
