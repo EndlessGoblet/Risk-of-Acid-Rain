@@ -450,7 +450,7 @@
 	global.areaChoice    = 0;
 
 	//Spawn invincible anti-portal maggot
-	if (GameCont.area != 100) with instance_create(Player.x-1000, Player.y-1000, Maggot) {
+	if (GameCont.area != 100 && GameCont.area != 107) with instance_create(Player.x-1000, Player.y-1000, Maggot) {
 	    visible = false;
 	    image_xscale = 0;
 	    image_yscale = 0;
@@ -480,7 +480,7 @@
 		with Player
 		{
 			// Teleporter
-			if GameCont.area != 100 && global.Gamemode != 2 with instance_create(instance_furthest(x, y, Floor).x - sprite_xoffset + sprite_width / 2, instance_furthest(x, y, Floor).y - sprite_yoffset + sprite_height / 2, CustomProp)
+			if GameCont.area != 100 && GameCont.area != 107 && global.Gamemode != 2 with instance_create(instance_furthest(x, y, Floor).x - sprite_xoffset + sprite_width / 2, instance_furthest(x, y, Floor).y - sprite_yoffset + sprite_height / 2, CustomProp)
 			{
 				name      = "Teleporter"
 				teledone  = false
@@ -923,7 +923,7 @@
 		if (GameCont.area == 7) && (GameCont.subarea = 1) BossRushModifier = 0
 	}
 	//if irandom(instance_number(enemy) + (BossRushModifier * 20) + room_speed * (1 - (crown_current = 7 ? .25 : 0))) = 0 && !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
-	if !instance_exists(Portal) && GameCont.area != 100 && !instance_exists(SpiralCont) enemySpawn()
+	if !instance_exists(Portal) && GameCont.area != 100 && GameCont.area != 107 && !instance_exists(SpiralCont) enemySpawn()
 
 	//Crown Vault Fix
 	if instance_exists(CrownPed) global.crownVault = true;
@@ -1132,7 +1132,7 @@
 		enemySpawn();
 	}*/
 
-	with(FloorMaker) if GameCont.area != 0 && GameCont.area != 2 && GameCont.area != 4 && GameCont.area != 6 && GameCont.area != 100//Make areas larger
+	with(FloorMaker) if GameCont.area != 0 && GameCont.area != 2 && GameCont.area != 4 && GameCont.area != 6 && GameCont.area != 100 && GameCont.area != 107//Make areas larger
 	{
 		goal = 160
 	  if (GameCont.area == 3) goal = 110

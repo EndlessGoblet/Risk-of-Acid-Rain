@@ -252,7 +252,7 @@
 	}
 	ds_list_shuffle(_floorq)
 
-	if GameCont.area != 100 repeat(_chest_amount + _prize_amount)
+	if GameCont.area != 100 && GameCont.area != 107 repeat(_chest_amount + _prize_amount)
 	
 	{
 		if(ds_list_size(_floorq) > 0){
@@ -289,7 +289,7 @@
 		}
 	}
 
-	if GameCont.area != 100 && _curse_amount > 0 // guaranteed cursed chest spawn in caves + extra cursed chest from crowns
+	if GameCont.area != 100 && GameCont.area != 107 && _curse_amount > 0 // guaranteed cursed chest spawn in caves + extra cursed chest from crowns
 	{
 		repeat(_curse_amount)
 		{
@@ -317,10 +317,10 @@
 	with BecomeScrapBoss instance_delete(self)
 
 	var floors        = instances_matching(Floor, mod_current, undefined),
-		_printer_amount = choose(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3) * (1 + mod_variable_get("mod", "main", "doubleShrines")) * (GameCont.area = 100)
+		_printer_amount = choose(1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 3, 3) * (1 + mod_variable_get("mod", "main", "doubleShrines")) * (GameCont.area = 100 || GameCont.area = 107) 
 		  _other_amount = choose(2, 2, 2, 3, 3) * (1 + mod_variable_get("mod", "main", "doubleShrines"))
 
-	if GameCont.area != 100 for(i = 0; i < _printer_amount; i++)
+	if GameCont.area != 100 && GameCont.area != 107 for(i = 0; i < _printer_amount; i++)
 	{
 		var my_floor = floors[irandom(array_length(floors) - 1)];
 	  with obj_create(my_floor.x, my_floor.y, "shrine")
@@ -330,7 +330,7 @@
 		}
 	}
 
-	if GameCont.area != 100 for(i = 0; i < _other_amount; i++)
+	if GameCont.area != 100 && GameCont.area != 107 for(i = 0; i < _other_amount; i++)
 	{
 		var my_floor = floors[irandom(array_length(floors) - 1)];
 		with obj_create(my_floor.x, my_floor.y, "shrine")
@@ -593,7 +593,7 @@
 
 
 	//Cheats--------------------------------------------------------------------------------------------------------------------------------------------------------
-	with (Player)
+	/*with (Player)
 	{
 		if(button_pressed(index, "horn"))
 		{
@@ -616,7 +616,7 @@
 		{
 		add_item(item[? "bottle"], 1)
 		}
-	}
+	}*/
 
 	//Timer
 	global.frame += current_time_scale; if (global.frame == 60) global.frame = 0;
