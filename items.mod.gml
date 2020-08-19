@@ -1610,11 +1610,11 @@
 	}
 	
  #define custom_begin_step
-	//Heal Thingy 1/2
-	var amount = item_get_count("heal");
+	//Protoplasm Bottle 1/2
+	var amount = item_get_count("bottle");
 	if amount >= 1 {
 		with(Player){
-			HealThingyOldHP = my_health;
+			ProtoplasmOldHP = my_health;
 		}
 	}
 
@@ -1806,14 +1806,20 @@
 			}
 		}
 	}
-	//Heal Thingy 2/2
-	var amount = item_get_count("heal");
+	//Protoplasm Bottle 2/2
+	var amount = item_get_count("bottle");
 	if amount >= 1 {
 		with(Player){
-			if(HealThingyOldHP < my_health){
+			if("ProtoplasmOldHP" in self && ProtoplasmOldHP < my_health){
 				my_health += amount;
 				my_health = min(my_health, maxhealth);
-				HealThingyOldHP = my_health;
+				ProtoplasmOldHP = my_health;
+			}
+		}
+		with(PopupText){
+			if("Protoplasm" not in self && string_count(" HP", mytext) == 1 && string_count("+", mytext) == 1){
+				mytext = "+" + string(real(string_split(string_split(mytext, "+")[1], " HP")[0]) + amount) + " HP";
+				Protoplasm = true;
 			}
 		}
 	}
