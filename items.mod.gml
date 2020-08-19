@@ -1824,10 +1824,16 @@
 	var amount = item_get_count("heal");
 	if amount >= 1 {
 		with(Player){
-			if(HealThingyOldHP < my_health){
+			if("HealThingyOldHP" in self && HealThingyOldHP < my_health){
 				my_health += amount;
 				my_health = min(my_health, maxhealth);
 				HealThingyOldHP = my_health;
+			}
+		}
+		with(PopupText){
+			if("HealThingy" not in self && string_count(" HP", mytext) == 1 && string_count("+", mytext) == 1){
+				mytext = "+" + string(real(string_split(string_split(mytext, "+")[1], " HP")[0]) + amount) + " HP";
+				HealThingy = true;
 			}
 		}
 	}
