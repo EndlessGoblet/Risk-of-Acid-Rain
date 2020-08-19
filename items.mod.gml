@@ -614,7 +614,7 @@
 		}
 		if(button_pressed(index, "key1"))
 		{
-		add_item(item[? "tweezers"], 1)
+		add_item(item[? "bottle"], 1)
 		}
 	}
 
