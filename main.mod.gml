@@ -41,32 +41,46 @@
 	global.CircleSurf = -1;
 
 	//spawn arrays  average of 7 seconds of charging = 210 credits to spend
-	global.spwDesert     = [Bandit, Bandit, Bandit, Scorpion, Scorpion, BigMaggot, Maggot, Maggot]
-	global.cosDesert     = [    40,     40,     40,       70,       70,       100,     20,     20]
-	global.spwSewers     = [Rat, Rat, Rat, Ratking, Gator, Gator, BuffGator, Bandit, Bandit]
-	global.cosSewers     = [ 70,  70,  70,     180,    90,    90,       150,     30,     30]
-	global.spwScrapyard  = [Bandit, Bandit, Raven, Raven, MeleeBandit, Sniper, Salamander]
-	global.cosScrapyard  = [		40,     40,    70,    70,          80,     60,        120]
-	global.spwCaves      = [LaserCrystal, LaserCrystal, LaserCrystal, LightningCrystal, Spider, Spider, Spider, Gator]
-	global.cosCaves      = [				 125, 				 125,          125, 						 200,     85,     85,     85,    90]
-	global.spwIce        = [Bandit, SnowTank, SnowBot, SnowBot, Wolf]
-	global.cosIce        = [ 		45, 		 160, 		 70, 			70,   90]
-	global.spwLabs       = [Freak, Freak, Turret, ExploFreak, Necromancer, RhinoFreak]
-	global.cosLabs       = [	 35, 		35, 	 100, 				80, 				150, 				180]
-	global.spwPalace     = [DogGuardian, Guardian, Guardian, Guardian, Guardian, ExploGuardian, ExploGuardian]
-	global.cosPalace     = [				240, 			100, 			100, 			100, 			100, 					 120, 					120]
+	global.spwDesert    	 = [Bandit, Bandit, Bandit, Scorpion, Scorpion, BigMaggot, Maggot, Maggot]
+	global.cosDesert    	 = [    40,     40,     40,       70,       70,       100,     20,     20]
+	global.spwDesertLoop	 = [Bandit, Bandit, Bandit, Scorpion, Scorpion, BigMaggot, Maggot, Maggot, JungleFly]
+	global.cosDesertLoop	 = [    40,     40,     40,       70,       70,       100,     20,     20,       120]
+	global.spwSewers         = [Rat, Rat, Rat, Ratking, Gator, Gator, BuffGator, Bandit, Bandit]
+	global.cosSewers         = [ 70,  70,  70,     180,    90,    90,       150,     30,     30]
+	global.spwSewersLoop     = [Rat, Rat, Rat, Ratking, Gator, Gator, BuffGator, Bandit, Bandit, FireBaller, LaserCrystal]
+	global.cosSewersLoop     = [ 70,  70,  70,     180,    90,    90,       150,     30,     30,         90,          125]
+	global.spwScrapyard      = [Bandit, Bandit, Raven, Raven, MeleeBandit, Sniper, Salamander]
+	global.cosScrapyard      = [	40,     40,    70,    70,          80,     60,        120]
+	global.spwScrapyardLoop  = [Bandit, Bandit, Raven, Raven, MeleeBandit, Sniper, Salamander, SnowBot, Gator]
+	global.cosScrapyardLoop  = [	40,     40,    70,    70,          80,     60,        120,      70     90]
+	global.spwCaves     	 = [LaserCrystal, LaserCrystal, LaserCrystal, LightningCrystal, Spider, Spider, Spider, Gator]
+	global.cosCaves     	 = [		 125, 		   125,          125, 			   200,     85,     85,     85,    90]
+	global.spwCavesLoop      = [LaserCrystal, LaserCrystal, LaserCrystal, LightningCrystal, Spider, Spider, Spider, Gator, RhinoFreak, ExploFreak]
+	global.cosCavesLoop      = [		 125, 		   125,          125, 			   200,     85,     85,     85,    90,        180,         80]
+	global.spwIce       	 = [Bandit, SnowTank, SnowBot, SnowBot, Wolf]
+	global.cosIce       	 = [    45, 	 160, 	   70, 		70,   90]
+	global.spwIceLoop        = [Bandit, SnowTank, SnowBot, SnowBot, Wolf, Necromancer, ExploGuardian, DogGuardian]
+	global.cosIceLoop        = [    45, 	 160, 	   70, 		70,   90           80,           120,         240]
+	global.spwLabs      	 = [Freak, Freak, Turret, ExploFreak, Necromancer, RhinoFreak]
+	global.cosLabs      	 = [   35, 	  35, 	 100, 		  80, 		  150, 		  180]
+	global.spwLabsLoop       = [Freak, Freak, Turret, ExploFreak, Necromancer, RhinoFreak, LaserCrystal, Ratking]
+	global.cosLabsLoop       = [   35, 	  35, 	 100, 		  80, 		  150, 		  180           125,     180]
+	global.spwPalace    	 = [DogGuardian, Guardian, Guardian, Guardian, Guardian, ExploGuardian, ExploGuardian]
+	global.cosPalace    	 = [		240, 	  100, 		100, 	  100, 		100, 		   120, 		  120]
+	global.spwPalaceLoop     = [DogGuardian, Guardian, Guardian, Guardian, Guardian, ExploGuardian, ExploGuardian, JungleBandit, ExploFreak, Sniper]
+	global.cosPalaceLoop     = [		240, 	  100, 		100, 	  100, 		100, 		   120, 		  120,           60,         80,     60]
 	global.spwPizza      = [Turtle, Rat]
-	global.cosPizza      = [		70,  70]
+	global.cosPizza      = [	70,  70]
 	global.spwOasis      = [BoneFish, BoneFish, BoneFish, BoneFish, BoneFish, Bandit, Bandit, Bandit, Bandit, Bandit, Crab]
 	global.cosOasis      = [			65, 			65, 			65, 			65, 			65, 		40, 		40, 		40, 		40, 		40,  150]
 	global.spwMansion    = [FireBaller, SuperFireBaller, Jock, Molefish, Molesarge]
-	global.cosMansion    = [				90, 						160, 	115, 			 60, 				70]
+	global.cosMansion    = [		90, 			160,  115, 		 60, 	    70]
 	global.spwCursed     = [InvLaserCrystal, InvSpider]
 	global.cosCursed     = [						125,        85]
 	global.spwEverything = [Bandit, Scorpion, BigMaggot, Maggot, Rat, Ratking, Gator, BuffGator, Raven, MeleeBandit, Sniper, Salamander, LaserCrystal, LightningCrystal, Spider, Bandit, SnowTank, SnowBot, Wolf, Turret, Freak, ExploFreak, Necromancer, RhinoFreak, ExploGuardian, Guardian, DogGuardian, Turtle, BoneFish, Crab, FireBaller, SuperFireBaller, Jock, Molefish, Molesarge, InvLaserCrystal, InvSpider]
 	global.cosEverything = [		37, 		  79, 			103, 		 17,  63, 		171, 		95, 			143, 		63, 				 77, 		 53, 				111, 					119, 							187, 		 81, 		 37, 			151, 			63,   85, 		67, 	 31, 				 81, 				 147, 			 171, 					127, 			 93, 				 235, 		63, 			61,  149, 				81, 			  	  157,  109, 			 53, 				65, 						121, 				83]
 	global.spwJungle     = [JungleAssassinHide, JungleBandit, JungleFly]
-	global.cosJungle     = [								80, 					60, 			120]
+	global.cosJungle     = [				80, 		  60, 		120]
 	global.spwNight      = [Bandit, Bandit]
 	global.cosNight      = [		55, 		55]
 
@@ -77,7 +91,6 @@
 	global.AreaStart = true;
 	global.BarLength = 0;
 	global.DarkCircle = false;
-	global.respawn = 0;
 	global.MenuIndex	 = -1; // -1 = no menu, 0 = modes, 1 = info, 2 = options
 	global.Gamemode  	 = 0;  // 0 = normal mode, 1 = hardmode, = boss rush
 	global.MenuXoffset = 3;
@@ -436,7 +449,6 @@
 	global.subareaChoice = 0;
 	global.areaChoice    = 0;
 
-	global.respawn = irandom_range(6, 12) * (crown_current = 7 ? 2 : 1) // double enemies with cob
 	//Spawn invincible anti-portal maggot
 	if (GameCont.area != 100) with instance_create(Player.x-1000, Player.y-1000, Maggot) {
 	    visible = false;
@@ -529,20 +541,57 @@
 				_cost  = -4;
 		switch GameCont.area
 		{
-			case   1: _place = global.spwDesert;
-								_cost  = global.cosDesert;    break;
-			case   2: _place = global.spwSewers;
-								_cost  = global.cosSewers;    break;
-			case   3: _place = global.spwScrapyard;
-								_cost  = global.cosScrapyard; break;
-			case   4: _place = global.spwCaves;
-								_cost  = global.cosCaves;     break;
-			case   5: _place = global.spwIce;
-								_cost  = global.cosIce;    	  break;
-			case   6: _place = global.spwLabs;
-								_cost  = global.cosLabs;      break;
-			case   7: _place = global.spwPalace;
-								_cost  = global.cosPalace;    break;
+			case   1: if GameCont.loops > 0{
+						_place = global.spwDesertLoop;
+						_cost  = global.cosDesertLoop;
+					}else{
+						_place = global.spwDesert;
+						_cost  = global.cosDesert;    
+					}		
+					break;
+			case   2: if GameCont.loops > 0{
+						_place = global.spwSewersLoop;
+						_cost  = global.cosSewersLoop;
+					}else{
+						_place = global.spwSewers;
+						_cost  = global.cosSewers;    
+					}		
+					break;
+			case   3: if GameCont.loops > 0{
+						_place = global.spwScrapyardLoop;
+						_cost  = global.cosScrapyardLoop;
+					}else{
+						_place = global.spwScrapyard;
+						_cost  = global.cosScrapyard;    
+					}
+			case   4: if GameCont.loops > 0{
+						_place = global.spwCavesLoop;
+						_cost  = global.cosCavesLoop;
+					}else{
+						_place = global.spwCaves;
+						_cost  = global.cosCaves;    
+					}
+			case   5: if GameCont.loops > 0{
+						_place = global.spwIceLoop;
+						_cost  = global.cosIceLoop;
+					}else{
+						_place = global.spwIce;
+						_cost  = global.cosIce;    
+					}
+			case   6: if GameCont.loops > 0{
+						_place = global.spwLabsLoop;
+						_cost  = global.cosLabsLoop;
+					}else{
+						_place = global.spwLabs;
+						_cost  = global.cosLabs;    
+					}
+			case   7: if GameCont.loops > 0{
+						_place = global.spwPalaceLoop;
+						_cost  = global.cosPalaceLoop;
+					}else{
+						_place = global.spwPalace;
+						_cost  = global.cosPalace;    
+					}
 			case   0: _place = global.spwNight;
 								_cost  = global.cosNight;     break;
 			case 100: _place = global.spwPalace;
@@ -629,7 +678,7 @@
 		     enemyChoice = _place[_n],
 				 enemyCost   = _cost[_n];
 
-			global.spawnCredits += current_time_scale * (.8 + global.difficulty / 100 - (global.BossesLeft > 0 ? 1 : 0) * .35 + item_get_power("times") * .05);
+			global.spawnCredits += current_time_scale * (.8 + global.difficulty / 100 - (global.BossesLeft > 0 ? 1 : 0) * .35 + item_get_power("times") * .05) * (crown_current = 7 ? 1.35 : 1);
 
 			global.wavetimer -= current_time_scale
 			if global.wavetimer <= 0{
@@ -668,9 +717,7 @@
 	if button_check(0, "key6") { trace_color("AREA: 6 (Labs)", c_blue); GameCont.area = 6; }
 	if button_check(0, "key7") { trace_color("AREA: 7 (Palace)", c_lime); GameCont.area = 7; } */
 
-	if instance_exists(Player) with instances_matching_ne(Corpse, "team", Player.team){
-		team = Player.team
-	}
+	with FrogQueen if "boss_buff" not in self{instance_delete(self)} // fuck mom
 
 	//More ammo to balance for more enemies
 	with instances_matching_le(enemy, "my_health", 0) {

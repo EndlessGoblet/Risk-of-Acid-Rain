@@ -1819,6 +1819,7 @@
 		with(PopupText){
 			if("Protoplasm" not in self && string_count(" HP", mytext) == 1 && string_count("+", mytext) == 1){
 				mytext = "+" + string(real(string_split(string_split(mytext, "+")[1], " HP")[0]) + amount) + " HP";
+				if Player.my_health = Player.maxhealth mytext = "MAX HP"
 				Protoplasm = true;
 			}
 		}
