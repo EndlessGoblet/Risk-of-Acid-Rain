@@ -341,6 +341,8 @@
 
  #define step
 
+	if (instance_exists(Player) && "prevHealth" not in Player) Player.prevHealth = Player.my_health
+
 	global.ItemDict = {};
 	for (var i = 0, iLen = array_length_1d(global.PlayerItems); i < iLen; i++) {
 		if("count" in global.PlayerItems[i]){
@@ -390,7 +392,7 @@
 	}
 
 	//Check if hurt this floor--------
-	with (Player) if nexthurt == current_frame + 5 && global.hurtFloor = false
+	with (Player) if my_health < prevHealth && global.hurtFloor = false
 	{
 		global.hurtFloor = true;
 		if (item_get_count("prize") > 0) with instance_create(Player.x, Player.y, PopupText)
@@ -1454,7 +1456,7 @@
 		extra_accuracy += amount * .6
 		extra_health   += ceil(amount * 2)
 
-		with (Player) if nexthurt == current_frame + 5
+		with (Player) if my_health < prevHealth
 		{
 		  with instance_create(x+random_range(-8,8),y+random_range(-8,8),WepSwap)
 			{
@@ -1571,14 +1573,6 @@
 	if amount >= 1 {
 		extra_health += amount * 6;
 	}
-	
-	//Heal Thingy 1/2
-	var amount = item_get_count("heal");
-	if amount >= 1 {
-		with(Player){
-			HealThingyOldHP = my_health;
-		}
-	}
 
 	// Focus
 	var amount = item_get_power("focus")
@@ -1619,13 +1613,25 @@
 
 	with instances_matching(EnemyBullet2, "roar_check_projectile", true){if speed <= friction + 1 instance_destroy()}
 
-	//if instance_exists(Player) Player.lsthealth = Player.my_health
+	if instance_exists(Player) Player.prevHealth = Player.my_health
 
-	if !instance_exists(global.step){
-		global.step = script_bind_step(custom_step, 0);
+	if !instance_exists(global.beginstep){
+		global.step = script_bind_begin_step(custom_begin_step, 0);
+	}
+	if !instance_exists(global.endstep){
+		global.step = script_bind_end_step(custom_end_step, 0);
+	}
+	
+ #define custom_begin_step
+	//Heal Thingy 1/2
+	var amount = item_get_count("heal");
+	if amount >= 1 {
+		with(Player){
+			HealThingyOldHP = my_health;
+		}
 	}
 
- #define custom_step
+ #define custom_end_step
 	// On create effects go here
 	with instances_matching_ne(enemy, "roar_check_create", true)
 	{
@@ -1820,6 +1826,7 @@
 			if(HealThingyOldHP < my_health){
 				my_health += amount;
 				my_health = min(my_health, maxhealth);
+				HealThingyOldHP = my_health;
 			}
 		}
 	}
