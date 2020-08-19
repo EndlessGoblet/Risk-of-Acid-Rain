@@ -79,7 +79,7 @@
 
 	global.CommonItems   = [item[? "info"]      , item[? "tweezers"], item[? "gumdrop"] , item[? "bandages"], item[? "fruit"]    , item[? "golden"] , item[? "rubber"]  , item[? "focus"]     , item[? "mush"]   , item[? "grease"] , item[? "boots"]   , item[? "chopper"] , item[? "locket"]   , item[? "metal"]  , item[? "mask"], item[? "dagger"]]
 	global.UncommonItems = [item[? "incendiary"], item[? "lens"]    , item[? "bulb"]    , item[? "lust"]    , item[? "nitrogen"] , item[? "binky"]  , item[? "cryo"]    , item[? "gift"]      , item[? "siphon"] , item[? "plate"]  , item[? "firewood"], item[? "coin"]    , item[? "celesteel"], item[? "canteen"], item[? "paragon"], item[? "shield"], item[? "fern"], item[? "accolade"]] //To-Do: Horror In a Bottle
-	global.RareItems     = [item[? "artifact"]  , item[? "slosher"] , item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"] , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]]
+	global.RareItems     = [item[? "artifact"]  , item[? "slosher"] , item[? "fungus"]  , item[? "wing"]    , item[? "tools"]    , item[? "prize"]  , item[? "blessing"], item[? "extractor"] , item[? "missile"], item[? "heart"]  , item[? "fillings"], item[? "flower"]  , item[? "bottle"]]
 	global.CursedItems   = [item[? "brooch"]    , item[? "heater"]  , item[? "gem"]     , item[? "exhaust"] , item[? "clay"]     , item[? "CD"]		  , item[? "edge"]] // Todo: None
 	global.UniqueItems   = [item[? "energy"]    , item[? "times"]   , item[? "injury"]  , item[? "currency"], item[? "Fcurrency"], item[? "flask"]  , item[? "fragment"]]
 	global.PlayerItems 	 = [item[? "none"]]
@@ -173,11 +173,11 @@
 	var amount = item_get_power("tweezers")
   if amount >= 1
 	{
-		Player.my_health += roll(.5 + .5 * amount)
+		Player.my_health += 2
 	}
 
 	var amount = item_get_power("metal")
-	if amount >= 1{Player.armor += 2 * amount}
+	if amount >= 1{Player.armor += 1 + amount}
 
 	var amount = item_get_count("brooch")
 	if amount >= 1{reorder()}
@@ -428,7 +428,15 @@
 		Player.shakeText += (room_speed / 10)
 		}
 	}
+	
+	// Medical tweezers
+	with HPPickup if "tweezer_buff" not in self{
+		tweezer_buff = true;
+		num += item_get_count("tweezers")
+	}
+	
 	// Eyes Custom Pickup Attraction: (big yokin thanks)
+	
 	 with(instances_matching(Player, "race", "eyes"))
 	 {
 		 if(canspec && button_check(index, "spec"))
@@ -567,32 +575,14 @@
 		 if (place_meeting(x, y, Player) || place_meeting(x, y, PortalShock) || (instance_exists(BigPortal)) && tag != "item")
 		 {
 
-				if button_pressed(Player.index, "pick") && mod_variable_get("mod", "main", "coins") <= 0
-				{
-					sound_play(sndCursedReminder)
-					with instance_create(Player.x, Player.y, PopupText)
-					{
-						text = "@wNot enough"
-						time = 10;
-					}
-				}
-				if (tag != "cursed") || button_pressed(Player.index, "pick") && mod_variable_get("mod", "main", "coins") >= 1
-				{
-					if (tag == "cursed")
-					{
-						mod_variable_set("mod", "main", "coins", mod_variable_get("mod", "main", "coins") - 1)
-						Player.cursedFlash = (3 -(room_speed / 30)) * 5
-					}
+			script_execute(on_open)
 
-					script_execute(on_open)
+			// fx
+			instance_create(x, y, FXChestOpen);
+			if tag = "coin"{repeat(5)	with instance_create(x, y, Smoke){motion_add(random(360), random_range(2, 3))}}
+			with instance_create(x, y, ChestOpen) sprite_index = other.spr_open;
 
-					// fx
-				  instance_create(x, y, FXChestOpen);
-				  if tag = "coin"{repeat(5)	with instance_create(x, y, Smoke){motion_add(random(360), random_range(2, 3))}}
-				  with instance_create(x, y, ChestOpen) sprite_index = other.spr_open;
-
-				 instance_delete(id);
-			 }
+			instance_delete(id);
 		}
 	}
 
@@ -624,11 +614,7 @@
 		}
 		if(button_pressed(index, "key1"))
 		{
-		with obj_create(mouse_x, mouse_y, "item"){
-				item_index = item[? "edge"]
-				tag = "item"
-				chest_setup(tag)
-			}
+		add_item(item[? "tweezers"], 1)
 		}
 	}
 
@@ -647,7 +633,7 @@
 
 	//Melting Balancing
 	if instance_exists(Player) && Player.race = ("melting") {
-	extra_health -= (GameCont.level - 1) * 2
+	extra_health -= (GameCont.level - 1)
 	}
 	
 	//Skeleton Balancing
@@ -2070,19 +2056,19 @@
 	}
 
 	//near cursed chests text
-	with instances_matching(chestprop, "name", "ItemChest")
+	/*with instances_matching(chestprop, "name", "ItemChest")
 	{
 		if (tag == "cursed") && place_meeting(x, y, Player) {
 			draw_x = 0; draw_y = 20;
 			draw_set_alpha(0.65);
 			draw_rectangle_colour(x+8, y-11 + draw_y, x-9, y-2 + draw_y, c_black, c_black, c_black, c_black, 0)
 			draw_set_alpha(1)
-			draw_text_nt(x, y - 35 + draw_y, "@1(keysmall:pick)")
-			draw_text_nt(x , y - 10 + draw_y, " 1")
+			draw_sprite(sprEPickup, 0, x, y - 7)
+			draw_text_nt(x, y - 32, "OPEN")
 			draw_sprite(global.sprText2, 1, x, y - 2 + draw_y)
 		}
 
-	}
+	}*/
 	//HEALTH BARS
 	if hpBars = true
 	{
@@ -2781,7 +2767,7 @@ draw_text_nt(cx+105,cy+39, `@sCLICK TO TOGGLE DESCRIPTIONS`)
 						if roll_luck(1) tag = "gold" else tag = "none" // 1% chance to turn regular chests into gold chests
 						if tag = "none" && roll_luck(4) tag = "large"  // 5% chance to turn into a large chest if gold chest roll failed
 						chest_setup(tag)
-						if (tag != "cursed") on_open = itemchest_open;
+						on_open = itemchest_open;
 					}
 					return _obj;
 		case "largeitemchest":

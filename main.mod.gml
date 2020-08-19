@@ -1516,21 +1516,21 @@
 				// Draw the gamemode menu
 		    if global.MenuIndex = 0
 				{
-					draw_x = 111 - global.MenuXoffset;
+					draw_x = 145 - global.MenuXoffset;
 					draw_y = 79
 					x_offset = 70 //space between each button
 					y_offset = 15
 	        draw_set_alpha(0.5)
 	        draw_sprite(global.sprModes, 0, draw_x + 1           , draw_y + y_offset + 1)
 	        draw_sprite(global.sprModes, 1, draw_x + 1 + x_offset, draw_y + y_offset + 1)
-			draw_sprite(global.sprModes, 2, draw_x + 1 + x_offset * 2, draw_y + y_offset + 1)
+			//draw_sprite(global.sprModes, 2, draw_x + 1 + x_offset * 2, draw_y + y_offset + 1)
 	        draw_set_alpha(1)
 	        draw_set_color(c_white)
 	        draw_rectangle(draw_x - 42 + global.Gamemode * x_offset, draw_y - 27 , draw_x + global.Gamemode * x_offset, draw_y + 15, 0)
 
 	        draw_sprite(global.sprModes, 0, draw_x           , draw_y + y_offset)
 	        draw_sprite(global.sprModes, 1, draw_x + x_offset, draw_y + y_offset)
-			draw_sprite(global.sprModes, 2, draw_x + x_offset * 2, draw_y + y_offset)
+			//draw_sprite(global.sprModes, 2, draw_x + x_offset * 2, draw_y + y_offset)
 	        draw_set_color(c_white); draw_set_alpha(0.2);
 					var _textx = 9,
 					    _texty = 169,
@@ -1563,7 +1563,7 @@
 	        }
 
 			draw_x += x_offset
-			  	if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -42, draw_y-27, draw_x+0, draw_y+10)
+			  	/*if point_in_rectangle(mouse_x[i]-view_xview[i], mouse_y[i]-view_yview[i],draw_x -42, draw_y-27, draw_x+0, draw_y+10)
 					{
 		        draw_backdrop(_textx, _texty - string_height(_strModeNormal) / 2, _textx + 298,  _texty + string_height(_strModeNormal), "Boss Rush")
 		        draw_text_nt(_textx + 3, _texty - string_height(_strModeNormal) * 4 / 3 - 2, _strModeBoss)
@@ -1573,7 +1573,7 @@
 			        sound_play_pitch(sndClick, 1)
 			        sound_play_pitch(sndSwapShotgun, 0.8)
 		        }
-	        }
+	        }*/
 					if global.MenuXoffset != 0 global.MenuXoffset = 0;
 	    }
 
