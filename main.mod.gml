@@ -1325,7 +1325,7 @@
 					global.areaChoice = GameCont.lastarea;
 				}
 				with instance_create(_tele.x, _tele.y, Portal){if _tele.portal = "vault" {global.areaChoice = 100; type = 2}else{type = 1}}
-				if(GameCont.area < 100){
+				if(global.areaChoice < 100){
 					GameCont.area = global.areaChoice - 1;
 				}else{
 					GameCont.area = global.areaChoice;
