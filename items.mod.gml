@@ -272,9 +272,9 @@
 
 	if _prize_amount > 0 // 1/2 of perfect prize's effect. repeat(0) executes the the code inside the repeat once
 	{
-		if is_undefined(_floorq[| 0]){exit}
 		repeat(_prize_amount)
 		{
+			if is_undefined(_floorq[| 0]){break;}
 			if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
 			{
 				with other
@@ -293,6 +293,7 @@
 	{
 		repeat(_curse_amount)
 		{
+			if is_undefined(_floorq[| 0]){break;}
 			if place_meeting(_floorq[| 0].x, _floorq[| 0].y, Wall)
 			{
 				with other
