@@ -717,8 +717,10 @@
 	if button_check(0, "key6") { trace_color("AREA: 6 (Labs)", c_blue); GameCont.area = 6; }
 	if button_check(0, "key7") { trace_color("AREA: 7 (Palace)", c_lime); GameCont.area = 7; } */
 
-	with FrogQueen if "boss_buff" not in self{instance_delete(self)} // fuck mom
-
+	with FrogQueen    if "boss_buff" not in self{instance_delete(self)} // fuck mom
+	with HyperCrystal if "boss_buff" not in self{instance_delete(self)}
+	with TechnoMancer if "boss_buff" not in self{instance_delete(self)}
+	
 	//More ammo to balance for more enemies
 	with instances_matching_le(enemy, "my_health", 0) {
 		chance = round(random_range(1, 8))
@@ -988,7 +990,7 @@
 					_speed_other    = (instance_is(self, FrogQueen) || instance_is(self, OasisBoss)) ? -.6 : 0,
 					_speed_cryo     = ("freezeTime" in self && freezeTime > 0) ? 0 : 1,
 					_speed_invis    = (mod_variable_get("mod", "items", "InvisibleTimer") > 0 && instance_exists(Player)) ? 0 : 1,
-					_speed_pause    = (_speed_cryo = 0 || _speed_invis = 0) ? 0 : 1;
+					_speed_pause    = (!instance_is(self, Van) && !instance_is(self, Nothing2))&&(_speed_cryo = 0 || _speed_invis = 0) ? 0 : 1;
 						
 				if(alarm_get(i) > 2){
 					alarm_set(i, alarm_get(i) - (_speed_hardmode + _speed_times + _speed_boss + _speed_other) * _speed_cryo * _speed_invis + (1 - _speed_pause) * 2);
@@ -2054,9 +2056,10 @@ with (Guardian) if "Reflect" in self && Reflect > 0 {
 						{
 							global.BossesLeft++
 							tag = "boss"
-							if instance_is(self, FrogQueen) ||instance_is(self, FrogQueen){
+							if instance_is(self, FrogQueen) || instance_is(self, Nothing2){
 								maxhealth *= .9
 							}else maxhealth *= 1.55
+							if instance_is(self, Nothing2){ y -= 200}
 							my_health = maxhealth
 							if instance_exists(Player) && distance_to_object(Player) <= 64
 							{

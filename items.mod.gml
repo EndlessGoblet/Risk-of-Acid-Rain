@@ -3030,8 +3030,6 @@ draw_text_nt(cx+105,cy+39, `@sCLICK TO TOGGLE DESCRIPTIONS`)
 	if projectile_canhit(other) && instance_is(other, enemy) with other
 	{
 		my_health -= other.damage;
-		x -= lengthdir_x(hspeed, direction)/2;
-		y -= lengthdir_y(vspeed, direction)/2;
 	}
 
 #define inv_hit
