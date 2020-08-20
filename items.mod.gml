@@ -816,7 +816,7 @@
 
 	with instances_matching_ge(enemy, "freezeTime", 1)
 	{
-		if "freezeTime" in self && object_index != BanditBoss && object_index != LaserCrystal && object_index != ScrapBoss && object_index != OasisBoss && object_index != Nothing && object_index != Nothing2 && object_index != HyperCrystal && object_index != FrogQueen && object_index != TechnoMancer && object_index != LilHunter
+		if "freezeTime" in self && object_index != BanditBoss && object_index != Nothing2 && object_index != DogGuardian && object_index != LaserCrystal && object_index != ScrapBoss && object_index != OasisBoss && object_index != Nothing && object_index != Nothing2 && object_index != HyperCrystal && object_index != FrogQueen && object_index != TechnoMancer && object_index != LilHunter
 		{
 			freezeTime--
 			if freezeTime > 0
