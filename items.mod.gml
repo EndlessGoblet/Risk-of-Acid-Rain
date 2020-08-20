@@ -816,7 +816,7 @@
 
 	with instances_matching_ge(enemy, "freezeTime", 1)
 	{
-		if "freezeTime" in self && object_index != BanditBoss && object_index != LaserCrystal && object_index != ScrapBoss && object_index != OasisBoss && object_index != Nothing && object_index != Nothing2 && object_index != HyperCrystal && object_index != FrogQueen && object_index != TechnoMancer && object_index != LilHunter
+		if "freezeTime" in self && object_index != BanditBoss && object_index != Nothing2 && object_index != DogGuardian && object_index != LaserCrystal && object_index != ScrapBoss && object_index != OasisBoss && object_index != Nothing && object_index != Nothing2 && object_index != HyperCrystal && object_index != FrogQueen && object_index != TechnoMancer && object_index != LilHunter
 		{
 			freezeTime--
 			if freezeTime > 0
@@ -3030,8 +3030,6 @@ draw_text_nt(cx+105,cy+39, `@sCLICK TO TOGGLE DESCRIPTIONS`)
 	if projectile_canhit(other) && instance_is(other, enemy) with other
 	{
 		my_health -= other.damage;
-		x -= lengthdir_x(hspeed, direction)/2;
-		y -= lengthdir_y(vspeed, direction)/2;
 	}
 
 #define inv_hit
