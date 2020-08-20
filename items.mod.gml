@@ -1054,7 +1054,7 @@
 			{
 				if roll_luck(8) = true && size > 0
 				{
-					for(var _i = 0, _amount = roll(amount + 1, _ang = random(360), _dang = 360/_amount; _i < _amount; _i++)
+					for(var _i = 0, _amount = roll(amount) + 1, _ang = random(360), _dang = 360/_amount; _i < _amount; _i++)
 					{
 						with obj_create(x, y, "chopper")
 						{
