@@ -806,7 +806,7 @@
   item_stone_dagger = {
     name              : "STONE DAGGER",
     description_small : "@sThe more @wenemies@s, the more @wdamage",
-    description_large : `@sIncrease @rdamage @sby @w1%@(color:${c_stack})(+.5% per stack) @sfor each @wenemy alive`,
+    description_large : `@sIncrease @rdamage @sby @w1%@(color:${c_stack})(+.5% per stack) @sfor each @wenemy alive@s,#@sCapped at @w25% increased damage@(color:${c_stack})(+25% per stack)`,
     description_width : 58,
     spr_index         : 74,
     tier              : 0

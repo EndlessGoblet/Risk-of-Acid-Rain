@@ -729,8 +729,8 @@
 
 	//Rebel Balancing
 	if instance_exists(Player) && Player.race = ("rebel") { //Rebel spends 20% health to spawn an ally on top of the regular -2 penalty
-		if (Player.my_health - 2 <= (Player.maxhealth / 5)) Player.canspec = false else Player.canspec = true
-		if button_pressed(Player.index, "spec") && (Player.my_health - 2 > (Player.maxhealth / 5)) Player.my_health = floor(Player.my_health - Player.maxhealth / 4)
+		if (Player.my_health - 2 < (Player.maxhealth / 5)) Player.canspec = false else Player.canspec = true
+		if button_pressed(Player.index, "spec") && (Player.my_health - 2 >= (Player.maxhealth / 5)) Player.my_health = floor(Player.my_health - Player.maxhealth / 4)
 	}
 
 

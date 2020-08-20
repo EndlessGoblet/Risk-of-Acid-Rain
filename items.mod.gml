@@ -1695,7 +1695,8 @@
 			var amount = item_get_power("dagger")
 			if amount >= 1
 			{
-        	var bonus = 1 + ( instance_number(enemy) )*(amount / 2) / 100 // +1% damage per enemy, with 50% increase per stack
+        	var bonus = 1.5 + ( instance_number(enemy) )*(amount / 2) / 100 // +1% damage per enemy, with 50% increase per stack
+			if (bonus >= (1 + .25*amount)) bonus = 1 + .25*amount //Capped at 25% damage increase, +25% cap per stack
 			damage *= bonus
 			}
 
