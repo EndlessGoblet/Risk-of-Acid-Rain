@@ -1539,7 +1539,7 @@
 				draw_text_nt(game_width / 2 - global.MenuXoffset, 50, "@sCursed update")
 				draw_set_font(fntM0)
 				draw_sprite(global.sprItems,39, game_width / 2 - global.MenuXoffset + 5, 83)
-				draw_text_nt(game_width / 2 - global.MenuXoffset, 80, "ADDED 20 ITEMS")
+				draw_text_nt(game_width / 2 - global.MenuXoffset, 80, "ADDED 19 ITEMS")
 
 				draw_sprite(global.sprItems,55, game_width / 2 - global.MenuXoffset + 5, 113)
 				draw_text_nt(game_width / 2 - global.MenuXoffset, 110, "ADDED CURSED ITEMS#AND COINS")
