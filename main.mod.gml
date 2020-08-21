@@ -52,7 +52,7 @@
 	global.spwScrapyard      = [Bandit, Bandit, Raven, Raven, MeleeBandit, Sniper, Salamander]
 	global.cosScrapyard      = [	40,     40,    70,    70,          80,     60,        120]
 	global.spwScrapyardLoop  = [Bandit, Bandit, Raven, Raven, MeleeBandit, Sniper, Salamander, SnowBot, Gator]
-	global.cosScrapyardLoop  = [	40,     40,    70,    70,          80,     60,        120,      70     90]
+	global.cosScrapyardLoop  = [	40,     40,    70,    70,          80,     60,        120,      70,     90]
 	global.spwCaves     	 = [LaserCrystal, LaserCrystal, LaserCrystal, LightningCrystal, Spider, Spider, Spider, Gator]
 	global.cosCaves     	 = [		 125, 		   125,          125, 			   200,     85,     85,     85,    90]
 	global.spwCavesLoop      = [LaserCrystal, LaserCrystal, LaserCrystal, LightningCrystal, Spider, Spider, Spider, Gator, RhinoFreak, ExploFreak]
@@ -60,11 +60,11 @@
 	global.spwIce       	 = [Bandit, SnowTank, SnowBot, SnowBot, Wolf]
 	global.cosIce       	 = [    45, 	 160, 	   70, 		70,   90]
 	global.spwIceLoop        = [Bandit, SnowTank, SnowBot, SnowBot, Wolf, Necromancer, ExploGuardian, DogGuardian]
-	global.cosIceLoop        = [    45, 	 160, 	   70, 		70,   90           80,           120,         240]
+	global.cosIceLoop        = [    45, 	 160, 	   70, 		70,   90,           80,           120,         240]
 	global.spwLabs      	 = [Freak, Freak, Turret, ExploFreak, Necromancer, RhinoFreak]
 	global.cosLabs      	 = [   35, 	  35, 	 100, 		  80, 		  150, 		  180]
 	global.spwLabsLoop       = [Freak, Freak, Turret, ExploFreak, Necromancer, RhinoFreak, LaserCrystal, Ratking]
-	global.cosLabsLoop       = [   35, 	  35, 	 100, 		  80, 		  150, 		  180           125,     180]
+	global.cosLabsLoop       = [   35, 	  35, 	 100, 		  80, 		  150, 		  180,           125,     180]
 	global.spwPalace    	 = [DogGuardian, Guardian, Guardian, Guardian, Guardian, ExploGuardian, ExploGuardian]
 	global.cosPalace    	 = [		240, 	  100, 		100, 	  100, 		100, 		   120, 		  120]
 	global.spwPalaceLoop     = [DogGuardian, Guardian, Guardian, Guardian, Guardian, ExploGuardian, ExploGuardian, JungleBandit, ExploFreak, Sniper]
@@ -729,8 +729,8 @@
 
 	//Rebel Balancing
 	if instance_exists(Player) && Player.race = ("rebel") { //Rebel spends 20% health to spawn an ally on top of the regular -2 penalty
-		if (Player.my_health - 2 < (Player.maxhealth / 5)) Player.canspec = false else Player.canspec = true
-		if button_pressed(Player.index, "spec") && (Player.my_health - 2 >= (Player.maxhealth / 5)) Player.my_health = floor(Player.my_health - Player.maxhealth / 4)
+		if (Player.my_health - 2 <= (Player.maxhealth / 5)) Player.canspec = false else Player.canspec = true
+		if button_pressed(Player.index, "spec") && (Player.my_health - 2 > (Player.maxhealth / 5)) Player.my_health = floor(Player.my_health - Player.maxhealth / 4)
 	}
 
 
@@ -1189,7 +1189,7 @@
 	//TIME SYSTEM END
 
 	//DIFFICULTY INCREASING TIMER
-	if !instance_exists(GenCont) && instance_exists(Player) global.time += (3 - speed) * 3 * (1 + item_get_count("times") * .5)
+	if !instance_exists(GenCont) && !instance_exists(SpiralCont) && instance_exists(Player) global.time += (3 - speed) * 3 * (1 + item_get_count("times") * .5)
 	if global.time >= global.timeControl && global.difficulty != 8 { //increases every 2 minutes	 //11520(?)
 	global.time = 0;
 	global.difficulty++ //difficulty increase

@@ -1060,8 +1060,9 @@
 						{
 							creator = Player;
 							team 		= creator.team;
-							pierce += ceil(amount);
+							pierce = 1;
 							motion_add(_ang + _dang * _i, 18);
+							damage *= ((amount * 1.2) - .2)
 						}
 					}
 				}

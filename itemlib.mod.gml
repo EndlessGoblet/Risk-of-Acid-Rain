@@ -361,7 +361,7 @@
   item_chopper = {
     name              : "Chopper",
   	description_small : "@wEnemies @sshoot out @ychoppers @son @wdeath",
-  	description_large : `@wEnemies @shave an @w8% chance@s to shoot out @w1@s to @w2@(color:${c_stack})(+1 per stack)#@wspinning @ychoppers@s on @wdeath@s,#@ychoppers @spierce through @w1@(color:${c_stack})(+1 per stack)@s enemies`,
+  	description_large : `@wEnemies @shave an @w8% chance@s to shoot out @w1@s to @w2@(color:${c_stack})(+1 per stack)#@wspinning @ychoppers@s on @wdeath@s,#@ychoppers @sdeal@w 100%@(color:${c_stack})(+20% per stack)@s damage`,
     description_width : 59,
   	spr_index         : 31,
   	tier              : 0
