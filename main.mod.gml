@@ -1323,7 +1323,7 @@
 				// determine if next area is a secret one
 				if irandom(14) == 0 && GameCont.area != 0 && GameCont.area != 6 && GameCont.area != 7{global.areaChoice += 100}
 
-				if GameCont.area == 100{
+				if GameCont.area == 100 || GameCont.area == 107 {
 					global.areaChoice = GameCont.lastarea;
 				}
 				with instance_create(_tele.x, _tele.y, Portal){if _tele.portal = "vault" {global.areaChoice = 100; type = 2}else{type = 1}}
